@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-work h-full min-h-screen flex flex-col;
+}
+
+@layer components {
+  .button {
+    @apply rounded-md py-2 px-4 hover:scale-105 transition duration-300 text-sm font-semibold;
+  }
+  .tv::after {
+    content: "";
+    @apply absolute top-full right-1/2 translate-x-1/2 h-16 w-24 bg-zinc-400/70;
+  }
+  .scroll-design::-webkit-scrollbar {
+    height: 8px;
+    @apply bg-zinc-200;
+  }
+  .scroll-design::-webkit-scrollbar-thumb {
+    height: 8px;
+    @apply bg-primary/80 rounded-full;
+  }
+  .swiper-pagination-bullet {
+    background-color: #ccc;
+  }
+  .swiper-pagination-bullet-active {
+    background-color: #1d4ed8;
+  }
+  .swiper {
+    touch-action: pan-y;
+  }
+  .label {
+    @apply block mb-4;
+  }
+  .label_text {
+    @apply text-[12px] font-semibold;
+  }
+  .label_note {
+    @apply text-[12px] text-zinc-600 leading-none;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  .animate-shimmer {
+    background: linear-gradient(-45deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  textarea.input {
+    @apply h-full min-h-max;
+  }
+  th {
+    @apply body-1 font-semibold text-start leading-tight py-3 border-x border-zinc-300 px-4;
+  }
+  td {
+    @apply px-2 py-3;
+  }
+  tr.source:hover ~ tr.dest {
+    @apply bg-zinc-300;
+  }
+}
