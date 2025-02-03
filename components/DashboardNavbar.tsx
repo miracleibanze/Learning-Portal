@@ -1,26 +1,18 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "@/redux/store"; // Make sure this path is correct
-import { FC, useEffect, useState } from "react";
-import { fetchUser } from "@redux/slices/userSlice"; // Assuming you have this action in your userSlice
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store"; // Make sure this path is correct
+import { FC, useState } from "react";
 import Image from "next/image";
-import { usePathname } from "@node_modules/next/navigation";
-import { OfficialLogo2, Umuravalogo } from "@public";
+import { usePathname } from "next/navigation";
+import { Umuravalogo } from "@public";
+import Link from "next/link";
 
 const DashboardNavbar: FC = () => {
   const pathname = usePathname();
 
-  const dispatch = useDispatch<AppDispatch>(); // Typing dispatch as AppDispatch
   const { user, status, error } = useSelector((state: RootState) => state.user); // Accessing user data
   const [isSearching, setIsSearching] = useState<boolean>(false);
-
-  // Fetch user data when the component mounts
-  useEffect(() => {
-    if (!user) {
-      dispatch(fetchUser("userId12345")); // Replace with actual user ID logic
-    }
-  }, [dispatch, user]);
 
   return (
     <>
@@ -46,7 +38,7 @@ const DashboardNavbar: FC = () => {
             ></i>
           )}
         </div>
-        <div className="flex w-full lg:max-w-lg max-w-md h-10 gap-2 ">
+        <div className="flex w-full lg:max-w-lg max-w-md h-8 gap-2 ">
           <div
             className="w-full md:max-w-md max-w-sm bg-zinc-100/60 rounded-md py-1.5 px-3 flex-1 min-h-full flex items-center max-sm:ml-auto"
             onClick={() => setIsSearching(true)}
@@ -60,7 +52,7 @@ const DashboardNavbar: FC = () => {
           </div>
 
           {isSearching && (
-            <button className="h-10 px-4 rounded-md bg-zinc-100">
+            <button className="h-8 px-4 rounded-md bg-zinc-100">
               <i
                 className={`fas fa-search bg-zinc-100 p-2 rounded-full flex-0 w-8`}
                 onClick={() => setIsSearching(false)}
@@ -73,12 +65,13 @@ const DashboardNavbar: FC = () => {
             isSearching && "max-sm:hidden"
           }`}
         >
-          {/* Notification Bell */}
-          <i
-            className={`far fa-bell bg-zinc-100 p-2 rounded-full flex-0 w-8`}
-          ></i>
+          <Link href="/dashboard/notification">
+            <span className=" bg-zinc-100 p-2 rounded-full flex-0 w-8 h-8">
+              <i className={`far fa-bell`}></i>
+            </span>
+          </Link>
 
-          <div className="w-max max-sm:hidden">
+          <Link href="/dashboard/profile" className="w-max max-sm:hidden">
             {user?.profile?.image ? (
               <Image
                 src={user.profile.image}
@@ -90,7 +83,7 @@ const DashboardNavbar: FC = () => {
             ) : (
               <i className="far fa-user bg-zinc-100 p-2 rounded-full flex-0 w-8"></i>
             )}
-          </div>
+          </Link>
         </div>
       </div>
       {isSearching && <div className="sm:hidden fixed bg-zinc-100"></div>}

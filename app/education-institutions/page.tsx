@@ -1,4 +1,4 @@
-import Heading from "@components/designs/Heading";
+import Heading from "@components/Heading";
 import {
   Ared,
   banner_img,

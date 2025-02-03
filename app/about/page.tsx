@@ -1,4 +1,4 @@
-import Heading from "@components/designs/Heading";
+import Heading from "@components/Heading";
 import { challengeRoute, imageUmurava } from "@public";
 import Image from "next/image";
 import { FC } from "react";

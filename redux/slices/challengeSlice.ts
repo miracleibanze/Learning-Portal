@@ -1,6 +1,6 @@
 import { challenges } from "@components/constants";
+import axiosInstance from "@components/features/axiosInstance";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
 interface Participants {
   name: string;
@@ -48,7 +48,7 @@ export const fetchChallenges = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       console.log("fetching challenges");
-      const response = await axios.get("/api/challenges");
+      const response = await axiosInstance.get("/api/challenges");
       return response.data || challenges;
     } catch (error: any) {
       console.log("fetching challenges failed");
@@ -62,7 +62,10 @@ export const createChallenge = createAsyncThunk(
   "challenge/createChallenge",
   async (challengeData: Challenge, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/challenges", challengeData);
+      const response = await axiosInstance.post(
+        "/api/challenges",
+        challengeData
+      );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -83,7 +86,7 @@ export const editChallenge = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `/api/challenges/${challengeId}`,
         updatedData
       );

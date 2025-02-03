@@ -1,20 +1,27 @@
 import React from "react";
 import Link from "@node_modules/next/link";
 import { FC, useState } from "react";
-import { User } from "@redux/slices/userSlice";
-import Heading from "./designs/Heading";
+import { setUser, setUserId, User } from "@redux/slices/userSlice";
+import Heading from "./Heading";
+import { jobTitles } from "./constants";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@redux/store";
+import { useRouter } from "@node_modules/next/navigation";
+import axiosInstance from "./features/axiosInstance";
 
 const Register: FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
   const [formData, setFormData] = useState<User>({
     names: "",
-    username: "",
     email: "",
     password: "",
+    title: "",
     phoneNumber: "",
     role: "",
   });
   const [isPasswordVissible, setIsPasswordVissible] = useState<boolean>(false);
-  const [stepToRegister, setStepToRegister] = useState<number>(3);
+  const [stepToRegister, setStepToRegister] = useState<number>(0);
   const handleVisibility = (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsPasswordVissible(e.target.checked);
   };
@@ -52,8 +59,18 @@ const Register: FC = () => {
       special: /[!@#$%^&*(),.?":{}|<>]/.test(value),
     });
   };
+  const handleRegister = async () => {
+    try {
+      const response = await axiosInstance.post("/api/register", formData);
+      const userData = response.data; // Assuming response contains full user data
 
-  const handleSubmit = () => {};
+      dispatch(setUser(userData)); // Store full user data in Redux
+
+      router.push("/dashboard");
+    } catch (error) {
+      console.error("Registration failed", error);
+    }
+  };
 
   return (
     <>
@@ -278,19 +295,19 @@ const Register: FC = () => {
             </select>
           </label>
           <label
-            htmlFor="username"
+            htmlFor="title"
             className="flex flex-col w-full mx-auto text-start mb-2"
           >
             <span className="text-sm text-zinc-600 translate-y-2 translate-x-2 bg-zinc-100 max-w-max pl-2 pr-4">
               Username
             </span>
-            <input
-              type="text"
-              className="input placeholder-[10px]"
-              id="username"
-              placeholder="Enter you username"
-              required
-            />
+            <select id="title" className="input">
+              {jobTitles?.map((item, index) => (
+                <option value={item} key={index}>
+                  {item}
+                </option>
+              ))}
+            </select>
           </label>
           <p className="slide-in text-sm text-gray-600 mb-6">
             By clicking <strong>Register</strong>, you confirm that you have
@@ -312,7 +329,7 @@ const Register: FC = () => {
           </p>
           <button
             className="button bg-primary text-white mx-auto px-12"
-            onClick={handleSubmit}
+            onClick={handleRegister}
           >
             Register
           </button>

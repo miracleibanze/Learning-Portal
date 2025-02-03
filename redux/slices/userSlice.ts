@@ -1,25 +1,55 @@
-import { myUser } from "@components/constants";
+import axiosInstance from "@components/features/axiosInstance";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
-
 // Define the type for the user
 export interface User {
   userId?: string;
   names: string;
-  username: string;
   email: string;
   password: string;
   phoneNumber: string;
   role: string;
+  title: string;
+  about?: string;
   profile?: {
     image: string;
     address?: string;
     interests?: string[];
+    age?: number;
+    country?: string;
+    educationLevel?: string;
+    skills?: string[];
+  };
+  experience?: {
+    position: string;
+    field: string;
+    company: string;
+    duration: {
+      start: string;
+      end: string;
+    };
+    description: string;
+  };
+
+  engagementStats?: {
+    pointsEarned?: number;
+    badges?: string[];
+    completedChallenges?: number;
+    feedbackReceived?: object[];
+  };
+
+  umuravaIntegration?: {
+    umuravaUserId?: string;
+    linkedAccounts?: {
+      github?: string;
+      linkedin?: string;
+    };
+  };
+
+  audit?: {
+    createdAt?: string;
+    updatedAt?: string;
   };
 }
-
-// Mock user data
-const mockUser: User = myUser;
 
 // Initial state
 interface UserState {
@@ -29,7 +59,10 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  user: null,
+  user:
+    typeof window !== "undefined"
+      ? JSON.parse(localStorage.getItem("user") || "null")
+      : null,
   status: "idle",
   error: null,
 };
@@ -39,21 +72,37 @@ export const fetchUser = createAsyncThunk(
   "user/fetchUser",
   async (userId: string) => {
     try {
-      const response = await axios.get(`/api/user/${userId}`);
+      const response = await axiosInstance.get(`/api/user/${userId}`);
       return response.data;
     } catch (error) {
-      // If the request fails, we will return a default mock user as fallback
       console.error("Failed to fetch user data:", error);
-      return mockUser; // Returning the mock user when there's an error
     }
   }
 );
 
-// Redux slice
 const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    setUserId: (state, action: PayloadAction<string>) => {
+      if (state.user) {
+        state.user.userId = action.payload;
+      } else {
+        state.user = { userId: action.payload } as User;
+      }
+      localStorage.setItem("userId", action.payload); // Store in localStorage
+    },
+    setUser: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+      localStorage.setItem("user", JSON.stringify(action.payload)); // Store full user data in localStorage
+      localStorage.setItem("userId", JSON.stringify(action.payload.userId)); // Store full user data in localStorage
+    },
+    clearUser: (state) => {
+      state.user = null;
+      localStorage.removeItem("userId");
+      localStorage.removeItem("user"); // Remove full user data from localStorage on logout
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUser.pending, (state) => {
@@ -65,11 +114,10 @@ const userSlice = createSlice({
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.status = "failed";
-        state.error = (action.error as Error).message; // Type casting here for better safety
-        // In case of rejection, we also set the mock user
-        state.user = mockUser;
+        state.error = (action.error as Error).message;
       });
   },
 });
 
+export const { setUserId, setUser, clearUser } = userSlice.actions;
 export default userSlice.reducer;

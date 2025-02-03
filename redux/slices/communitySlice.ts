@@ -1,5 +1,5 @@
+import axiosInstance from "@components/features/axiosInstance";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
 export interface Community {
   _id?: string;
@@ -7,7 +7,15 @@ export interface Community {
   description: string;
   category: string;
   visibility: string;
-  members?: number;
+  members: number;
+  listOfMembers?: [
+    {
+      names: string;
+      image: string;
+      title: string;
+      userId: string;
+    }
+  ];
   createdAt?: string;
 }
 
@@ -30,7 +38,7 @@ export const fetchCommunities = createAsyncThunk(
   "community/fetchCommunities",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get("/api/communities");
+      const response = await axiosInstance.get("/api/communities");
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -45,7 +53,10 @@ export const createCommunity = createAsyncThunk(
   "community/createCommunity",
   async (communityData: Community, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/communities", communityData);
+      const response = await axiosInstance.post(
+        "/api/communities",
+        communityData
+      );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -63,7 +74,10 @@ export const updateCommunity = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.put(`/api/communities/${id}`, updatedData);
+      const response = await axiosInstance.put(
+        `/api/communities/${id}`,
+        updatedData
+      );
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -78,7 +92,7 @@ export const deleteCommunity = createAsyncThunk(
   "community/deleteCommunity",
   async (id: string, { rejectWithValue }) => {
     try {
-      await axios.delete(`/api/communities/${id}`);
+      await axiosInstance.delete(`/api/communities/${id}`);
       return id;
     } catch (error: any) {
       return rejectWithValue(

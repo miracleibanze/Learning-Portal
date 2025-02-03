@@ -11,7 +11,7 @@ import {
 } from "@public";
 import { useState, FC } from "react";
 import Image from "next/image";
-import Heading from "@components/designs/Heading";
+import Heading from "@components/Heading";
 import ChallengeCard from "@components/challengeCard";
 import { challenges } from "@components/constants";
 
@@ -355,7 +355,7 @@ const Home: FC = () => {
               <h4 className="text-lg font-semibold mb-2">
                 Sign Up on Umurava Platform
               </h4>
-              <p className="text-zinc-600 body-2">
+              <p className="text-zinc-600 body-2 mb-4">
                 Submit your completed project for evaluation
               </p>
               <Image src={signup} alt="signup" className="w-1/2 float-end" />
@@ -367,7 +367,7 @@ const Home: FC = () => {
               <h4 className="text-lg font-semibold mb-2">
                 Register and Participate
               </h4>
-              <p className="text-zinc-600 body-2">
+              <p className="text-zinc-600 body-2 mb-4">
                 Sign up for the challenge and start working on the project.
               </p>
               <Image

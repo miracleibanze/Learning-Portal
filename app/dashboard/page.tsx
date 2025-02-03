@@ -1,16 +1,14 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import ChallengeCard, {
   ChallengeCardSkeleton,
 } from "@components/challengeCard";
-import { AppDispatch, RootState } from "@redux/store"; // Importing AppDispatch
-import { FC, useEffect } from "react";
-import { fetchChallenges } from "@redux/slices/challengeSlice";
-import { fetchAnalytics } from "@redux/slices/analyticsSlice";
+import { RootState } from "@redux/store"; // Importing AppDispatch
+import { FC } from "react";
+import Link from "@node_modules/next/link";
 
 const Page: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const { user, status, error } = useSelector((state: RootState) => state.user); // Accessing user, status, and error
 
   const { challenges, loadingChallenges } = useSelector(
@@ -19,11 +17,6 @@ const Page: FC = () => {
   const { analytics, loadingAnalytics } = useSelector(
     (state: RootState) => state.analytic
   );
-
-  useEffect(() => {
-    dispatch(fetchChallenges());
-    dispatch(fetchAnalytics());
-  }, [dispatch]);
 
   return (
     <section className="w-full p-3 bg-zinc-50 flex-1 h-full">
@@ -48,7 +41,7 @@ const Page: FC = () => {
             {analytics.map((data, index) => (
               <div
                 key={index}
-                className={`bg-white rounded-lg p-6 border-2 border-zinc-100 flex items-center max-w-md justify-start ${
+                className={`bg-white rounded-lg p-6 border-2 border-zinc-100 flex items-center max-md:max-w-md justify-start ${
                   index === 0 || index === 1 ? "lg:col-span-3" : "lg:col-span-2"
                 } ${index === 0 ? "md:col-span-2" : "md:col-span-1"} relative
             ${index % 2 === 1 && "w-full ml-auto"}`}
@@ -66,9 +59,11 @@ const Page: FC = () => {
                       {data.percentage}%
                     </span>
                   </div>
-                  <div className="text-xs absolute top-2 right-4">
-                    Last Week <i className="fas fa-angle-down"></i>
-                  </div>
+
+                  <select className="text-xs absolute top-2 right-4">
+                    <option value="last-week">Last Week</option>
+                    <option value="last-Month">Last Month</option>
+                  </select>
                 </div>
               </div>
             ))}
@@ -83,12 +78,15 @@ const Page: FC = () => {
           {Array(4)
             .fill("")
             .map((_, index) => (
-              <div className="bg-zinc-200 w-full h-20 rounded-md bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse animate-shimmer"></div>
+              <div
+                className="bg-zinc-200 w-full h-20 rounded-md bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse animate-shimmer"
+                key={index}
+              ></div>
             ))}
         </div>
       )}
 
-      <div className="flex flex-wrap items-center gap-3 justify-center mb-4">
+      <div className="flex flex-wrap items-center gap-3 mb-4">
         {!loadingChallenges ? (
           challenges.length > 0 ? (
             Array(3)
@@ -104,11 +102,13 @@ const Page: FC = () => {
         ) : (
           Array(3)
             .fill("")
-            .map((_, index) => <ChallengeCardSkeleton />)
+            .map((_, index) => <ChallengeCardSkeleton key={index} />)
         )}
       </div>
       <div className="w-full py-3 px-3 flex justify-end">
-        <button className="button bg-primary text-white">View more</button>
+        <Link href="/dashboard/challenges&hackathons">
+          <button className="button bg-primary text-white">View more</button>
+        </Link>
       </div>
     </section>
   );

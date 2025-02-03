@@ -2,7 +2,7 @@
 
 import { useState, FC } from "react";
 import { Community } from "@redux/slices/communitySlice"; // Assuming you have this type
-import Heading from "./designs/Heading";
+import Heading from "./Heading";
 
 interface CommunityFormProps {
   setIsCreateModalOpen: (data: boolean) => void;
@@ -26,6 +26,7 @@ const CommunityForm: FC<CommunityFormProps> = ({
     description: initialData?.description || "",
     category: initialData?.category || "tech",
     visibility: initialData?.visibility || "public",
+    members: initialData?.members || 0,
   };
 
   const [formData, setFormData] = useState<Community>(initialFormData);

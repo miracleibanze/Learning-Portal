@@ -1,5 +1,5 @@
+import axiosInstance from "@components/features/axiosInstance";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 
 export interface Analytic {
   title: string;
@@ -61,7 +61,7 @@ export const fetchAnalytics = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       console.log("fetching analytics");
-      const response = await axios.get("/api/analytics");
+      const response = await axiosInstance.get("/api/analytics");
       return response.data || analytics;
     } catch (error: any) {
       console.log("fetching analytics failed");
@@ -75,7 +75,7 @@ export const createAnalytic = createAsyncThunk(
   "analytic/createAnalytic",
   async (analyticData: Analytic, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/api/analytics", analyticData);
+      const response = await axiosInstance.post("/api/analytics", analyticData);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -96,7 +96,7 @@ export const editAnalytic = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `/api/analytics/${analyticId}`,
         updatedData
       );

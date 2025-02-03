@@ -11,6 +11,8 @@ import {
   deleteCommunity,
   updateCommunity,
 } from "@redux/slices/communitySlice";
+import Link from "@node_modules/next/link";
+import { useRouter } from "@node_modules/next/navigation";
 
 const Page: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -129,7 +131,89 @@ const Page: FC = () => {
           />
         ))}
       </table>
+      {isManageMembersModalOpen && communityToManageMembers && (
+        <ListOfMembers
+          community={communityToManageMembers}
+          setIsManageMembersModalOpen={setIsManageMembersModalOpen}
+        />
+      )}
     </div>
+  );
+};
+const ListOfMembers: FC<{
+  community: Community;
+  setIsManageMembersModalOpen: (data: boolean) => void;
+}> = ({ community, setIsManageMembersModalOpen }) => {
+  const user = useSelector((state: RootState) => state.user.user);
+  const router = useRouter();
+
+  return (
+    <section className="fixed z-[100] inset-0 bg-zinc-600/30 backdrop-blur-sm flex items-center justify-center">
+      <div className="w-full max-w-md bg-white rounded-md p-3">
+        <button
+          className="button bg-zinc-100 mb-2"
+          onClick={() => setIsManageMembersModalOpen(false)}
+        >
+          <i className="fas fa-arrow-left"></i>
+        </button>
+        <h4 className="h4 font-semibold">{community.name}</h4>
+        <p className="text-sm text-zinc-500 mb-3">
+          The following are members, you can view each person's profile or visit
+          the whatsApp group.
+        </p>
+        <div className="w-full h-[15rem] border overflow-y-scroll mb-4 flex flex-col">
+          <Link
+            className="w-full px-3 py-2 border-b hover:bg-zinc-100 flex gap-2"
+            href={`/dashboard/profile`}
+          >
+            <div className="h-12 w-12 border bg-zinc-100">
+              <img
+                src={user?.profile?.image}
+                alt="person"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="h-8 w-full flex-1">
+              <p className="body-2 font-semibold">{user?.names}</p>
+              <p className="text-sm text-zinc-600 flex justify-between">
+                <span>{user?.title}</span>
+                <strong className="text-primary">Admin</strong>
+              </p>
+            </div>
+          </Link>
+          {community.listOfMembers ? (
+            community.listOfMembers?.map((item) => (
+              <Link
+                className="w-full px-3 py-2 border-b hover:bg-zinc-100 flex gap-2"
+                href={item.userId}
+              >
+                <div className="h-12 w-12 border bg-zinc-100">
+                  <img
+                    src={item.image}
+                    alt="person"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="h-8 w-full flex-1">
+                  <p className="body-2 font-semibold">{item.names}</p>
+                  <p className="text-sm text-zinc-600">{item.title}</p>
+                </div>
+              </Link>
+            ))
+          ) : (
+            <div className="w-full h-full flex-1 flex items-center justify-center font-semibold text-zinc-400">
+              No Members found
+            </div>
+          )}
+        </div>
+        <Link
+          href="https://web.whatsapp.com/your-community-group-link"
+          target="_blank"
+        >
+          <button className="button bg-primary text-white">Visit Group</button>
+        </Link>
+      </div>
+    </section>
   );
 };
 

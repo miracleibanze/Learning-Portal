@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { whiteLogo } from "@public";
 import Image from "next/image";
-import { FC } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@redux/store";
+import { FC, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@redux/store";
+import { clearUser } from "@redux/slices/userSlice";
 
 interface link {
   name: string;
@@ -36,7 +37,7 @@ const sidebarUtilities: link[] = [
   },
   {
     name: "Help Center",
-    href: "/help-center",
+    href: "/help",
     icon: "fas fa-headphones",
   },
   {
@@ -46,10 +47,26 @@ const sidebarUtilities: link[] = [
   },
 ];
 
+interface LinkType {
+  name: string;
+  href: string;
+  icon: string;
+}
+
 const Sidebar: FC = () => {
   const { user } = useSelector((state: RootState) => state.user); // Accessing user, status, and error
 
   const pathname = usePathname();
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState<boolean>(false);
+
+  const handleLogout = () => {
+    dispatch(clearUser());
+    setIsLogoutModalOpen(false);
+    router.push("/login");
+  };
 
   return (
     <div className="sm:sticky fixed z-[100] sm:top-0 sm:h-screen sm:left-0 w-full lg:max-w-[19rem] md:max-w-[14rem] sm:max-w-[4rem] bg-primary text-white sm:py-4 px-2 flex sm:flex-col justify-between bottom-0 max-sm🇦🇫 h-[4rem]">
@@ -147,22 +164,31 @@ const Sidebar: FC = () => {
           ))}
         </ul>
         <div className="w-full sm:flex items-center gap-2 flex-wrap md:justify-end justify-center hidden">
-          {user?.profile?.image ? (
-            <Image
-              src={user.profile.image} // Use the determined image source
-              alt="profile image"
-              width={40} // Set appropriate width and height
-              height={40}
-              className="h-10 !aspect-square rounded-full flex-0 object-cover"
-            />
-          ) : (
-            <i className="fas fa-user p-3 text-primary bg-white/50 rounded-full flex-0"></i>
-          )}
-          <div className="flex-1 w-full my-auto md:flex flex-col items-start hidden">
+          <Link href="/dashboard/profile">
+            {user?.profile?.image ? (
+              <Image
+                src={user.profile.image} // Use the determined image source
+                alt="profile image"
+                width={40} // Set appropriate width and height
+                height={40}
+                className="h-10 !aspect-square rounded-full flex-0 object-cover"
+              />
+            ) : (
+              <i className="fas fa-user p-3 text-primary bg-white/50 rounded-full flex-0"></i>
+            )}
+          </Link>
+          <Link
+            href="/dashboard/profile"
+            className="flex-1 w-full my-auto md:flex flex-col items-start hidden"
+          >
             <p className="body-2 font-semibold">{user?.names}</p>
             <p className="text-sm leading-none text-white/70">{user?.email}</p>
-          </div>
-          <div className="md:!w-7 flex-0 flex w-full items-center justify-center">
+          </Link>
+
+          <div
+            className="md:!w-7 flex-0 flex w-full items-center justify-center"
+            onClick={handleLogout}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
@@ -173,6 +199,32 @@ const Sidebar: FC = () => {
           </div>
         </div>
       </div>
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Confirm Logout
+            </h2>
+            <p className="text-gray-600 mt-2">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="mr-2 px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-white bg-red-600 rounded hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

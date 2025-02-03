@@ -1,16 +1,14 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@redux/store";
+import { FC, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "@redux/store";
 import Link from "next/link";
-import { fetchChallenges } from "@redux/slices/challengeSlice";
 import ChallengeCard, {
   ChallengeCardSkeleton,
 } from "@components/challengeCard";
 
 const Page: FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const { challenges, loadingChallenges } = useSelector(
     (state: RootState) => state.challenge
   );
@@ -32,10 +30,6 @@ const Page: FC = () => {
       number: challenges.filter((c) => c.status === "ongoing").length,
     },
   ];
-
-  useEffect(() => {
-    dispatch(fetchChallenges());
-  }, [dispatch]);
 
   const handleFilter = (index: number) => {
     setFilterIndex(index);
@@ -89,7 +83,7 @@ const Page: FC = () => {
         </Link>
       </div>
 
-      <div className="w-full flex flex-wrap gap-3 py-12 justify-center justify-items-center">
+      <div className="w-full flex flex-wrap gap-3 py-12 justify-items-center">
         {loadingChallenges ? (
           <div className="px-4 p-8 flex flex-wrap gap-3 justify-center">
             {Array(6)
