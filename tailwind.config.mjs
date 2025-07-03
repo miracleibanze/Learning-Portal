@@ -2,6 +2,7 @@
 import plugin from "tailwindcss/plugin";
 
 const config = {
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,7 +11,7 @@ const config = {
   theme: {
     extend: {
       fontFamily: {
-        work: ["'Work Sans'", "sans-serif"],
+        assignment: ["'assignment Sans'", "sans-serif"],
       },
       colors: {
         primary: "#2B71F0",
@@ -65,7 +66,7 @@ const config = {
             {},
         },
         ".input": {
-          "@apply text-sm w-full py-2 text-black pl-3 border cursor-pointer border-gray-300 rounded-sm !text-zinc-600 shadow-sm focus:ring-2 focus:ring-blue-500 outline-none focus:border-blue-500":
+          "@apply text-sm w-full py-2 text-black pl-3 border cursor-pointer border-gray-300 rounded-sm !text-zinc-600 bg-transparent text-white shadow-sm focus:ring-2 focus:ring-blue-500 outline-none focus:border-blue-500":
             {},
         },
       });

@@ -3,16 +3,50 @@
 @tailwind utilities;
 
 body {
-  @apply font-work h-full min-h-screen flex flex-col;
+  @apply font-assignment h-full min-h-screen flex flex-col;
 }
-
+main {
+  @apply flex-1;
+}
 @layer components {
   .button {
     @apply rounded-md py-2 px-4 hover:scale-105 transition duration-300 text-sm font-semibold;
   }
-  .tv::after {
-    content: "";
-    @apply absolute top-full right-1/2 translate-x-1/2 h-16 w-24 bg-zinc-400/70;
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+  }
+  .truncate-two-lines {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    50% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .skeleton-shimmer {
+    animation: shimmer 2.5s infinite linear;
+    background: linear-gradient(
+      140deg,
+      transparent 30%,
+      #ffffffc4 50%,
+      transparent 70%
+    );
+    background-size: 200% 100%;
   }
   .scroll-design::-webkit-scrollbar {
     height: 8px;
@@ -64,5 +98,38 @@ body {
   }
   tr.source:hover ~ tr.dest {
     @apply bg-zinc-300;
+  }
+
+  .navbar-mobile {
+    animation: slideIn 1s ease-in-out forwards;
+    @apply fixed bottom-0 top-0 right-0 max-w-md;
+  }
+  @keyframes slideIn {
+    from {
+      width: 0vw;
+    }
+    to {
+      width: 80vw;
+    }
+  }
+  @keyframes Loading {
+    0% {
+      left: 0%;
+      width: 10%;
+    }
+    50% {
+      left: 30%;
+      width: 50%;
+    }
+    70% {
+      width: 70%;
+    }
+    100% {
+      left: 100%;
+      width: 0%;
+    }
+  }
+  .animate-loading {
+    animation: Loading 2s ease-in-out infinite;
   }
 }

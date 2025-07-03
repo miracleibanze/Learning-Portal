@@ -1,181 +1,151 @@
 "use client";
 
-import Link from "@node_modules/next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import axiosInstance from "./features/axiosInstance";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "@redux/store";
-import { setUser } from "@redux/slices/userSlice";
-import { myUser } from "./constants";
+import { getSession, signIn } from "next-auth/react";
+import { FC, Suspense, useEffect, useState } from "react";
+import { redirect, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { pcBook1 } from "@assets";
+import Loading from "@app/loading";
 
-const Login = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
+const LoginComponent: FC = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [isLogginIn, setIsLogginIn] = useState(false);
+  const searchParams = useSearchParams();
+  const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard";
+  useEffect(() => {
+    setError("");
+  }, [password, email]);
 
-  interface LoginForm {
-    email: string;
-    password: string;
-    data?: string;
-  }
+  const handleLogin = async (e: React.ChangeEvent<HTMLFormElement>) => {
+    setIsLogginIn(true);
+    e.preventDefault();
+    const result = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
 
-  const [formData, setFormData] = useState<LoginForm>({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState<LoginForm>({
-    email: "",
-    password: "",
-    data: "",
-  });
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+    if (result?.error) {
+      setError(result.error);
+    } else {
+      const userSession = await getSession(); // Retrieve session after login
+      console.log(userSession);
+      if (userSession) {
+        localStorage.setItem("learnTech", JSON.stringify(userSession.user)); // Save to localStorage
+        console.log("Session saved to localStorage");
+      }
 
-  const handleVisibility = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsPasswordVisible(e.target.checked);
-  };
-
-  const handleData = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setError({ email: "", password: "" });
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
-
-  const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9-]+\.[a-z]{2,}$/;
-
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault(); // Prevent default form submission
-
-    const trimmedEmail = formData.email.trim().toLowerCase();
-
-    if (!emailRegex.test(trimmedEmail)) {
-      setError((prevError) => ({
-        ...prevError,
-        email: "Please enter a valid email",
-      }));
-      return;
+      redirect(callBackUrl); // Redirect on success
     }
-
-    if (!formData.password.trim()) {
-      setError((prevError) => ({
-        ...prevError,
-        password: "Please enter your password",
-      }));
-      return;
-    }
-
-    try {
-      setIsLoggingIn(true);
-      const response = await axiosInstance.post("/api/login", {
-        email: formData.email,
-        password: formData.password,
-      });
-
-      const userData = response.data; // Assuming response contains user data
-      dispatch(setUser(userData)); // Store full user data in Redux
-
-      router.push("/dashboard");
-    } catch (err) {
-      setError({
-        ...error,
-        data: "Problem Logging in, please try again later!",
-      });
-      console.log(err);
-      dispatch(setUser(myUser)); // Store full user data in Redux
-      router.push("/dashboard");
-    } finally {
-      setIsLoggingIn(false);
-    }
+    setIsLogginIn(false);
   };
 
   return (
-    <>
-      <h3 className="h3 font-semibold">Welcome back</h3>
-      <p className="body-2 text-zinc-600 mb-6">
-        Sign in to continue to your UMURAVA dashboard,{" "}
-        <br className="max-md:hidden" />
-        or don't have an account?{" "}
-        <Link href="/register" className="text-primary">
-          Sign up
-        </Link>
-      </p>
-
-      {error.data !== "" && (
-        <span className="text-sm text-red-600 px-4">{error.data}</span>
-      )}
-
-      <form onSubmit={handleSubmit} className="w-full flex flex-col ">
-        <label
-          htmlFor="email"
-          className="flex flex-col w-full mx-auto text-start mb-2"
-        >
-          <span className="text-sm text-zinc-600 translate-y-2 translate-x-2 bg-zinc-100 max-w-max pl-2 pr-4">
-            Email
-          </span>
-          <input
-            type="text"
-            className="input bg-transparent placeholder-[10px]"
-            id="email"
-            placeholder="Enter your email"
-            required
-            value={formData.email}
-            onChange={handleData}
-          />
-          {error.email !== "" && (
-            <span className="text-sm text-red-600 px-4">{error.email}</span>
-          )}
-        </label>
-
-        <label
-          htmlFor="password"
-          className="flex flex-col w-full mx-auto text-start"
-        >
-          <span className="text-sm text-zinc-600 translate-y-2 translate-x-2 bg-zinc-100 max-w-max pl-2 pr-4">
-            Password
-          </span>
-          <input
-            type={isPasswordVisible ? "text" : "password"}
-            className="input bg-transparent placeholder-[10px]"
-            id="password"
-            placeholder="Enter your Password"
-            value={formData.password}
-            onChange={handleData}
-          />
-          {error.password !== "" && (
-            <span className="text-sm text-red-600 px-4">{error.password}</span>
-          )}
-        </label>
-
-        <label
-          htmlFor="show"
-          className="flex items-center w-full mx-auto text-start py-2 px-2 gap-2"
-        >
-          <input
-            type="checkbox"
-            id="show"
-            onChange={handleVisibility}
-            className="h-max"
-          />
-          <span className="text-sm text-zinc-600">Show password</span>
-        </label>
-
-        <div className="w-full flex justify-end">
-          <Link href="" className="text-sm text-primary mb-6 ">
-            Forgot password?
-          </Link>
+    <main className="w-full flex-1 min-h-full container flex items-center justify-center relative py-4">
+      <div className="fixed inset-0">
+        <Image
+          src={pcBook1}
+          alt="backgroundImage"
+          className="h-full w-full object-cover object-full"
+        />
+        <div className="absolute inset-0 backdrop-blur-sm" />
+      </div>
+      <div className="shadow-lg max-w-md rounded-2xl backdrop-blur-3xl z-[10] border-white/50 border-2 my-auto bg-black/40">
+        <div className="p-8 text-white">
+          <h4 className="h4 font-bold">Welcome to IMBONI&nbsp;Learn</h4>
+          <p className="body-2">
+            Unlock your learning potential today.
+            <br />
+            Sign in to start you journey.
+          </p>
         </div>
 
-        <button
-          type="submit"
-          className={`button mx-auto px-12 ${
-            isLoggingIn ? "bg-zinc-400" : "bg-primary text-white"
-          }`}
-          disabled={isLoggingIn}
+        {/* <svg
+          data-name="Layer 1"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+          height={80}
+          className="!bg-blue-700 top-0 w-full left-0 right-0 rotate-180 p-0"
         >
-          Login
-        </button>
-      </form>
-    </>
+          <path
+            d="M0,0V7.23C0,65.52,268.63,112.77,600,112.77S1200,65.52,1200,7.23V0Z"
+            className="fill-zinc-100"
+          ></path>
+          </svg> */}
+
+        <p className="body-2 text-red-500 px-8 mb-3">{error !== "" && error}</p>
+        <form
+          onSubmit={handleLogin}
+          className="relative p-8 pt-0 rounded-b-2xl text-white"
+        >
+          <label>
+            Email&nbsp;:
+            <input
+              className="input !text-white mb-5"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </label>
+          <label>
+            Password&nbsp;:
+            <input
+              className="input !text-white"
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </label>
+          <label className="block cursor-pointer">
+            <input
+              type="checkbox"
+              name="show"
+              className="max-w-8 m-2"
+              onChange={(event) => {
+                console.log(event.target.checked);
+                setShowPassword(event.target.checked);
+              }}
+            />
+            Show password
+          </label>
+          <p className="text-end !text-blue-400 mb-3 cursor-pointer">
+            Forgot password ?
+          </p>
+          <button
+            type="submit"
+            disabled={isLogginIn}
+            className="button rounded-full !bg-blue-700 text-white block w-full"
+          >
+            {isLogginIn ? "Login..." : "login"}
+          </button>
+          <p className="py-4 text-center">
+            or Don't have account{" "}
+            <span
+              className="text-blue-400"
+              onClick={() => redirect("/register")}
+            >
+              Register
+            </span>
+            .
+          </p>
+        </form>
+      </div>
+    </main>
   );
 };
+
+const Login: FC = () => (
+  <Suspense fallback={<Loading />}>
+    <LoginComponent />
+  </Suspense>
+);
 
 export default Login;

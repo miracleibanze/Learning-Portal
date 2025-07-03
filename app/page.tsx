@@ -1,439 +1,459 @@
 "use client";
 
+import { FC, memo, useContext, useEffect, useRef } from "react";
 import {
-  computerCalcs,
-  image1,
-  Image2,
-  banner_img,
-  challengesImage,
-  signup,
-  students,
-} from "@public";
-import { useState, FC } from "react";
+  courses,
+  features,
+  instructors,
+  pricingPlans,
+  quickLinks,
+  socials,
+  testimonies,
+} from "../features/constants";
+import ClipPath from "../assets/svgs/ClipPath";
+import Arrow from "../assets/svgs/Arrow";
 import Image from "next/image";
-import Heading from "@components/Heading";
-import ChallengeCard from "@components/challengeCard";
-import { challenges } from "@components/constants";
-
-interface Benefit {
-  title: string;
-  description: string;
-  icon: string;
-}
-
-interface Testimonial {
-  name: string;
-  title: string;
-  testimonial: string;
-}
-
-const SkillChallenges: string[] = [
-  "UI/UX Design",
-  "Data Science",
-  "Graphic Design",
-  "Data Analysis & Research",
-  "Animation",
-  "Videography & Photography",
-  "AI Machine Learning",
-  "Web3",
-  "Digital Marketing & Communication",
-];
-
-const benefits: Benefit[] = [
-  {
-    title: "Enhance Your Employment Path",
-    description:
-      "Network with other talented individuals and learn from their experiences.",
-    icon: "fa-briefcase",
-  },
-  {
-    title: "Earn Recognition and Prizes",
-    description:
-      "Gain valuable experience and knowledge to advance your career in the digital economy.",
-    icon: "fa-clipboard-list",
-  },
-  {
-    title: "Personal Growth",
-    description:
-      "Challenge yourself, learn new skills, and grow your professional network.",
-    icon: "fa-chart-line",
-  },
-  {
-    title: "Learn from Industry Experts",
-    description:
-      "Access valuable insights and guidance from experienced professionals in the digital career field and spaces.",
-    icon: "fa-robot",
-  },
-];
-
-const testimonials: Testimonial[] = [
-  {
-    name: "Manzi Jack",
-    title: "Product Designer, Kigali",
-    testimonial: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-  {
-    name: "Cyuzuzo Peter",
-    title: "Marketing Manager, Kigali",
-    testimonial: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-  {
-    name: "Mukunzi James",
-    title: "Software Developer, Kigali",
-    testimonial: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-];
-
-const TestimonialCard: FC<Testimonial> = ({ name, title, testimonial }) => (
-  <div className="min-w-[25rem] max-w-[25rem] px-5 border border-zinc-400 rounded-lg py-8">
-    <div className="w-full rounded-lg aspect-video bg-primary mb-4 flex items-center justify-center">
-      <span className="flex items-center justify-center bg-white/50 p-4 rounded-full aspect-square">
-        <i className="fas fa-play text-3xl text-white translate-x-[0.095rem]"></i>
-      </span>
-    </div>
-    <div className="flex">
-      <div className="w-10 aspect-square rounded-full bg-primary mr-3"></div>
-      <div className="flex-1 w-full">
-        <p className="body-2 font-semibold">{name}</p>
-        <p className="text-sm">{title}</p>
-      </div>
-    </div>
-  </div>
-);
+import SectionLoader from "@components/designs/SectionLoader";
+import { featuresCard, pcBook2, pcBook3, pcBulb, student } from "@assets";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setAboutRef,
+  setCoursesRef,
+  setPricingRef,
+  setFeaturesRef,
+} from "@redux/slices/refsSlice";
+import { AppDispatch, RootState } from "@redux/store";
+import { useRouter } from "next/navigation";
 
 const Home: FC = () => {
-  const [skillChallenge, setSkillChallenge] = useState<number>(0);
+  const dispatch = useDispatch<AppDispatch>();
 
+  const homeRef = useRef<HTMLDivElement | null>(null);
+  const aboutRef = useRef<HTMLDivElement | null>(null);
+  const featuresRef = useRef<HTMLDivElement | null>(null);
+  const coursesRef = useRef<HTMLDivElement | null>(null);
+  const pricingRef = useRef<HTMLDivElement | null>(null);
+
+  // Dispatch refs to Redux store (by using ID or section name)
+  useEffect(() => {
+    if (aboutRef.current) {
+      dispatch(setAboutRef("about"));
+    }
+    if (featuresRef.current) {
+      dispatch(setFeaturesRef("features"));
+    }
+    if (coursesRef.current) {
+      dispatch(setCoursesRef("courses"));
+    }
+    if (pricingRef.current) {
+      dispatch(setPricingRef("pricing"));
+    }
+  }, [dispatch]);
+
+  // Get section references (IDs)
+  // const { about, features, courses, team } = useSelector(
+  //   (state: RootState) => state.refs
+  // );
+
+  const scrollToSection = (section: React.RefObject<HTMLDivElement | null>) => {
+    if (section.current) {
+      section.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
   return (
     <>
-      <header className="container mx-auto bg-white pb-10 md:pt-0 pt-10 px-5 md:px-20 flex flex-col md:flex-row items-center justify-between">
-        <div className="flex flex-col md:w-1/2 w-full max-w-lg">
-          <h1 className="text-4xl font-bold text-blue-700">
-            Build Work Experience through Skills Challenges Program
-          </h1>
-          <p className="text-lg text-gray-600 mt-4">
-            Enhance your Employability and Accelerate your Career Growth by
-            working on Hands-on projects & hackathons from various businesses &
-            organizations.
-          </p>
-          <button className="bg-blue-700 text-white text-lg mt-6 py-3 px-8 rounded-md w-max">
-            Get Started
-          </button>
-        </div>
-        <div className="flex md:w-1/2 h-max mt-8 md:mt-0 items-end gap-x-4 w-full">
-          <Image
-            src={Image2}
-            alt="Team"
-            className="w-[55%] aspect-[6/9] md:aspect-[18/33] lg:aspect-[9/14]"
-          />
-          <Image
-            src={image1}
-            alt="Team"
-            className="w-[45%] aspect-9/15 md:aspect-[1/2] lg:aspect-[9/15]"
-          />
+      <header
+        id="header-banner"
+        ref={homeRef}
+        className="relative text-white py-20"
+      >
+        <div className="mx-auto px-5 flex flex-col-reverse md:flex-row items-center">
+          <div className="w-full md:w-3/5 text-center md:text-left z-[100]">
+            <h1 className="h1 font-extrabold leading-tight flex">
+              Transform Your Learning&nbsp;Experience
+            </h1>
+            <p className="mt-6 text-lg">
+              Discover the tools and courses to unlock your potential.
+              <br />
+              Learn, grow, and achieve with <strong>IMBONI Learn</strong>.
+            </p>
+            <div className="mt-8 flex flex-col md:flex-row gap-4 justify-center md:justify-start">
+              <button
+                onClick={() => scrollToSection(aboutRef)}
+                className="bg-white text-blue-600 hover:bg-blue-100 px-6 py-3 text-lg font-semibold shadow-md transition rounded-full"
+              >
+                Explore Features
+              </button>
+              <button
+                onClick={() => scrollToSection(coursesRef)}
+                className="bg-blue-900 hover:bg-violet-700 px-6 py-3 text-white text-lg font-semibold shadow-md transition rounded-full z-[10]"
+              >
+                Browse Courses
+              </button>
+            </div>
+          </div>
+          <div className="absolute inset-0 w-full">
+            <div className="absolute inset-0 bg-gradient-to-r w-full from-blue-500 via-indigo-600 to-transparent z-[10]" />
+            <Image
+              src={pcBulb}
+              alt="Learning Illustration"
+              className="w-full h-full object-cover object-bottom"
+            />
+          </div>
         </div>
       </header>
-      {/* Second Section */}
-      <section className="container mx-auto py-12 px-5 md:px-20">
-        <Heading
-          title="Experience a New Way of Building"
-          title2="Work Experience"
-          text="Join Skills Challenge Program to accelerate your career growth and become part of africa's largest workforce at digital professionals."
+
+      <section
+        id="about"
+        ref={aboutRef}
+        className="w-full max-w-screen-lg mx-auto px-6 text-center py-16 text-gray-900 dark:text-zinc-200"
+      >
+        <h2 className="h2 font-bold text-gray-800 dark:text-zinc-100">
+          About Us
+        </h2>
+        <p className="mt-4 body-1">
+          IMBONI Learn is an innovative platform offering high-quality
+          educational content from a global netassignment of instructors. Our
+          goal is to empower learners to gain skills and knowledge that will
+          benefit them in both personal and professional growth.
+        </p>
+        <p className="mt-4 body-1">
+          We offer flexible learning experiences with both live sessions and
+          on-demand courses that fit your schedule and learning preferences.
+        </p>
+        <Image
+          src={student}
+          alt="Student Learning"
+          className="w-full object-cover object-left"
         />
-
-        <div className="grid sm:grid-cols-2 gap-8  text-white">
-          <div className="p-6 rounded-lg shadow-md sm:col-span-2 bg-primary">
-            <i className="fas fa-briefcase bg-white text-primary p-5 rounded-md"></i>
-            <p className="body-1 mt-4 font-semibold">
-              Build a Strong Portfolio and Hands-On Experience
-            </p>
-            <p className="mt-4 w-full max-w-2xl body-2 text-zinc-100/90 mb-4">
-              Tackle real-world projects through challenges and hackathons that
-              mirror real-world challenges faced by businesses and
-              organizations. Therefore showcase your skill and accomplishments
-              to potential employers and clients through a portfolio of a
-              completed projects.
-            </p>
-          </div>
-          <div className="bg-primary p-6 rounded-lg shadow-md">
-            <i className="fas fa-briefcase bg-white text-primary p-5 rounded-md"></i>
-            <p className="body-1 mt-4 font-semibold">
-              Enhance Your Employment Path
-            </p>
-            <p className="mt-4 body-2 text-zinc-100/90 mb-4">
-              Develop in-demand skills and build a strong portfolio to increase
-              your chances of landing your dream job or contract.
-            </p>
-          </div>
-          <div className="bg-primary p-6 rounded-lg shadow-md">
-            <i className="fas fa-briefcase bg-white text-primary p-5 rounded-md"></i>
-            <p className="body-1 mt-4 font-semibold">
-              Earn Recognition and Prizes
-            </p>
-            <p className="mt-4 body-2 text-zinc-100/90 mb-4">
-              Earn both Money and Knowledge Prizes by participating in various
-              contests and competitions by working on real-world projects and
-              hackathons.
-            </p>
-          </div>
-        </div>
+        <p className="mt-4 body-1">
+          With powerful tools like progress tracking, AI recommendations, and an
+          interactive community, IMBONI Learn ensures that learners receive
+          personalized and effective education.
+        </p>
       </section>
 
-      {/* Stats Section */}
-      <section className="container mx-auto mb-24 px-5">
-        <div className="relative bg-primary overflow-hidden rounded-2xl text-white py-20 px-5 md:px-20 md:flex justify-between grid grid-cols-2 gap-y-4">
-          <div className="absolute top-0 right-0 h-[20rem] aspect-square border-[3rem] rounded-full -translate-y-1/2 translate-x-1/3 border-white/20" />
-          <div className="absolute top-0 left-0 h-[20rem] aspect-square border-[3rem] rounded-full translate-y-1/3 translate-x-1/3 border-white/20" />
-          <p className="body-1 flex flex-col">
-            <span className="h2 font-semibold leading-none">1</span>
-            <span>Year</span>
-          </p>
-          <p className="body-1 flex flex-col">
-            <span className="h2 font-semibold leading-none">500+</span>
-            <span>Challenges Completed</span>
-          </p>
-          <p className="body-1 flex flex-col">
-            <span className="h2 font-semibold leading-none">10K+</span>
-            <span>Users</span>
-          </p>
-          <p className="body-1 flex flex-col">
-            <span className="h2 font-semibold leading-none">6+</span>
-            <span>Countries</span>
-          </p>
-        </div>
-      </section>
-
-      <Heading
-        title="Skills Challenges Cover various in-demand skills and Careers for the digital economy"
-        text="Explore the projects that various talents are working on."
-        className="px-4"
-      />
-
-      <section className="flex flex-wrap gap-3 justify-center">
-        {Array(2)
-          .fill("")
-          .map((item, index) => (
-            <button
-              key={index}
-              className={`button ${
-                index === skillChallenge
-                  ? "bg-primary !text-white"
-                  : "bg-zinc-200"
-              } text-zinc-900/90 !font-normal`}
-              onClick={() => setSkillChallenge(index)}
-            >
-              {SkillChallenges[index]}
-            </button>
-          ))}
-      </section>
-      <section className="container flex flex-wrap gap-3 justify-center mx-auto py-2 md:px-6 mb-12 max-w-3xl">
-        {SkillChallenges.map((item, index) => (
-          <button
-            key={index}
-            className={`button ${
-              index === skillChallenge
-                ? "bg-primary !text-white"
-                : "bg-zinc-200"
-            } text-zinc-900/90 ${index < 2 && "hidden"} !font-normal`}
-            onClick={() => setSkillChallenge(index)}
-          >
-            {item}
-          </button>
-        ))}
-      </section>
-
-      <section className="container mx-auto flex md:flex-row flex-col gap-4 bg-zinc-100 px-6 py-12 rounded-md">
-        <div className="md:w-1/2 w-full flex flex-col items-start gap-8 px-4 py-8">
-          <div className="bg-white py-6 px-4 rounded-md w-max mb-4 mt-8">
-            <span className="w-7 aspect-square rounded-full p-2 font-bold bg-black text-white">
-              <span style={{ color: "green" }}>S</span>f.
-            </span>
-          </div>
-          <p className="body-2 text-zinc-600 w-full max-w-md">
-            The Embedded Finance Platform and Payroll Management Software
-            Solutions for your organization and workforce.
-          </p>
-          <button className="text-primary body-2 tracking-tighter font-semibold">
-            Learn more{" "}
-            <span className="!py-1 px-2 rounded-full bg-primary">
-              <i className="fas fa-arrow-right text-white"></i>
-            </span>
-          </button>
-        </div>
-        <div className="md:w-1/2 w-full h-max px-4 mb-16 relative tv">
-          <Image src={computerCalcs} alt="computer" className="w-full h-auto" />
-        </div>
-      </section>
-
-      <nav className="w-full flex gap-4 justify-center py-8 mb-12">
-        {Array(4)
-          .fill("")
-          .map((item, index) => (
-            <div
-              key={index}
-              className={`w-3 h-3 ${
-                index === 2 ? "bg-primary" : "bg-zinc-300"
-              } rounded-full`}
-            />
-          ))}
-      </nav>
-      <section className="container mx-auto px-5">
-        <Heading
-          title="Explore Challenges & Hackathons"
-          text="Join Skills Challenges Program to accelerate your career growth and become part of Africa's largest workforce of digital professionals."
-        />
-
-        <div className="flex flex-wrap items-center justify-center gap-6 md:px-8">
-          {Array(3)
-            .fill("")
-            .map((_, index) => (
-              <ChallengeCard key={index} {...challenges[index]} />
-            ))}
-        </div>
-
-        <button className="mt-12 mb-24 border border-blue-500 hover:bg-blue-600 hover:text-white !text-blue-600 font-semibold px-12 py-4 rounded-lg block mx-auto">
-          View More
-        </button>
-      </section>
-      <section className="container mx-auto w-full bg-zinc-100 px-4 py-12">
-        <Heading
-          title="What else can I gain from participating"
-          title2=" in Skills Challenges?"
-          text="Join Skills Challenges Program to accelerate your career growth and become part of Africa's largest workforce of digital professionals."
-        />
-
-        <section className="flex lg:flex-row flex-col">
-          <div className="rounded-lg p-6 lg:w-3/5 w-full grid sm:grid-cols-2 gap-4">
-            {benefits.map((item, index) => (
-              <div key={index}>
-                <i
-                  className={`fas ${item.icon} p-6 rounded-lg bg-primary text-white mb-4`}
-                ></i>
-                <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-                <p className="text-zinc-500 w-full max-w-md">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-          <section className="lg:w-2/5 w-full">
-            <Image
-              src={banner_img}
-              alt="Featured Project"
-              className="w-full h-full max-w-lg mx-auto"
-            />
-          </section>
-        </section>
-      </section>
-      <section className="container mx-auto py-16 px-4">
-        <h3 className="h3 font-bold mb-2 px-3">
-          Users are in Love with Skills <br className="max-md:hidden" />
-          Challenges Program
-        </h3>
-        <p className="text-gray-500 text-sm mb-12 px-4">
-          See what our clients say about working with us. Their success{" "}
-          <br className="max-md:hidden" />
-          speaks for our dedication and expertise.
+      <section
+        id="features"
+        ref={featuresRef}
+        className="py-16 bg-gray-100 dark:bg-zinc-900 mx-auto px-6"
+      >
+        <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-zinc-100">
+          Why Choose IMBONI Learn?
+        </h2>
+        <p className="mt-4 text-lg text-center text-gray-600 dark:text-gray-400">
+          Discover the powerful features and tools that make learning with us
+          engaging and impactful.
         </p>
 
-        <div className="flex overflow-x-auto scroll-smooth gap-4 py-6 scroll-design">
-          {testimonials.map((testimonial, index) => (
-            <TestimonialCard key={index} {...testimonial} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="block relative p-0.5 bg-no-repeat bg-[length:100%_100%] md:max-w-[24rem] group"
+              style={{ backgroundImage: `url("${featuresCard}")` }}
+            >
+              <div className="relative z-2 flex flex-col min-h-[22rem] p-[2.4rem] pointer-events-none z-[100]">
+                <h5 className="h5 mb-5 font-semibold">{feature.title}</h5>
+                <p className="body-2 leading-tight mb-6 text-n-3 font-normal">
+                  {feature.description}
+                </p>
+                <div className="flex items-center justify-between mt-auto">
+                  <div
+                    className={`flex items-center justify-center w-16 h-16 rounded-full ${feature.bgColor}`}
+                  >
+                    <i className={`${feature.icon} text-2xl z-[10]`}></i>
+                  </div>
+                  <span className="flex items-center space-x-2 body-1 group-hover:bg-blue-800 group-hover:text-white rounded-full pl-4 py-2 group-hover:pr-2">
+                    <p className="moreIcon">Explore more</p>
+                    <Arrow />
+                  </span>
+                </div>
+              </div>
+              <div
+                className="absolute inset-0.5 bg-n-8"
+                style={{ clipPath: "url(#benefits)" }}
+              >
+                <div className="absolute inset-0 opacity-10 transition-opacity hover:opacity-40">
+                  <Image
+                    src={pcBook3}
+                    height={380}
+                    width={362}
+                    alt="ask"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
+              <ClipPath />
+            </div>
           ))}
         </div>
       </section>
 
-      <section className="container mx-auto py-16 bg-zinc-100 px-4">
-        <Heading title="How to Get Started" />
+      <section id="courses" ref={coursesRef} className="py-16 mx-auto px-6">
+        <h2 className="text-3xl font-bold text-gray-800 text-center dark:text-zinc-100 py-4">
+          Our Courses
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-8 mt-8 place-content-center">
+          {courses.length > 0 ? (
+            Array(courses.length > 5 ? 5 : courses.length)
+              .fill("")
+              .map((item, index) => (
+                <div
+                  className="bg-white rounded-lg shadow overflow-hidden dark:bg-zinc-800/50 dark:shadow-slate-200"
+                  key={courses[index]?._id + index}
+                >
+                  <div className="w-full aspect-video bg-zinc-300">
+                    <Image
+                      src={pcBook2}
+                      alt="course"
+                      className="w-full h-full object-cover object-center"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h5 className="h5 leading-tight font-semibold text-gray-800 dark:text-gray-100">
+                      {courses[index]?.title}
+                    </h5>
+                    <p className="mt-4 body-2">{courses[index]?.description}</p>
+                    <p className="mt-4 body-2 flex gap-x-3 flex-wrap gap-y-2">
+                      {courses[index]?.tags.map((tag) => (
+                        <span
+                          className="p-1 rounded-full bg-zinc-300/80 dark:text-black px-3"
+                          key={index + ": " + tag}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </p>
+                    <p className="mt-4">
+                      By:{" "}
+                      {courses[index]?.instructor?.name || "Private instructor"}
+                    </p>
+                  </div>
+                </div>
+              ))
+          ) : (
+            <SectionLoader />
+          )}
+          <div className="w-full h-full flex-1 flex items-end justify-end">
+            <button className="button bg-blue-600 dark:bg-blue-300 text-white dark:text-blue-800 px-8">
+              See More Courses
+            </button>
+          </div>
+        </div>
+      </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="row-span-3 gap-6 grid sm:grid-row-2">
-            <div className="row-span-1 bg-white rounded-lg p-6 ">
-              <button className="button bg-primary !text-white mb-4">
-                Step 1
-              </button>
-              <h4 className="text-lg font-semibold mb-2">
-                Sign Up on Umurava Platform
-              </h4>
-              <p className="text-zinc-600 body-2 mb-4">
-                Submit your completed project for evaluation
-              </p>
-              <Image src={signup} alt="signup" className="w-1/2 float-end" />
-            </div>
-            <div className="row-span-1 bg-white rounded-lg p-6">
-              <button className="button bg-primary !text-white mb-4">
-                Step 2
-              </button>
-              <h4 className="text-lg font-semibold mb-2">
-                Register and Participate
-              </h4>
-              <p className="text-zinc-600 body-2 mb-4">
-                Sign up for the challenge and start working on the project.
-              </p>
+      <section className="py-32 bg-gray-100 dark:bg-zinc-900 mx-auto px-6">
+        <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-zinc-100">
+          Meet Our Experts
+        </h2>
+        <p className="mt-4 text-lg text-center text-gray-600 dark:text-gray-400">
+          Our instructors are experienced professionals who are passionate about
+          helping you succeed.
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+          {instructors.map((instructor, index) => (
+            <div
+              key={index}
+              className="bg-white dark:bg-zinc-800 p-6 rounded-lg knob relative"
+            >
               <Image
-                src={challengesImage}
-                alt="challenges"
-                className="w-1/2 float-end"
+                src={instructor.image}
+                alt="Instructor"
+                className="w-full h-48 object-cover rounded-2xl bg-zinc-300 object-top"
+              />
+              <h3 className="mt-6 text-xl font-bold text-gray-800 dark:text-zinc-100">
+                {instructor.name}
+              </h3>
+              <p className="mt-4 text-gray-600 dark:text-gray-300">
+                {instructor.role}
+              </p>
+              <p className="mt-4 text-gray-600 dark:text-gray-300">
+                {instructor.description}
+              </p>
+              <button className="button !bg-blue-500 mt-8 hover:scale-105 duration-300 transition">
+                Connect
+              </button>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section
+        id="testimonials"
+        className="py-32 bg-gray-50 dark:bg-zinc-800 mx-auto px-6"
+      >
+        <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-zinc-100">
+          What Our Learners Say
+        </h2>
+        <div className="flex flex-wrap justify-center gap-8 mt-8">
+          {testimonies.map((item) => (
+            <div
+              className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-lg max-w-sm flex flex-col justify-between shadow-black dark:shadow-zinc-300"
+              key={item.name + ": " + item.title}
+            >
+              <p className="text-lg text-gray-600 dark:text-gray-300">
+                "{item.content}"
+              </p>
+              <div className="mt-4 flex items-center">
+                <Image
+                  src={item.image}
+                  alt="Student"
+                  className="w-20 h-24 rounded-2xl bg-zinc-200 object-cover object-center"
+                />
+                <div className="ml-4">
+                  <p className="font-semibold text-gray-800 dark:text-gray-100">
+                    {item.name}
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300">
+                    {item.title}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section
+        id="pricing"
+        ref={pricingRef}
+        className="py-32 bg-gradient-to-br from-blue-700 to-violet-700 text-white mx-auto px-6 text-center"
+      >
+        <h2 className="text-4xl font-extrabold">Affordable Pricing</h2>
+        <p className="mt-4 text-lg max-w-2xl mx-auto">
+          Choose from a range of pricing options that fit your budget and
+          learning needs. Get started today and access high-quality education at
+          affordable prices.
+        </p>
+
+        <div className="mt-12 flex flex-wrap justify-center gap-8">
+          {pricingPlans.map((plan, index) => (
+            <div
+              key={index}
+              className={`relative bg-white text-gray-800 max-2xl:mt-10 p-8 rounded-2xl shadow-lg max-w-sm transform transition duration-300 flex flex-col justify-between hover:scale-105 ${
+                plan.isPopular ? "border-4 border-yellow-400" : ""
+              }`}
+            >
+              <div className="relative">
+                {plan.isPopular && (
+                  <div className="absolute top-0 right-0 bg-yellow-400 text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
+                    Popular
+                  </div>
+                )}
+
+                <div className="flex justify-center">
+                  <i className={plan.iconStyles}></i>
+                </div>
+
+                <h3 className="mt-2 text-2xl font-bold">{plan.title}</h3>
+                <p className="mt-4 text-xl font-semibold text-blue-600">
+                  {plan.price}
+                </p>
+                <p className="mt-4 text-gray-600">{plan.description}</p>
+
+                <ul className="mt-6 text-left space-y-3">
+                  {plan.benefits.map((benefit, idx) => (
+                    <li key={idx} className="flex items-center">
+                      <i className="fas fa-check text-blue-500 mr-2"></i>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button className="mt-8 !bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-semibold transition duration-200">
+                {plan.buttonText}
+              </button>
+              <div
+                className={`absolute top-full w-[90%] mx-auto z-1 h-6 right-0 left-0 bg-blue-800 shadow-xl rounded-b-[1.25rem] lg:h-5 ${
+                  plan.isPopular && "border-t-4 border-[3px] border-yellow-400"
+                }`}
+              />
+              <div
+                className={`absolute top-full w-[70%] mx-auto z-1 h-6 right-0 left-0 bg-neutral-800/70 shadow-xl rounded-b-[1.25rem] lg:h-5 translate-y-5 ${
+                  plan.isPopular && "border-t-none border-2 border-yellow-400"
+                }`}
               />
             </div>
-          </div>
-          <div className="bg-white rounded-lg p-6">
-            <button className="button bg-primary !text-white mb-4">
-              Step 2
-            </button>
-            <h4 className="text-lg font-semibold mb-2">
-              Register and Participate
-            </h4>
-            <p className="text-zinc-600 body-2">
-              Sign up for the challenge and start working on the project.
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg p-6">
-            <button className="button bg-primary !text-white mb-4">
-              Step 3
-            </button>
-            <h4 className="text-lg font-semibold mb-2">Submit your work</h4>
-            <p className="text-zinc-600 body-2">
-              Submit your completed project for evaluation
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg p-6">
-            <button className="button bg-primary !text-white mb-4">
-              Step 4
-            </button>
-            <h4 className="text-lg font-semibold mb-2">
-              Receive Feedback and Recognition
-            </h4>
-            <p className="text-zinc-600 body-2">
-              Get feedback on your work and celebrate your achievements.
-            </p>
-          </div>
+          ))}
         </div>
       </section>
-      <section className="container mx-auto w-full lg:p-16 md:p-12 p-6">
-        <div className="w-full bg-primary text-white rounded-2xl p-12 flex md:flex-row flex-col gap-12">
-          <div className="md:w-2/5 w-full">
-            <Image src={students} alt="students" className="w-full h-full" />
-          </div>
-          <div className="md:w-1/2 w-full flex flex-col items-start justify-center md:pl-8">
-            <h3 className="h3 font-semibold mb-4 md:pr-4">
-              Ready to Unlock Your Career Potential Today!
-            </h3>
-            <p className="body-2 text-white/90 mb-12">
-              Join a challenge or a Hackathon to gain valuable work experience,
-              build an impressive portfolio and increase your chances to land
-              job opportunities and celebrate your career growth.
-            </p>
-            <button className="button bg-white text-primary py-4 px-12">
-              View Challenge
-            </button>
+
+      <footer className="bg-white mt-32 text-black dark:text-white dark:bg-black px-12 py-10 container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+        <div className="col-span-2">
+          <h4 className="text-lg font-bold mb-4">About IMBONI Learn</h4>
+          <p className="text-sm">
+            IMBONI Learn is your trusted platform for personalized, flexible,
+            and high-quality education. Empowering learners across the globe
+            with affordable courses and expert-led instruction.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="text-lg font-bold mb-4">Quick Links</h4>
+          <div className="space-y-2 text-sm flex flex-col">
+            {quickLinks.map((link, index) => (
+              <span
+                key={index}
+                onClick={() => {
+                  if (link === "Home") {
+                    scrollToSection(homeRef);
+                  } else if (link === "About") {
+                    scrollToSection(aboutRef);
+                  } else if (link === "Courses") {
+                    scrollToSection(coursesRef);
+                  } else if (link === "Features") {
+                    scrollToSection(featuresRef);
+                  } else if (link === "Pricing") {
+                    scrollToSection(pricingRef);
+                  } else {
+                  }
+                }}
+                className="cursor-pointer hover:text-teal-400"
+              >
+                {link}
+              </span>
+            ))}
           </div>
         </div>
-      </section>
+
+        <div>
+          <h4 className="text-lg font-bold mb-4">Contact Us</h4>
+          <p className="text-sm">
+            Email:{" "}
+            <a
+              href="mailto:miracleibanze@gmail.com"
+              className="hover:text-teal-400"
+            >
+              support@imbonilearn.com
+            </a>
+          </p>
+          <p className="text-sm mt-2">Phone: +250 123 456 789</p>
+          <p className="text-sm mt-2">Location: Kigali, Rwanda</p>
+          <button className="button !bg-blue-500 mt-4">Contact us</button>
+        </div>
+
+        <div>
+          <h4 className="text-lg font-bold mb-4">Follow Us</h4>
+          <div className="flex gap-x-4 flex-wrap">
+            {socials.map((social) => (
+              <a
+                href={social.link}
+                className="hover:text-teal-400"
+                key={social.name}
+              >
+                {social.name}
+              </a>
+            ))}
+          </div>
+        </div>
+        <p className="text-sm mt-4 md:col-span-5 text-center border-t pt-4">
+          &copy; {new Date().getFullYear()} IMBONI Learn. All rights reserved.
+        </p>
+      </footer>
     </>
   );
 };
 
-export default Home;
+export default memo(Home);

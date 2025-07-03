@@ -1,15 +1,19 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "@/redux/slices/userSlice";
-import challengeReducer from "@/redux/slices/challengeSlice";
-import communityReducer from "@/redux/slices/communitySlice";
-import analyticReducer from "@/redux/slices/analyticsSlice";
+import userReducer from "@redux/slices/userSlice";
+import refsReducer from "@redux/slices/refsSlice";
+import navigationReducer from "@redux/slices/navigationSlice";
+import coursesReducer from "@redux/slices/coursesSlice";
+import assignmentReducer from "@redux/slices/assignmentsSlice";
+import announcementsReducer from "@redux/slices/announcementsSlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
-    challenge: challengeReducer,
-    community: communityReducer,
-    analytic: analyticReducer,
+    refs: refsReducer,
+    navigation: navigationReducer,
+    courses: coursesReducer,
+    assignment: assignmentReducer,
+    announcements: announcementsReducer,
   },
 });
 

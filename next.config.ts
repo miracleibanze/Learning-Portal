@@ -1,9 +1,9 @@
-import path from 'path';
-import { NextConfig } from 'next';
+import path from "path";
+import { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   webpack(config) {
-    config.resolve.alias['@'] = path.join(__dirname);
+    config.resolve.alias["@"] = path.resolve(__dirname);
     return config;
   },
 };

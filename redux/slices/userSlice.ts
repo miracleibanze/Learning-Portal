@@ -1,123 +1,147 @@
-import axiosInstance from "@components/features/axiosInstance";
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
-// Define the type for the user
-export interface User {
-  userId?: string;
-  names: string;
-  email: string;
-  password: string;
-  phoneNumber: string;
-  role: string;
-  title: string;
-  about?: string;
-  profile?: {
-    image: string;
-    address?: string;
-    interests?: string[];
-    age?: number;
-    country?: string;
-    educationLevel?: string;
-    skills?: string[];
-  };
-  experience?: {
-    position: string;
-    field: string;
-    company: string;
-    duration: {
-      start: string;
-      end: string;
-    };
-    description: string;
-  };
+import { UserType } from "@type/User"; // Import the simplified UserType
+import axios from "axios";
 
-  engagementStats?: {
-    pointsEarned?: number;
-    badges?: string[];
-    completedChallenges?: number;
-    feedbackReceived?: object[];
+// Define the initial state
+export interface UserState {
+  detailedUser: {
+    data: UserType | null;
+    loading: boolean;
+    error: string | null;
   };
-
-  umuravaIntegration?: {
-    umuravaUserId?: string;
-    linkedAccounts?: {
-      github?: string;
-      linkedin?: string;
-    };
-  };
-
-  audit?: {
-    createdAt?: string;
-    updatedAt?: string;
-  };
-}
-
-// Initial state
-interface UserState {
-  user: User | null;
-  status: "idle" | "loading" | "succeeded" | "failed";
+  user: UserType | null;
+  loadingUser: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
-  user:
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("user") || "null")
-      : null,
-  status: "idle",
+  detailedUser: {
+    data: null,
+    loading: false,
+    error: null,
+  },
+  user: null,
+  loadingUser: false,
   error: null,
 };
 
-// Thunk for fetching user data from an API
+// Async thunk to fetch user data
 export const fetchUser = createAsyncThunk(
   "user/fetchUser",
-  async (userId: string) => {
+  async (userId: string, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`/api/user/${userId}`);
+      const response = await axios.get(`/api/user`);
       return response.data;
-    } catch (error) {
-      console.error("Failed to fetch user data:", error);
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+export const fetchDetailedUser = createAsyncThunk(
+  "user/fetchDetailedUser",
+  async (userId: string, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(`/api/user`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
     }
   }
 );
 
+// Async thunk to update user progress
+export const updateUserProgress = createAsyncThunk(
+  "user/updateUserProgress",
+  async (
+    {
+      userId,
+      courseId,
+      completedModules,
+    }: { userId: string; courseId: string; completedModules: number },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await axios.put(`/api/user/progress`, {
+        courseId,
+        completedModules,
+      });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Create the user slice
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setUserId: (state, action: PayloadAction<string>) => {
+    // Sync action to update any field of the user object
+    updateUserField: (state, action: PayloadAction<Partial<UserType>>) => {
       if (state.user) {
-        state.user.userId = action.payload;
-      } else {
-        state.user = { userId: action.payload } as User;
+        state.user = { ...state.user, ...action.payload };
       }
-      localStorage.setItem("userId", action.payload); // Store in localStorage
-    },
-    setUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
-      localStorage.setItem("user", JSON.stringify(action.payload)); // Store full user data in localStorage
-      localStorage.setItem("userId", JSON.stringify(action.payload.userId)); // Store full user data in localStorage
-    },
-    clearUser: (state) => {
-      state.user = null;
-      localStorage.removeItem("userId");
-      localStorage.removeItem("user"); // Remove full user data from localStorage on logout
     },
   },
   extraReducers: (builder) => {
+    // Fetch user
     builder
       .addCase(fetchUser.pending, (state) => {
-        state.status = "loading";
+        state.loadingUser = true;
+        state.error = null;
       })
-      .addCase(fetchUser.fulfilled, (state, action: PayloadAction<User>) => {
-        state.status = "succeeded";
-        state.user = action.payload;
+      .addCase(
+        fetchUser.fulfilled,
+        (state, action: PayloadAction<UserType>) => {
+          state.loadingUser = false;
+          state.user = action.payload;
+        }
+      )
+      .addCase(fetchUser.rejected, (state, action: PayloadAction<any>) => {
+        state.loadingUser = false;
+        state.error = action.payload?.message || "Failed to fetch user";
       })
-      .addCase(fetchUser.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = (action.error as Error).message;
-      });
+      .addCase(updateUserProgress.pending, (state) => {
+        state.loadingUser = true;
+        state.error = null;
+      })
+      .addCase(
+        updateUserProgress.fulfilled,
+        (state, action: PayloadAction<UserType>) => {
+          state.loadingUser = false;
+          state.user = action.payload;
+        }
+      )
+      .addCase(
+        updateUserProgress.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.loadingUser = false;
+          state.error = action.payload?.message || "Failed to update progress";
+        }
+      )
+      .addCase(fetchDetailedUser.pending, (state) => {
+        state.detailedUser.loading = true;
+      })
+      .addCase(
+        fetchDetailedUser.fulfilled,
+        (state, action: PayloadAction<UserType>) => {
+          state.detailedUser.data = action.payload;
+          state.detailedUser.loading = false;
+        }
+      )
+      .addCase(
+        fetchDetailedUser.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.detailedUser.error =
+            action.payload?.message || "Failed to update detailed User";
+        }
+      );
   },
 });
 
-export const { setUserId, setUser, clearUser } = userSlice.actions;
+// Export actions
+export const { updateUserField } = userSlice.actions;
+
+// Export the reducer
 export default userSlice.reducer;
