@@ -1,49 +1,43 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowLeft, ArrowRight, UserCircle2Icon } from "lucide-react";
+import { ChevronRight, UserCircle2Icon } from "lucide-react";
 import Link from "next/link";
 import { pcBook2 } from "@assets";
-import React, { FC } from "react";
-import { CourseDocument } from "@lib/models/Course";
+import React, { FC, useState } from "react";
+import { CourseDocument, DetailedCourseDocument } from "@lib/models/Course";
 import { useRouter } from "next/navigation";
 import { CourseDetailsSkeleton } from "@components/designs/Skeletons";
+import GoBack from "@components/GoBack";
+import SendJoinRequest from "@components/dashboard/SendJoinRequest";
 
 interface CourseDetailsProps {
-  course: CourseDocument | null;
+  course: DetailedCourseDocument | null;
   loading: boolean;
   enrolled: boolean;
-  isOpenNavigation: boolean;
 }
 
 const CourseDetails: FC<CourseDetailsProps> = ({
   course,
   loading,
   enrolled,
-  isOpenNavigation,
 }) => {
   const router = useRouter();
+  const [isSendRequest, setIsSendRequest] = useState<boolean>(false);
   return (
     <>
-      <div className="min-h-screen text-gray-900 dark:text-gray-100 p-6">
-        {!isOpenNavigation && (
-          <button
-            className="button bg-zinc-300 py-2 px-4 rounded-lg dark:bg-white/30 mb-5 flex items-center gap-2"
-            onClick={() => router.back()}
-          >
-            <ArrowLeft /> Back
-          </button>
-        )}
+      <div className="min-h-screen text-gray-900 dark:text-gray-100 md:p-6 p-4">
+        <GoBack />
         {!loading ? (
           <>
-            <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg dark:border border-white/40">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 md:p-6 p-3 rounded-lg shadow-lg dark:border border-white/40">
               <div className="mb-4">
                 <Image
                   src={pcBook2 || course?.thumbnail}
                   alt={course?.title || ""}
                   width={200}
                   height={150}
-                  className="w-full h-72 object-cover rounded-lg shadow-md"
+                  className="w-full md:h-72 h-52 object-cover rounded-lg shadow-md"
                 />
               </div>
 
@@ -99,28 +93,33 @@ const CourseDetails: FC<CourseDetailsProps> = ({
                   <UserCircle2Icon className="w-12 h-12 rounded-full" />
                 )}
                 <div className="ml-3">
-                  <p className="text-gray-800 font-semibold">
-                    {course?.instructor?.name}
+                  <p className="text-gray-800 dark:text-zinc-200 font-semibold">
+                    {course?.instructor.name}
                   </p>
-                  <p className="text-gray-600 text-sm">
-                    {course?.instructor?.email}
+                  <p className="text-gray-600 dark:text-zinc-100 text-sm">
+                    {course?.instructor.email}
                   </p>
                 </div>
               </Link>
               <p>Language: {course?.language}</p>
               <p>Chapters: {course?.chapters}</p>
               <div className="w-full flex justify-end pt-6 px-4">
-                <Link
-                  href={
+                <button
+                  className="button bg-blue-600 text-white flex gap-2 items-center"
+                  onClick={() =>
                     enrolled
-                      ? `/dashboard/my-courses/study/${course?.title}/${course?._id}`
-                      : `/dashboard/enroll/register/${course?.title}/${course?._id}`
+                      ? router.push(
+                          course
+                            ? `/dashboard/my-courses/study/${encodeURIComponent(
+                                course.title
+                              )}/${course?._id}`
+                            : ""
+                        )
+                      : setIsSendRequest(true)
                   }
                 >
-                  <button className="button bg-blue-600 text-white flex gap-2 items-center">
-                    {enrolled ? "Start learning" : "Join Course"} <ArrowRight />
-                  </button>
-                </Link>
+                  {enrolled ? "Continue" : "Join Course"} <ChevronRight />
+                </button>
               </div>
             </div>
           </>
@@ -128,6 +127,12 @@ const CourseDetails: FC<CourseDetailsProps> = ({
           <CourseDetailsSkeleton />
         )}
       </div>
+      {course && isSendRequest && (
+        <SendJoinRequest
+          course={course}
+          close={() => setIsSendRequest(false)}
+        />
+      )}
     </>
   );
 };

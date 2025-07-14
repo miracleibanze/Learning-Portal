@@ -13,9 +13,6 @@ const page: FC = () => {
   const { courseId }: { courseId: string } = useParams();
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
-  const { isOpenNavigation } = useSelector(
-    (state: RootState) => state.navigation
-  );
   const { data, detailedCourseLoading, detailedCourseError } = useSelector(
     (state: RootState) => state.courses.detailedCourse
   );
@@ -41,7 +38,6 @@ const page: FC = () => {
       course={data}
       loading={detailedCourseLoading}
       enrolled={false}
-      isOpenNavigation={isOpenNavigation}
     />
   );
 };

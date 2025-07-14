@@ -1,9 +1,9 @@
 import { FC } from "react";
-import { CourseDocument } from "@lib/models/Course";
+import { CourseDocument, DetailedCourseDocument } from "@lib/models/Course";
 import Image from "next/image";
 
 interface CourseCardProps {
-  course: CourseDocument;
+  course: DetailedCourseDocument;
   purchased?: boolean;
 }
 
@@ -48,8 +48,13 @@ const CourseCard: FC<CourseCardProps> = ({ course, purchased = false }) => {
           ))}
         </p>
       </div>
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 relative">
-        <span className="text-xs text-gray-500">{course.category}</span>
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700 relative flex justify-between items-center">
+        <span className="text-xs text-gray-500 dark:text-white/80">
+          {course.category}
+        </span>
+        <button className="bg-sky-600 text-white px-3 py-1 rounded">
+          {purchased ? "Continue" : "Check"}
+        </button>
       </div>
     </>
   );

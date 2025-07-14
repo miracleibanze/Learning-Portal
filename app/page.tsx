@@ -2,7 +2,6 @@
 
 import { FC, memo, useContext, useEffect, useRef } from "react";
 import {
-  courses,
   features,
   instructors,
   pricingPlans,
@@ -23,10 +22,13 @@ import {
   setFeaturesRef,
 } from "@redux/slices/refsSlice";
 import { AppDispatch, RootState } from "@redux/store";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { fetchTop4Courses } from "@redux/slices/coursesSlice";
 
 const Home: FC = () => {
+  const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
+  const { top4Courses } = useSelector((state: RootState) => state.courses);
 
   const homeRef = useRef<HTMLDivElement | null>(null);
   const aboutRef = useRef<HTMLDivElement | null>(null);
@@ -50,10 +52,10 @@ const Home: FC = () => {
     }
   }, [dispatch]);
 
-  // Get section references (IDs)
-  // const { about, features, courses, team } = useSelector(
-  //   (state: RootState) => state.refs
-  // );
+  useEffect(() => {
+    if (top4Courses.data.length > 0) return;
+    dispatch(fetchTop4Courses());
+  }, [pathname]);
 
   const scrollToSection = (section: React.RefObject<HTMLDivElement | null>) => {
     if (section.current) {
@@ -154,18 +156,18 @@ const Home: FC = () => {
               style={{ backgroundImage: `url("${featuresCard}")` }}
             >
               <div className="relative z-2 flex flex-col min-h-[22rem] p-[2.4rem] pointer-events-none z-[100]">
-                <h5 className="h5 mb-5 font-semibold">{feature.title}</h5>
-                <p className="body-2 leading-tight mb-6 text-n-3 font-normal">
-                  {feature.description}
-                </p>
+                <h5 className="h5 mb-5 font-semibold leading-tight">
+                  {feature.title}
+                </h5>
+                <p className="body-2 leading-tight">{feature.description}</p>
                 <div className="flex items-center justify-between mt-auto">
                   <div
-                    className={`flex items-center justify-center w-16 h-16 rounded-full ${feature.bgColor}`}
+                    className={`flex items-center justify-center w-12 h-12 rounded-full ${feature.bgColor} group-hover:bg-gray-300`}
                   >
                     <i className={`${feature.icon} text-2xl z-[10]`}></i>
                   </div>
                   <span className="flex items-center space-x-2 body-1 group-hover:bg-blue-800 group-hover:text-white rounded-full pl-4 py-2 group-hover:pr-2">
-                    <p className="moreIcon">Explore more</p>
+                    <span className="text-sm leading-tight">Explore more</span>
                     <Arrow />
                   </span>
                 </div>
@@ -174,7 +176,7 @@ const Home: FC = () => {
                 className="absolute inset-0.5 bg-n-8"
                 style={{ clipPath: "url(#benefits)" }}
               >
-                <div className="absolute inset-0 opacity-10 transition-opacity hover:opacity-40">
+                <div className="absolute inset-0 opacity-30 transition-opacity hover:opacity-50">
                   <Image
                     src={pcBook3}
                     height={380}
@@ -190,18 +192,17 @@ const Home: FC = () => {
         </div>
       </section>
 
-      <section id="courses" ref={coursesRef} className="py-16 mx-auto px-6">
+      <section id="courses" ref={coursesRef} className="py-16 px-6">
         <h2 className="text-3xl font-bold text-gray-800 text-center dark:text-zinc-100 py-4">
           Our Courses
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-8 mt-8 place-content-center">
-          {courses.length > 0 ? (
-            Array(courses.length > 5 ? 5 : courses.length)
-              .fill("")
-              .map((item, index) => (
+        <div className="relative max-w-full overflow-x-scroll">
+          <div className="flex relative mb-4 gap-8 mt-8 w-max">
+            {top4Courses.data.length > 0 ? (
+              top4Courses.data.map((item, index) => (
                 <div
-                  className="bg-white rounded-lg shadow overflow-hidden dark:bg-zinc-800/50 dark:shadow-slate-200"
-                  key={courses[index]?._id + index}
+                  className="w-[18rem] h-[28rem] bg-white rounded-lg shadow-md shadow-black/90 dark:bg-zinc-800/50 dark:shadow-slate-200 flex-0"
+                  key={item._id + index}
                 >
                   <div className="w-full aspect-video bg-zinc-300">
                     <Image
@@ -211,14 +212,16 @@ const Home: FC = () => {
                     />
                   </div>
                   <div className="p-6">
-                    <h5 className="h5 leading-tight font-semibold text-gray-800 dark:text-gray-100">
-                      {courses[index]?.title}
+                    <h5 className="body-1 leading-tight font-semibold text-gray-800 dark:text-gray-100">
+                      {item.title}
                     </h5>
-                    <p className="mt-4 body-2">{courses[index]?.description}</p>
+                    <p className="mt-4 body-2 truncate-two-lines">
+                      {item.description}
+                    </p>
                     <p className="mt-4 body-2 flex gap-x-3 flex-wrap gap-y-2">
-                      {courses[index]?.tags.map((tag) => (
+                      {item.tags.map((tag) => (
                         <span
-                          className="p-1 rounded-full bg-zinc-300/80 dark:text-black px-3"
+                          className="py-1 rounded-full bg-zinc-300/80 dark:text-black px-3 body-2 leading-none"
                           key={index + ": " + tag}
                         >
                           {tag}
@@ -226,20 +229,20 @@ const Home: FC = () => {
                       ))}
                     </p>
                     <p className="mt-4">
-                      By:{" "}
-                      {courses[index]?.instructor?.name || "Private instructor"}
+                      By: {item.instructor.name || "Private instructor"}
                     </p>
                   </div>
                 </div>
               ))
-          ) : (
-            <SectionLoader />
-          )}
-          <div className="w-full h-full flex-1 flex items-end justify-end">
-            <button className="button bg-blue-600 dark:bg-blue-300 text-white dark:text-blue-800 px-8">
-              See More Courses
-            </button>
+            ) : (
+              <SectionLoader />
+            )}
           </div>
+        </div>
+        <div className="w-full h-full flex-1 flex items-end mt-4 justify-end">
+          <button className="button bg-blue-600 dark:bg-blue-300 text-white dark:text-blue-800 px-8">
+            See More Courses
+          </button>
         </div>
       </section>
 
@@ -256,7 +259,7 @@ const Home: FC = () => {
           {instructors.map((instructor, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-zinc-800 p-6 rounded-lg knob relative"
+              className="bg-white dark:bg-zinc-800 p-6 rounded-lg knob relative shadow-md shadow-black/90"
             >
               <Image
                 src={instructor.image}
@@ -266,10 +269,10 @@ const Home: FC = () => {
               <h3 className="mt-6 text-xl font-bold text-gray-800 dark:text-zinc-100">
                 {instructor.name}
               </h3>
-              <p className="mt-4 text-gray-600 dark:text-gray-300">
+              <p className="mt-2 text-gray-600 dark:text-gray-300">
                 {instructor.role}
               </p>
-              <p className="mt-4 text-gray-600 dark:text-gray-300">
+              <p className="mt-2 body-2 leading-tight text-gray-600 dark:text-gray-300">
                 {instructor.description}
               </p>
               <button className="button !bg-blue-500 mt-8 hover:scale-105 duration-300 transition">

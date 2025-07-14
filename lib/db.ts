@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Content } from "@/lib/models/Content";
 
 export async function connectDB() {
   if (mongoose.connection.readyState >= 1) {

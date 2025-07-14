@@ -45,63 +45,63 @@ export const features = [
     description:
       "Engage in live sessions, quizzes, and hands-on projects designed to provide a dynamic and immersive learning experience. With real-time interactions and collaborative tasks, you'll never feel alone on your learning journey.",
     icon: "fas fa-graduation-cap",
-    bgColor: "bg-blue-200 text-blue-500",
+    bgColor: "text-blue-500",
   },
   {
     title: "AI-Powered Personalized Learning",
     description:
       "Track your progress, identify areas for improvement, and receive personalized learning paths. Our AI-driven system ensures that every student gets a tailored experience to maximize their potential.",
     icon: "fas fa-brain",
-    bgColor: "bg-green-200 text-green-500",
+    bgColor: "text-green-500",
   },
   {
     title: "Diverse Course Library",
     description:
       "Explore a comprehensive range of courses across various fields, including technology, business, art, and more. All courses are developed by experienced instructors to ensure quality and relevance.",
     icon: "fas fa-book",
-    bgColor: "bg-red-200 text-red-500",
+    bgColor: "text-red-500",
   },
   {
     title: "Expert Instructors",
     description:
       "Learn from a team of seasoned professionals who bring real-world experience to the virtual classroom. Benefit from their industry insights and practical knowledge to enhance your skills.",
     icon: "fas fa-user-tie",
-    bgColor: "bg-yellow-200 text-yellow-500",
+    bgColor: "text-yellow-500",
   },
   {
     title: "Progress Tracking & Analytics",
     description:
       "Monitor your achievements, assess your learning outcomes, and gain insights through detailed analytics. Stay motivated as you watch your progress unfold in real-time.",
     icon: "fas fa-chart-line",
-    bgColor: "bg-purple-200 text-purple-500",
+    bgColor: "text-purple-500",
   },
   {
     title: "Collaborative Learning",
     description:
       "Connect with peers and instructors through interactive forums, group projects, and live discussions. Share ideas, ask questions, and grow together in a supportive learning community.",
     icon: "fas fa-handshake",
-    bgColor: "bg-indigo-200 text-indigo-500",
+    bgColor: "text-indigo-500",
   },
   {
     title: "Certifications",
     description:
       "Earn certifications that are recognized and respected by employers and institutions worldwide. Showcase your skills and achievements to advance your career or academic pursuits.",
     icon: "fas fa-certificate",
-    bgColor: "bg-teal-200 text-teal-500",
+    bgColor: "text-teal-500",
   },
   {
     title: "Mobile-Friendly Access",
     description:
       "Access all features and resources seamlessly on any device. Whether you're at home, at assignment, or on the go, our platform adapts to your needs to ensure uninterrupted learning.",
     icon: "fas fa-mobile-alt",
-    bgColor: "bg-gray-200 text-gray-500",
+    bgColor: "text-gray-500",
   },
   {
     title: "Affordable Pricing",
     description:
       "Gain access to high-quality education without breaking the bank. Choose from a variety of affordable plans and free options to match your budget and learning goals.",
     icon: "fas fa-tags",
-    bgColor: "bg-pink-200 text-pink-500",
+    bgColor: "text-cyan-500",
   },
 ];
 

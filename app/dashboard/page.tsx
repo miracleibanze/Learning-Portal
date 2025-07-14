@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { EyeIcon, Loader, PlusIcon } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
+import { MutableAssignment } from "@redux/slices/assignmentsSlice";
+import { IAssignment } from "@type/Assignment";
+import AssignmentDetailModal from "@components/dashboard/AssignmentDetail";
 import { fetchAnnouncements } from "@redux/slices/announcementsSlice";
 import { fetchTop4Courses } from "@redux/slices/coursesSlice";
 import {
@@ -17,21 +20,23 @@ import Link from "next/link";
 import Progress from "@components/Progress";
 import Assignment from "@components/Assignment";
 import { fetchpendingAssignments } from "@redux/slices/assignmentsSlice";
+import AnnouncementCard from "@components/dashboard/AnnouncementCard";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
   const pathname = usePathname();
   const dispatch = useDispatch<AppDispatch>();
   const currentUser = useSelector((state: RootState) => state.user);
-
   const { announcements, loadingAnnouncements } = useSelector(
     (state: RootState) => state.announcements
   );
-
+  const [announcementCard, setAnnouncementCard] = useState<string | null>(null);
   const { top4Courses } = useSelector((state: RootState) => state.courses);
   const { pendingAssignments } = useSelector(
     (state: RootState) => state.assignment
   );
+  const [selectedAssignment, setSelectedAssignment] =
+    useState<MutableAssignment | null>(null);
 
   useEffect(() => {
     if (session?.user) {
@@ -42,7 +47,7 @@ export default function DashboardPage() {
       if (!announcements || announcements.length === 0)
         dispatch(fetchAnnouncements());
     }
-  }, [session?.user, pathname, dispatch]);
+  }, [session?.user, dispatch]);
 
   if (!session?.user)
     return (
@@ -55,7 +60,7 @@ export default function DashboardPage() {
     );
 
   return (
-    <main className="px-4 py-6 max-w-full grid lg:grid-cols-3 grid-cols-1 gap-6">
+    <main className="px-4 py-6 max-w-full grid lg:grid-cols-3 grid-cols-1 gap-6 relative overflow-hidden">
       <div
         className="w-full border-2 rounded lg:col-span-2 border-zinc-300 dark:border-white/50 flex flex-col"
         data-testid="announcement-container"
@@ -97,60 +102,55 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
-
+        {announcementCard !== null && (
+          <AnnouncementCard
+            id={announcementCard}
+            close={() => setAnnouncementCard(null)}
+          />
+        )}
         <div
           className={`min-h-52 h-full flex-1 max-h-72`}
           data-testid="announcement-list"
         >
           {loadingAnnouncements ? (
-            Array(3)
-              .fill("")
-
-              .map((_, index) => (
-                <LineSkeleton
-                  data-testid="line-skeleton"
-                  index={3}
-                  key={index}
-                />
-              ))
+            Array.from({ length: 4 }).map((_, index) => (
+              <LineSkeleton data-testid="line-skeleton" index={3} key={index} />
+            ))
           ) : announcements?.length > 0 ? (
-            Array(3)
+            Array(announcements.length > 3 ? 3 : announcements.length)
               .fill("")
               .map((_, index) => (
-                <>
-                  <div
-                    key={index}
-                    className={`border-t border-gray-300 dark:border-white/30 py-2 ${
-                      announcements[index].createdBy === "admin" &&
-                      "border-l-4 !border-l-sky-500"
-                    } ${
-                      announcements[index].createdBy === "instructor" &&
-                      "border-l-4 !border-l-yellow-400"
-                    } px-3`}
-                    data-testid={`announcement-${announcements[index]._id}`}
+                <div
+                  key={index}
+                  className={`border-t hover:bg-gray-200 dark:hover:bg-gray-200/10 cursor-pointer border-gray-300 dark:border-white/30 py-2 ${
+                    announcements[index].createdBy === "admin" &&
+                    "border-l-4 !border-l-sky-500"
+                  } ${
+                    announcements[index].createdBy === "instructor" &&
+                    "border-l-4 !border-l-yellow-400"
+                  } px-3`}
+                  data-testid={`announcement-${announcements[index]._id}`}
+                  onClick={() => setAnnouncementCard(announcements[index]._id)}
+                >
+                  <h3
+                    className="text-lg font-semibold tracking-wide uppercase"
+                    data-testid={`announcement-title-${announcements[index]._id}`}
                   >
-                    <h3
-                      className="text-lg font-semibold tracking-wide uppercase"
-                      data-testid={`announcement-title-${announcements[index]._id}`}
-                    >
-                      {announcements[index].title}
-                    </h3>
-                    <p
-                      className="text-sm text-gray-600 dark:text-gray-300 w-full truncate"
-                      data-testid={`announcement-description-${announcements[index]._id}`}
-                    >
-                      {announcements[index].description}
-                    </p>
-                    <p
-                      className="text-xs text-gray-500 dark:text-gray-400"
-                      data-testid={`announcement-date-${announcements[index]._id}`}
-                    >
-                      {new Date(
-                        announcements[index].createdAt
-                      ).toLocaleString()}
-                    </p>
-                  </div>
-                </>
+                    {announcements[index].title}
+                  </h3>
+                  <p
+                    className="text-sm text-gray-600 dark:text-gray-300 w-full truncate"
+                    data-testid={`announcement-description-${announcements[index]._id}`}
+                  >
+                    {announcements[index].description}
+                  </p>
+                  <p
+                    className="text-xs text-gray-500 dark:text-gray-400"
+                    data-testid={`announcement-date-${announcements[index]._id}`}
+                  >
+                    {new Date(announcements[index].createdAt).toLocaleString()}
+                  </p>
+                </div>
               ))
           ) : (
             <div
@@ -168,20 +168,74 @@ export default function DashboardPage() {
             announcements?.length <= 3 && "hidden"
           } text-blue-600 underline gap-1`}
         >
-          <EyeIcon /> See more
+          <Link href="/dashboard/announcements" className="flex">
+            <EyeIcon />
+            <span> See more</span>
+          </Link>
         </div>
       </div>
 
       {session.user.role !== "admin" && (
-        <Assignment
-          pendingAssignments={pendingAssignments}
-          create={session.user.role === "instructor" ? true : false}
-          data-testid="assignment-component"
-        />
+        <div className="col-span-1 w-full border-2 rounded border-zinc-300 dark:border-white/50 overflow-hidden flex flex-col">
+          <h5 className="h5 text-sky-500 font-semibold px-3 pt-2 group-hover:underline">
+            Assignment
+          </h5>
+          <p className="text-sm text-sky-400 leading-none px-3 pb-2 group-hover:underline">
+            You have unfinished assignments in your studies.
+          </p>
+          <div className={`min-h-52 h-full flex-1 max-h-72 flex flex-col`}>
+            {pendingAssignments?.data.length > 0 ? (
+              Array(4)
+                .fill("")
+                .map((_, index) => (
+                  <div
+                    className="w-full px-3 border-t border-gray-300 dark:border-white/50 py-2 cursor-pointer"
+                    key={index}
+                    onClick={() =>
+                      setSelectedAssignment(pendingAssignments.data[index])
+                    }
+                  >
+                    <h3 className="text-lg font-semibold">
+                      {pendingAssignments.data[index].title}
+                    </h3>
+                    <p className="text-sm truncate text-zinc-600 dark:text-white/70">
+                      {pendingAssignments.data[index].description}
+                    </p>
+                  </div>
+                ))
+            ) : pendingAssignments.loading ? (
+              Array(3)
+                .fill("")
+                .map((_, index) => <LineSkeleton key={index} />)
+            ) : (
+              <div className="w-full h-52 flex items-center justify-center">
+                <p className="text-gray-500 text-sm text-center py-2">
+                  No assignment available.
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div
+            className={`w-full px-3 border-t border-gray-300 dark:border-white/50 py-2 flex items-center justify-center ${
+              pendingAssignments.data?.length <= 3 && "hidden"
+            } text-blue-600 underline`}
+          >
+            <Link href="/dashboard/assignments" className="flex gap-1">
+              <EyeIcon /> See more
+            </Link>
+          </div>
+          {selectedAssignment && (
+            <AssignmentDetailModal
+              assignment={selectedAssignment}
+              close={() => setSelectedAssignment(null)}
+            />
+          )}
+        </div>
       )}
 
       <div
-        className="w-full mt-3 lg:col-span-3 col-span-1 flex pr-8 items-end"
+        className="w-full mt-3 lg:col-span-3 col-span-1 flex pr-8 md:flex-row flex-col"
         data-testid="popular-course-section"
       >
         <div className="w-full flex-1">
@@ -199,6 +253,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <Link
+          className="ml-auto"
           href={
             session.user.role === "student"
               ? "/dashboard/enroll"
@@ -218,16 +273,14 @@ export default function DashboardPage() {
         data-testid="course-list"
       >
         {top4Courses?.top4CoursesLoading ? (
-          Array(4)
-            .fill("")
-            .map((_, index) => (
-              <CourseCardSkeleton key={index} data-testid="course-skeleton" />
-            ))
+          Array.from({ length: 4 }).map((_, index) => (
+            <CourseCardSkeleton key={index} data-testid="course-skeleton" />
+          ))
         ) : top4Courses?.data?.length > 0 ? (
           top4Courses?.data.map((course, index) => (
             <Link
               href={`/dashboard/${
-                currentUser.user?.myCourses.includes(course._id)
+                (currentUser.user?.myCourses ?? []).includes(course._id)
                   ? "my-courses"
                   : "enroll"
               }/${course._id}`}
@@ -237,7 +290,9 @@ export default function DashboardPage() {
               <CourseCard
                 course={course}
                 data-testid={`course-card-${course._id}`}
-                purchased={currentUser.user?.myCourses.includes(course._id)}
+                purchased={(currentUser.user?.myCourses ?? []).includes(
+                  course._id
+                )}
               />
             </Link>
           ))

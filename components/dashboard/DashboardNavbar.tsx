@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, SidebarClose, SidebarOpen } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import useFormattedPathSegment from "@features/useFormattedPathSegment";
 import Image from "next/image";
@@ -57,21 +57,15 @@ const DashboardNavbar: FC = () => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
   return (
-    <nav className="w-full bg-sky-600 dark:bg-gray-900 dark:border-b border-white/50 text-white sticky top-0 px-4 py-2 flex items-center justify-between">
+    <nav className="w-full bg-sky-600 dark:bg-gray-900 dark:border-b border-white/50 text-white sticky top-0 px-4 py-2 flex items-center justify-between z-50">
       <div
         className="flex items-center gap-2 capitalize"
         onClick={handleToggleSidebar}
       >
         {isOpenNavigation ? (
-          <MenuIcon />
+          <SidebarOpen />
         ) : session?.user.picture ? (
-          <Image
-            src={session?.user.picture as string}
-            alt="picture"
-            width={30}
-            height={20}
-            className="w-8 aspect-square object-cover rounded-full border border-white"
-          />
+          <SidebarClose />
         ) : (
           <span className=" bg-white/80 w-[30px] aspect-square text-sky-600 rounded-full p-1 flex items-center justify-center">
             <i className="fas fa-user text-lg"></i>

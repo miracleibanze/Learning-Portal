@@ -30,7 +30,7 @@ const page: FC = () => {
       <p className="body-2 text-sky-500 leading-none mb-5">
         All Course i Have been enrolled in and assignmenting out.
       </p>
-      <div className="flex gap-x-4 gap-y-3 flex-wrap w-full">
+      <div className="flex gap-x-4 gap-y-3 flex-wrap w-full max-md:justify-center">
         {myCourseError && (
           <p className="text-red-400 body-2">{myCourseError}</p>
         )}

@@ -1,6 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import axios from "axios";
-import { ChapterDocument, CourseDocument } from "@lib/models/Course";
+import {
+  ChapterDocument,
+  CourseDocument,
+  DetailedCourseDocument,
+} from "@lib/models/Course";
 
 // Async action to fetch all courses
 export const fetchCourses = createAsyncThunk(
@@ -120,7 +124,7 @@ export const fetchDetailedCourseChapters = createAsyncThunk(
   "courses/fetchDetailedCourseChapters",
   async (courseId: string, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`/api/courses/${courseId}`);
+      const response = await axios.get(`/api/courses/chapters/${courseId}`);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(
@@ -137,7 +141,7 @@ interface CourseState {
     coursesError: any;
   };
   top4Courses: {
-    data: CourseDocument[];
+    data: DetailedCourseDocument[];
     top4CoursesLoading: boolean;
     top4CoursesError: any;
   };
@@ -157,12 +161,12 @@ interface CourseState {
     coursesCreatedError: any;
   };
   detailedCourse: {
-    data: CourseDocument | null;
+    data: DetailedCourseDocument | null;
     detailedCourseLoading: boolean;
     detailedCourseError: any;
   };
   detailedCourseChapters: {
-    data: { _id: string | null; chapters: ChapterDocument[] };
+    data: { chapters: ChapterDocument[] };
     detailedCourseChaptersLoading: boolean;
     detailedCourseChaptersError: any;
   };
@@ -202,7 +206,7 @@ const initialState: CourseState = {
     detailedCourseError: null,
   },
   detailedCourseChapters: {
-    data: { _id: null, chapters: [] },
+    data: { chapters: [] },
     detailedCourseChaptersLoading: true,
     detailedCourseChaptersError: null,
   },
@@ -332,7 +336,7 @@ const courseSlice = createSlice({
         fetchDetailedCourseChapters.fulfilled,
         (state, action: PayloadAction<CourseDocument[]>) => {
           state.detailedCourseChapters.detailedCourseChaptersLoading = false;
-          state.detailedCourseChapters.data.chapters = JSON.parse(
+          state.detailedCourseChapters.data = JSON.parse(
             JSON.stringify(action.payload)
           );
         }

@@ -35,34 +35,30 @@ const Sidebar: FC<SidebarProps> = ({
 
   const handleLogout = async () => {
     try {
-      window.location.href = "/login";
-      await signOut({ redirect: false });
+      await signOut({ callbackUrl: "/login" });
     } catch (error) {
       console.error("🚨 Error during logout:", error);
     } finally {
       setShowPopup(false);
     }
   };
-  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) return null;
+    window.innerWidth < 768 && handleToggleSidebar?.(); // only if it should auto-close
+  }, [pathname]);
 
   return (
     <>
       <div
-        className={`fixed inset-0 bg-black/40 sm:hidden z-[100] ${
+        className={`fixed inset-0 md:bg-black/40 sm:hidden z-[100] ${
           !isOpenNavigation && "hidden"
         } `}
         onClick={handleToggleSidebar}
       />
       <aside
         className={`
-          ${isOpenNavigation ? "w-full" : "w-0"}
+          ${isOpenNavigation ? "w-full" : "w-0 max-md:hidden"}
           bg-sky-500 dark:bg-gray-900 text-white h-screen py-4 flex flex-col justify-between dark:border-r border-white/50
           transition-all duration-300 ease-in-out 
           ${
@@ -102,13 +98,13 @@ const Sidebar: FC<SidebarProps> = ({
             </div>
             <div className="text-center p-4">
               <p className="body-1 leading-none">
-                {user?.name ? user?.name : "Your names"}
+                {user?.name ? user?.name : "Loading..."}
               </p>
               <p className="text-[11px] text-white/90 mb-1">
-                {user?.email ? user?.email : "your contact email"}
+                {user?.email ? user?.email : "..."}
               </p>
               <button className="button border rounded-full !py-1 capitalize">
-                {user?.role ? user?.role : "Your role"}
+                {user?.role ? user?.role : "..."}
               </button>
             </div>
           </Link>
@@ -157,9 +153,7 @@ const Sidebar: FC<SidebarProps> = ({
               </Link>
 
               <div
-                className={`w-full flex flex-col h-full max-h-[20rem] ${
-                  navbarBack.list?.length > 3 && "overflow-y-scroll"
-                }`}
+                className={`w-full flex flex-col h-full max-h-[20rem] overflow-y-auto`}
               >
                 {navbarBack.list?.map((link, index) => (
                   <Link
@@ -187,10 +181,10 @@ const Sidebar: FC<SidebarProps> = ({
             <SettingsIcon />
           </Link>
 
-          <div className="relative">
+          <div className="md:relative">
             <button
               onClick={() => setShowPopup(!showPopup)}
-              className="p-2 rounded-full hover:bg-gray-200 focus:outline-none group"
+              className="p-2 rounded-full hover:bg-gray-200 focus:outline-none group relative overflow-hidden"
             >
               <PowerIcon size={24} className="group-hover:text-sky-500" />
               <MoreHorizontal
@@ -200,12 +194,14 @@ const Sidebar: FC<SidebarProps> = ({
             </button>
 
             {showPopup && (
-              <div className="absolute bottom-full left-0 mt-10 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64">
+              <div className="md:absolute fixed md:bottom-full max-md:top-1/2 max-md:-translate-x-1/2 max-md:left-1/2 max-md:-translate-y-1/2 left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 max-w-[90vw] z-50">
                 <p className="text-sm text-gray-700 mb-4">
                   You will need to enter your credentials the next time you log
                   in.
                 </p>
                 <button
+                  aria-label="Logout"
+                  role="button"
                   onClick={handleLogout}
                   className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none"
                 >

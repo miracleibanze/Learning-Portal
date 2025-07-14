@@ -24,6 +24,7 @@ export async function POST() {
   try {
     await connectDB();
 
+    console.error("fetching top courses");
     let topCourses = await Course.aggregate([
       // Ensure students array exists
       {

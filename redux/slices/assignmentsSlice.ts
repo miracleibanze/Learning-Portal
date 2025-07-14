@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { IAssignment } from "@type/Assignment"; // Your original IAssignment
+import { IAssignment, Question } from "@type/Assignment"; // Your original IAssignment
 import axios from "axios";
 import { User } from "next-auth";
 
@@ -9,10 +9,13 @@ export interface MutableAssignment {
   title: string;
   description: string;
   instructor: User;
+  type: "quiz" | "coding";
   deadline: Date;
   createdAt: Date;
   createdBy: string;
   courseId: string; // Simplified courseId type
+  questions?: Question[];
+  codeInstructions?: string;
 }
 
 // Define the AssignmentState using the mutable types
@@ -53,6 +56,20 @@ export const fetchpendingAssignments = createAsyncThunk(
     }
   }
 );
+// Thunk action to fetch assignments created by the instructor
+export const fetchCreatedAssignments = createAsyncThunk(
+  "assignment/fetchCreatedAssignments",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/api/assignments/created`);
+      return response.data;
+    } catch (err: any) {
+      return rejectWithValue(
+        err.response?.data || "Error fetching created assignments"
+      );
+    }
+  }
+);
 
 // Assignment slice creation
 const assignmentSlice = createSlice({
@@ -60,17 +77,26 @@ const assignmentSlice = createSlice({
   initialState,
   reducers: {
     // Set pending assignments and update status
-    setpendingAssignments(state, action: PayloadAction<MutableAssignment[]>) {
+    setpendingAssignments(
+      state,
+      action: PayloadAction<MutableAssignment[] | IAssignment[]>
+    ) {
       state.pendingAssignments.data = action.payload;
       state.pendingAssignments.loading = false;
     },
     // Set submitted assignments and update status
-    setSubmittedAssignments(state, action: PayloadAction<MutableAssignment[]>) {
+    setSubmittedAssignments(
+      state,
+      action: PayloadAction<MutableAssignment[] | IAssignment[]>
+    ) {
       state.submittedAssignments.data = action.payload;
       state.submittedAssignments.status = "set";
     },
     // Set created assignments and update status
-    setCreatedAssignments(state, action: PayloadAction<MutableAssignment[]>) {
+    setCreatedAssignments(
+      state,
+      action: PayloadAction<MutableAssignment[] | IAssignment[]>
+    ) {
       state.createdAssignments.data = action.payload;
       state.createdAssignments.status = "set";
     },
@@ -87,6 +113,16 @@ const assignmentSlice = createSlice({
       .addCase(fetchpendingAssignments.rejected, (state, action) => {
         state.pendingAssignments.error = action.payload;
         state.pendingAssignments.loading = false;
+      })
+      .addCase(fetchCreatedAssignments.pending, (state) => {
+        state.createdAssignments.status = "loading";
+      })
+      .addCase(fetchCreatedAssignments.fulfilled, (state, action) => {
+        state.createdAssignments.data = action.payload;
+        state.createdAssignments.status = "set";
+      })
+      .addCase(fetchCreatedAssignments.rejected, (state) => {
+        state.createdAssignments.status = "error";
       });
   },
 });

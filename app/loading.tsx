@@ -1,23 +1,14 @@
-import { FC } from "react";
+// app/dashboard/loading.tsx
+"use client";
 import Image from "next/image";
 
-const Loading: FC = () => {
+export default function Loading() {
   return (
-    <div
-      className={`fixed inset-0 flex items-center justify-center z-[9999] bg-zinc-100 dark:bg-black/70`}
-    >
-      <div className="w-full max-w-[15rem] relative overflow-hidden p-3 pb-8 bg-sky-600 flex justify-center">
-        <Image
-          src="/logo.png"
-          alt="logo"
-          width={200}
-          height={100}
-          className="w-auto h-auto"
-        />
-        <div className="h-2 animate-loading bg-white absolute rounded-md bottom-0" />
+    <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-black z-[9999]">
+      <div className="p-4 bg-sky-600 rounded">
+        <Image src="/logo.png" alt="Logo" width={120} height={60} />
+        <div className="h-2 animate-loading bg-white rounded-md mt-4" />
       </div>
     </div>
   );
-};
-
-export default Loading;
+}

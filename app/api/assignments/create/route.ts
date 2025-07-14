@@ -11,7 +11,7 @@ export default async function handler(
   }
 
   await connectDB();
-  const { title, description, deadline, instructorId, courseId } = req.body;
+  const { title, description, deadline, instructorId, courseId } = req;
 
   try {
     const assignment = await Assignment.create({

@@ -3,22 +3,23 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
 import { FC, useEffect } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { fetchDetailedCourse } from "@redux/slices/coursesSlice";
 
 const page: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const searchParams = useSearchParams();
+  const { params }: { params: string[] } = useParams();
+  const courseName = decodeURIComponent(params[0]);
+  const courseId = params[0];
+  const { detailedCourse } = useSelector((state: RootState) => state.courses);
   const pathname = usePathname();
-  const courseId = searchParams.get("ref");
-  const { data, detailedCourseLoading, detailedCourseError } = useSelector(
-    (state: RootState) => state.courses.detailedCourse
-  );
 
   useEffect(() => {
-    if (data && courseId === data?._id) dispatch(fetchDetailedCourse(courseId));
-  }, [courseId, pathname]);
+    if (courseId && detailedCourse?.data?.title !== courseName) {
+      dispatch(fetchDetailedCourse(courseId));
+    }
+  }, [dispatch, pathname]);
 
   return (
     <main className="h-full flex-1 flex items-center justify-center">
@@ -26,7 +27,9 @@ const page: FC = () => {
         <h3 className="h3 font-semibold underline text-center">
           Join the course
         </h3>
-        <div className="flex w-full gap-3">s</div>
+        <div className="flex w-full gap-3">
+          {JSON.stringify(detailedCourse.data)}
+        </div>
       </div>
     </main>
   );

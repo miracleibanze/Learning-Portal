@@ -2,118 +2,138 @@
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { fetchpendingAssignments } from "@redux/slices/assignmentsSlice";
 import { LineSkeleton } from "@components/designs/Skeletons";
 import Image from "next/image";
 import { UserCircle2Icon } from "lucide-react";
 import Link from "next/link";
-import Assignment from "@components/Assignment";
+import AssignmentDetailModal from "@components/dashboard/AssignmentDetail";
+import { IAssignment } from "@type/Assignment";
 
-const page: FC = () => {
+const PendingAssignmentsPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const [selectedAssignment, setSelectedAssignment] =
+    useState<IAssignment | null>(null);
   const { data, loading, error } = useSelector(
     (state: RootState) => state.assignment.pendingAssignments
   );
+
   useEffect(() => {
     if (!data || data.length === 0) {
       dispatch(fetchpendingAssignments());
     }
-  }, []);
+  }, [dispatch, data]);
 
-  return (
-    <main className="px-4 py-6">
-      <h1 className="text-2xl font-bold mb-4">Pending Assignments</h1>
-      <div className="space-y-3">
-        {!loading ? (
-          data.length > 0 ? (
-            data?.map((assignment) => (
-              <div
-                key={assignment._id}
-                className="shrink-0 bg-white dark:bg-zinc-900 shadow-md overflow-hidden border border-gray-200  dark:border-white/60 rounded-lg hover:scale-[1.01] transition hover:shadow-lg cursor-pointer p-4"
-              >
-                <Link
-                  href={`/dashboard/my-courses/${assignment.courseId}`}
-                  className="group"
-                >
-                  <h2 className="h5 text-blue-700 dark:text-blue-400 font-semibold group-hover:underline">
-                    {assignment.title}
-                  </h2>
-                  <p className="body-1">{assignment.description}</p>
-                  <p className="text-zinc-700 dark:text-white/70">
-                    Deadline:
-                    {new Date(assignment.deadline).toLocaleDateString()}
-                  </p>
-                  <p className="text-green-600 dark:text-green-500 font-bold body-1 mt-4">
-                    {assignment.instructor.role}
-                  </p>
-                </Link>
-                <Link
-                  href={`/dashboard/${assignment.instructor.name}/${assignment?.instructor._id}`}
-                  className="flex items-center group w-max"
-                >
-                  {assignment.instructor.picture ? (
-                    <Image
-                      src={assignment?.instructor?.picture}
-                      alt={assignment?.instructor?.name}
-                      width={40}
-                      height={40}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    <UserCircle2Icon className="w-12 h-12 rounded-full" />
-                  )}
-                  <div className="ml-3">
-                    <p className="text-gray-800 font-semibold group-hover:underline">
-                      {assignment?.instructor?.name}
-                    </p>
-                    <p className="text-gray-600 text-sm group-hover:underline">
-                      {assignment?.instructor?.email}
-                    </p>
-                  </div>
-                </Link>
-              </div>
-            ))
-          ) : (
-            <p
-              className="text-gray-500 dark:text-gray-400"
-              data-testid="no-top-courses"
+  return !selectedAssignment ? (
+    <main className="px-4 py-6 min-h-screen bg-white dark:bg-black text-black dark:text-white">
+      <h1 className="text-3xl font-bold mb-6 text-sky-600 dark:text-sky-400">
+        Pending Assignments
+      </h1>
+
+      <section className="space-y-5 md:px-6 px-3">
+        {loading ? (
+          Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="p-4 rounded-lg bg-zinc-100 dark:bg-zinc-900 border dark:border-white/30"
             >
-              No assignments available
-            </p>
-          )
-        ) : (
-          Array(4)
-            .fill("")
-            .map((_, index) => (
+              <LineSkeleton index={3} assignment={true} />
+            </div>
+          ))
+        ) : data && data.length > 0 ? (
+          data.map((assignment) => (
+            <div
+              key={assignment._id}
+              className="p-4 bg-white dark:bg-zinc-900 shadow-sm rounded-lg border border-gray-200 dark:border-white/30 transition hover:shadow-md"
+            >
+              {/* Assignment Details */}
               <div
-                key={index}
-                className="p-4 shadow rounded-lg bg-white dark:bg-gray-900 dark:border border-white/40"
+                className="block group mb-4"
+                onClick={() => setSelectedAssignment(assignment)}
               >
-                <LineSkeleton index={3} assignment={true} />
+                <h2 className="h5 font-semibold text-blue-700 dark:text-blue-400 group-hover:underline">
+                  {assignment.title}
+                </h2>
+                <p className="body-2 text-gray-600 dark:text-gray-300 mt-1">
+                  {assignment.description}
+                </p>
+                <p className="body-2 mt-2 font-medium text-zinc-700 dark:text-white/70">
+                  Deadline:{" "}
+                  <span className="font-semibold">
+                    {new Date(assignment.deadline).toLocaleDateString()}
+                  </span>
+                </p>
+                <p className="body-2 font-semibold text-green-600 dark:text-green-400 mt-2">
+                  Role: {assignment.instructor.role}
+                </p>
               </div>
-            ))
+
+              {/* Instructor Info */}
+              <Link
+                href={`/dashboard/${assignment.instructor.name}/${assignment.instructor._id}`}
+                className="flex items-center gap-3 group px-3"
+                aria-label={`Go to instructor profile ${assignment.instructor.name}`}
+              >
+                {assignment.instructor.picture ? (
+                  <Image
+                    src={assignment.instructor.picture}
+                    alt={`${assignment.instructor.name}'s profile`}
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-full object-cover border"
+                  />
+                ) : (
+                  <UserCircle2Icon className="w-12 h-12 text-gray-500" />
+                )}
+                <div>
+                  <p className="font-semibold text-gray-800 dark:text-white group-hover:underline">
+                    {assignment.instructor.name}
+                  </p>
+                  <p className="body-2 text-gray-600 dark:text-gray-400 group-hover:underline">
+                    {assignment.instructor.email}
+                  </p>
+                </div>
+              </Link>
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400 body-2">
+              No assignments available at the moment.
+            </p>
+          </div>
         )}
-      </div>
+      </section>
+
       {error && (
-        <p className="text-red-500" data-testid="no-top-courses">
-          Server not available at the moment, Contact{" "}
-          <u>
+        <div className="mt-8 p-4 bg-red-100 text-red-700 rounded-md border border-red-300 dark:bg-red-900 dark:text-red-200 dark:border-red-600">
+          <p className="body-2 font-medium">
+            Server error: Could not fetch assignments.
+          </p>
+          <p className="body-2">
+            Please contact{" "}
             <a
               href={`mailto:miracleibanze@gmail.com?subject=${encodeURIComponent(
                 "Assignment fetch fail"
               )}&body=${encodeURIComponent(
-                "I am seeking help along with feedback on assignment section when assignment are not being fetched."
+                "I'm facing an issue with loading assignments."
               )}`}
+              className="underline"
             >
               miracleibanze@gmail.com
-            </a>
-          </u>
-          for help
-        </p>
+            </a>{" "}
+            for support.
+          </p>
+        </div>
       )}
     </main>
+  ) : (
+    <AssignmentDetailModal
+      assignment={selectedAssignment}
+      close={() => setSelectedAssignment(null)}
+    />
   );
 };
 
-export default page;
+export default PendingAssignmentsPage;

@@ -4,6 +4,7 @@ import { Announcement } from "@lib/models/Announcement";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@app/api/auth/[...nextauth]/route";
 import { User } from "@lib/models/User";
+import { Course } from "@lib/models/Course";
 
 export async function GET(req: Request) {
   await connectDB();
@@ -17,8 +18,9 @@ export async function GET(req: Request) {
 
   try {
     console.log("🔍 Fetching user and enrolled courses...");
-    const user = await User.findById(session.user._id).exec();
-
+    const user = await User.findById(session.user._id)
+      .select("myCourses role")
+      .exec();
     if (!user) {
       console.log("❌ User not found in database");
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -26,17 +28,21 @@ export async function GET(req: Request) {
 
     console.log("✅ User found:", user.myCourses);
 
-    let announcements;
-    const enrolledCourseIds = user.myCourses.map((courseId: any) => courseId);
+    let enrolledCourseIds;
+
+    if (user.role === "admin") {
+      const allCourses = await Course.find().select("_id").lean();
+      enrolledCourseIds = allCourses.map((course) => course._id);
+    } else {
+      enrolledCourseIds = user.myCourses;
+    }
+
     console.log("📚 Enrolled Course IDs:", enrolledCourseIds);
 
-    announcements = await Announcement.aggregate([
+    const announcements = await Announcement.aggregate([
       {
         $match: {
-          $or: [
-            { courseId: { $in: enrolledCourseIds } }, // Match enrolled courses
-            { courseId: "all" }, // Include announcements for all courses
-          ],
+          $or: [{ courseId: { $in: enrolledCourseIds } }, { courseId: "all" }],
         },
       },
       {
@@ -47,8 +53,26 @@ export async function GET(req: Request) {
           as: "courseInfo",
         },
       },
-      { $sort: { createdAt: -1 } }, // Sort by newest
-      { $limit: 10 }, // Limit to 10 announcements
+      {
+        $addFields: {
+          courseInfo: {
+            $map: {
+              input: "$courseInfo",
+              as: "course",
+              in: {
+                _id: "$$course._id",
+                title: "$$course.title",
+                description: "$$course.description",
+                category: "$$course.category",
+                thumbnail: "$$course.thumbnail",
+                instructor: "$$course.instructor",
+              },
+            },
+          },
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $limit: 10 },
     ]);
 
     console.log("📢 Announcements fetched:", announcements.length);

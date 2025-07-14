@@ -65,6 +65,13 @@ main {
   .swiper {
     touch-action: pan-y;
   }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  .flex-vertical-center {
+    @apply flex flex-col items-center justify-center;
+  }
   .label {
     @apply block mb-4;
   }
@@ -80,6 +87,30 @@ main {
     }
     100% {
       background-position: 200% 0;
+    }
+  }
+  .animateIn {
+    animation: dropIn 0.1s ease-in forwards;
+  }
+  @keyframes dropIn {
+    from {
+      transform: translateY(-10rem);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  .animateSlide {
+    /* transform: translateX(5rem); */
+    width: 100%;
+    animation: slideIn 0.1s ease-in forwards;
+  }
+  @keyframes slideIn {
+    0% {
+      transform: translateX(5rem);
+    }
+    100% {
+      transform: translateX(0);
     }
   }
   .animate-shimmer {

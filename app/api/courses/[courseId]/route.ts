@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Course } from "@lib/models/Course";
+import { Content } from "@lib/models/Content";
 import mongoose from "mongoose";
 import { connectDB } from "@lib/db";
 
@@ -75,31 +76,6 @@ export async function GET(
     console.error("Error fetching course details:", error);
     return NextResponse.json(
       { message: "Failed to fetch course details" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(
-  req: Request,
-  { params }: { params: { courseId: string } }
-) {
-  try {
-    const { courseId } = await params;
-    await connectDB();
-
-    // Check if user already exists
-    const chapters = await Course.find({ _id: courseId })
-      .select("chapters")
-      .exec();
-
-    console.log("chapters found: ", chapters);
-
-    return NextResponse.json(chapters);
-  } catch (error) {
-    console.log("Registration error:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error, Contact +250794881466 for help." },
       { status: 500 }
     );
   }

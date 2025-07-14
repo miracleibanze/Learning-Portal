@@ -117,7 +117,14 @@ function MainLayout({ children }: { children: React.ReactNode }) {
           object.title = matchedLink.name;
           object.url = matchedLink.path;
           object.list = myCourses.data.map((item) => ({
-            url: item._id as string,
+            url: encodeURIComponent(item.title) + "/" + item._id,
+            name: item.title as string,
+          }));
+        } else if (matchedLink.path === "/dashboard/my-courses/study") {
+          object.title = matchedLink.name;
+          object.url = matchedLink.path;
+          object.list = myCourses.data.map((item) => ({
+            url: encodeURIComponent(item.title) + "/" + item._id,
             name: item.title as string,
           }));
         }
@@ -167,7 +174,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         />
       )}
       <div
-        className={`flex-1 relative flex flex-col h-full w-full ${
+        className={`flex-1 relative flex flex-col h-full w-full overflow-x-hidden ${
           !showSidebar ? "min-h-full" : "min-h-screen"
         }`}
       >
