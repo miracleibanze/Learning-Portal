@@ -21,4 +21,5 @@ export interface IAssignment extends Document {
   questions?: Question[];
   codeInstructions?: string;
   students: string[];
+  codeAnswer?: string;
 }

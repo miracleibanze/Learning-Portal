@@ -15,6 +15,7 @@ const AnnouncementSchema = new mongoose.Schema({
     ref: "Course",
     required: true,
   },
+  students: [{ type: String }],
 });
 
 const Announcement =

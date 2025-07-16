@@ -174,7 +174,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
         />
       )}
       <div
-        className={`flex-1 relative flex flex-col h-full w-full overflow-x-hidden ${
+        className={`flex-1 relative h-full w-full overflow-x-hidden ${
           !showSidebar ? "min-h-full" : "min-h-screen"
         }`}
       >

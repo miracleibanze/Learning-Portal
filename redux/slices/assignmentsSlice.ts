@@ -12,6 +12,7 @@ export interface MutableAssignment {
   type: "quiz" | "coding";
   deadline: Date;
   createdAt: Date;
+  students: string[];
   createdBy: string;
   courseId: string; // Simplified courseId type
   questions?: Question[];

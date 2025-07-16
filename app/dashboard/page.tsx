@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { EyeIcon, Loader, PlusIcon } from "lucide-react";
+import { Check, CheckCheck, EyeIcon, Loader, PlusIcon } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
 import { MutableAssignment } from "@redux/slices/assignmentsSlice";
@@ -18,9 +18,10 @@ import {
 import CourseCard from "@components/CourseCard";
 import Link from "next/link";
 import Progress from "@components/Progress";
-import Assignment from "@components/Assignment";
 import { fetchpendingAssignments } from "@redux/slices/assignmentsSlice";
 import AnnouncementCard from "@components/dashboard/AnnouncementCard";
+import axios from "@node_modules/axios";
+import PreviousMap_ from "@node_modules/postcss/lib/previous-map";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -31,12 +32,24 @@ export default function DashboardPage() {
     (state: RootState) => state.announcements
   );
   const [announcementCard, setAnnouncementCard] = useState<string | null>(null);
+  const [seenAnnouncementsList, setSeenAnnouncementsList] = useState<string[]>(
+    []
+  );
   const { top4Courses } = useSelector((state: RootState) => state.courses);
   const { pendingAssignments } = useSelector(
     (state: RootState) => state.assignment
   );
   const [selectedAssignment, setSelectedAssignment] =
     useState<MutableAssignment | null>(null);
+
+  const ReadAnnouncement = async (id: string) => {
+    try {
+      // const response = await axios.post(`/api/announcements/`);
+      close();
+    } catch (err: any) {
+      console.error("Quiz submission error:", err);
+    }
+  };
 
   useEffect(() => {
     if (session?.user) {
@@ -62,7 +75,7 @@ export default function DashboardPage() {
   return (
     <main className="px-4 py-6 max-w-full grid lg:grid-cols-3 grid-cols-1 gap-6 relative overflow-hidden">
       <div
-        className="w-full border-2 rounded lg:col-span-2 border-zinc-300 dark:border-white/50 flex flex-col"
+        className="w-full border-2 rounded lg:col-span-2 border-zinc-300 dark:border-white/50 flex flex-col shadow-md"
         data-testid="announcement-container"
       >
         <div
@@ -105,6 +118,7 @@ export default function DashboardPage() {
         {announcementCard !== null && (
           <AnnouncementCard
             id={announcementCard}
+            gotIt={() => ReadAnnouncement(announcementCard)}
             close={() => setAnnouncementCard(null)}
           />
         )}
@@ -113,45 +127,64 @@ export default function DashboardPage() {
           data-testid="announcement-list"
         >
           {loadingAnnouncements ? (
-            Array.from({ length: 4 }).map((_, index) => (
+            Array.from({ length: 3 }).map((_, index) => (
               <LineSkeleton data-testid="line-skeleton" index={3} key={index} />
             ))
           ) : announcements?.length > 0 ? (
-            Array(announcements.length > 3 ? 3 : announcements.length)
-              .fill("")
-              .map((_, index) => (
+            Array.from({
+              length: announcements.length > 3 ? 3 : announcements.length,
+            }).map((_, index) => {
+              const item = announcements[index];
+              const isSeen = seenAnnouncementsList.includes(
+                announcements[index]._id
+              );
+              const isRead = announcements[index].students
+                ? announcements[index].students.includes(session.user._id)
+                  ? true
+                  : false
+                : false;
+              return (
                 <div
                   key={index}
-                  className={`border-t hover:bg-gray-200 dark:hover:bg-gray-200/10 cursor-pointer border-gray-300 dark:border-white/30 py-2 ${
-                    announcements[index].createdBy === "admin" &&
-                    "border-l-4 !border-l-sky-500"
+                  className={`border-t ${
+                    !isRead
+                      ? isSeen
+                        ? "hover:bg-gray-200 dark:hover:bg-gray-200/10"
+                        : "bg-zinc-200 dark:bg-white/10"
+                      : "hover:bg-gray-200 dark:hover:bg-gray-200/10"
+                  }  cursor-pointer border-gray-300 dark:border-white/30 py-2 ${
+                    item.createdBy === "admin" && "border-l-4 !border-l-sky-500"
                   } ${
-                    announcements[index].createdBy === "instructor" &&
+                    item.createdBy === "instructor" &&
                     "border-l-4 !border-l-yellow-400"
-                  } px-3`}
-                  data-testid={`announcement-${announcements[index]._id}`}
-                  onClick={() => setAnnouncementCard(announcements[index]._id)}
+                  } px-3 text-gray-900/90 dark:text-white/90`}
+                  data-testid={`announcement-${item._id}`}
+                  onClick={() => {
+                    setSeenAnnouncementsList((prev) => [...prev, item._id]);
+                    setAnnouncementCard(item._id);
+                  }}
                 >
                   <h3
                     className="text-lg font-semibold tracking-wide uppercase"
-                    data-testid={`announcement-title-${announcements[index]._id}`}
+                    data-testid={`announcement-title-${item._id}`}
                   >
-                    {announcements[index].title}
+                    {item.title}
                   </h3>
                   <p
                     className="text-sm text-gray-600 dark:text-gray-300 w-full truncate"
-                    data-testid={`announcement-description-${announcements[index]._id}`}
+                    data-testid={`announcement-description-${item._id}`}
                   >
-                    {announcements[index].description}
+                    {item.description}
                   </p>
                   <p
                     className="text-xs text-gray-500 dark:text-gray-400"
-                    data-testid={`announcement-date-${announcements[index]._id}`}
+                    data-testid={`announcement-date-${item._id}`}
                   >
-                    {new Date(announcements[index].createdAt).toLocaleString()}
+                    {new Date(item.createdAt).toLocaleString()}
                   </p>
                 </div>
-              ))
+              );
+            })
           ) : (
             <div
               className="w-full h-52 flex items-center justify-center"
@@ -176,7 +209,7 @@ export default function DashboardPage() {
       </div>
 
       {session.user.role !== "admin" && (
-        <div className="col-span-1 w-full border-2 rounded border-zinc-300 dark:border-white/50 overflow-hidden flex flex-col">
+        <div className="col-span-1 w-full border-2 rounded border-zinc-300 dark:border-white/50 overflow-hidden flex flex-col shadow-md">
           <h5 className="h5 text-sky-500 font-semibold px-3 pt-2 group-hover:underline">
             Assignment
           </h5>
@@ -185,28 +218,37 @@ export default function DashboardPage() {
           </p>
           <div className={`min-h-52 h-full flex-1 max-h-72 flex flex-col`}>
             {pendingAssignments?.data.length > 0 ? (
-              Array(4)
-                .fill("")
-                .map((_, index) => (
+              Array.from({
+                length:
+                  pendingAssignments.data.length > 4
+                    ? 4
+                    : pendingAssignments.data.length,
+              }).map((_, index) => {
+                const item = pendingAssignments.data[index];
+                return (
                   <div
-                    className="w-full px-3 border-t border-gray-300 dark:border-white/50 py-2 cursor-pointer"
+                    className="w-full px-3 border-t border-gray-300 dark:border-white/50 py-2 cursor-pointer flex"
                     key={index}
-                    onClick={() =>
-                      setSelectedAssignment(pendingAssignments.data[index])
-                    }
+                    onClick={() => setSelectedAssignment(item)}
                   >
-                    <h3 className="text-lg font-semibold">
-                      {pendingAssignments.data[index].title}
-                    </h3>
-                    <p className="text-sm truncate text-zinc-600 dark:text-white/70">
-                      {pendingAssignments.data[index].description}
-                    </p>
+                    <span className="flex items-center -translate-x-1.5">
+                      {item.students.includes(session.user._id) && (
+                        <CheckCheck className="text-green-500" />
+                      )}
+                    </span>
+                    <div className="flex-1 w-full text-gray-900/90 dark:text-white/90">
+                      <h3 className="text-lg font-semibold">{item.title}</h3>
+                      <p className="text-sm truncate text-zinc-600 dark:text-white/70">
+                        {item.description}
+                      </p>
+                    </div>
                   </div>
-                ))
+                );
+              })
             ) : pendingAssignments.loading ? (
-              Array(3)
-                .fill("")
-                .map((_, index) => <LineSkeleton key={index} />)
+              Array.from({ length: 3 }).map((_, index) => (
+                <LineSkeleton key={index} />
+              ))
             ) : (
               <div className="w-full h-52 flex items-center justify-center">
                 <p className="text-gray-500 text-sm text-center py-2">
@@ -228,6 +270,7 @@ export default function DashboardPage() {
           {selectedAssignment && (
             <AssignmentDetailModal
               assignment={selectedAssignment}
+              completed={selectedAssignment.students.includes(session.user._id)}
               close={() => setSelectedAssignment(null)}
             />
           )}

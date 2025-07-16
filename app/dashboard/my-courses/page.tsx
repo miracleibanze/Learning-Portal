@@ -45,9 +45,9 @@ const page: FC = () => {
             </Link>
           ))
         ) : myCourseLoading ? (
-          Array(8)
-            .fill("")
-            .map((_, index) => <CourseCardSkeleton key={index} />)
+          Array({ length: 8 }).map((_, index) => (
+            <CourseCardSkeleton key={index} />
+          ))
         ) : (
           <div className="w-full h-52 flex items-center justify-center">
             <p className="text-gray-500 text-sm text-center py-2">

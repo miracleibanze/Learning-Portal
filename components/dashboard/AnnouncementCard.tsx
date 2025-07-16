@@ -18,26 +18,42 @@ interface InstructorType {
   picture: string;
 }
 
-const AnnouncementCard: FC<{ id: string; close: () => void }> = ({
-  id,
-  close,
-}) => {
-  const { announcements } = useSelector((state: RootState) => state.announcements);
+const AnnouncementCard: FC<{
+  id: string;
+  gotIt: () => void;
+  close: () => void;
+}> = ({ id, gotIt, close }) => {
+  const { announcements } = useSelector(
+    (state: RootState) => state.announcements
+  );
   const announcement = announcements.find((item) => item._id === id);
   const session = useSession().data;
-  const [instructor, setInstructor] = useState<InstructorType | null | User>(null);
+  const [instructor, setInstructor] = useState<InstructorType | null | User>(
+    null
+  );
 
   useEffect(() => {
-    const handleSender = async ({ id }: { id?: string }) => {
-      const response = await axios.post(`/api/announcements/${id}`);
+    const handleSender = async ({
+      id,
+      announcementId,
+    }: {
+      id?: string;
+      announcementId: string;
+    }) => {
+      const response = await axios.post(`/api/announcements/details`, {
+        id,
+        announcementId,
+      });
+      if (id === "00000") return;
       setInstructor(response.data);
     };
-
-    if (
-      announcement?.courseId.toString() !== "all" &&
-      announcement?.courseInfo[0]?.instructor
-    ) {
-      handleSender({ id: announcement?.courseInfo[0].instructor });
+    if (announcement && announcement._id) {
+      handleSender({
+        id: announcement.courseInfo[0]
+          ? announcement?.courseInfo[0].instructor
+          : "00000",
+        announcementId: announcement._id,
+      });
     }
   }, [announcement]);
 
@@ -63,25 +79,28 @@ const AnnouncementCard: FC<{ id: string; close: () => void }> = ({
 
         {/* Card */}
         <div className="mx-auto lg:max-w-[42rem] bg-zinc-200 dark:bg-gray-900 dark:border border-white/50 rounded-md p-6">
-          {/* Course Title */}
+          {JSON.stringify(announcement)}
           <h3 className="h3 font-bold text-sky-700 dark:text-sky-400 mb-3">
-            {announcement.courseId.toString() !== "all"
+            {announcement.courseId.toString() !== "all" &&
+            announcement.courseInfo.length > 0
               ? announcement.courseInfo[0].title
               : "General Announcement!"}
           </h3>
 
           {/* Course Description */}
           <p className="body-2 text-gray-700 dark:text-gray-300 mb-3">
-            {announcement.courseId.toString() !== "all"
+            {announcement.courseId.toString() !== "all" &&
+            announcement.courseInfo.length > 0
               ? announcement.courseInfo[0].description
               : "Anyone, regardless of subject pursued, must follow the announcement below."}
           </p>
 
-          {announcement.courseId.toString() !== "all" && (
-            <span className="inline-block bg-sky-600 text-white text-xs font-bold px-3 py-1 rounded-md mb-4">
-              {announcement.courseInfo[0].category}
-            </span>
-          )}
+          {announcement.courseId.toString() !== "all" &&
+            announcement.courseInfo.length > 0 && (
+              <span className="inline-block bg-sky-600 text-white text-xs font-bold px-3 py-1 rounded-md mb-4">
+                {announcement.courseInfo[0].category}
+              </span>
+            )}
 
           {/* Announcement content */}
           <div className="w-full min-h-16 border border-black/60 dark:border-white/40 p-4 mt-3 rounded-md bg-white/70 dark:bg-zinc-800 relative">
@@ -97,7 +116,10 @@ const AnnouncementCard: FC<{ id: string; close: () => void }> = ({
           <div className="mt-6 flex items-center gap-4 border-t border-gray-300 dark:border-white/30 pt-4">
             {announcement.createdBy !== "admin" ? (
               instructor ? (
-                <Link href={`/Person/${instructor._id}`} className="flex items-center gap-4 group">
+                <Link
+                  href={`/Person/${instructor._id}`}
+                  className="flex items-center gap-4 group"
+                >
                   {instructor.picture ? (
                     <Image
                       src={instructor.picture}
@@ -111,9 +133,12 @@ const AnnouncementCard: FC<{ id: string; close: () => void }> = ({
                   )}
                   <div>
                     <p className="font-semibold group-hover:underline text-sm">
-                      {instructor.name} {session?.user._id === instructor._id && "(You)"}
+                      {instructor.name}{" "}
+                      {session?.user._id === instructor._id && "(You)"}
                     </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">{instructor.email}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
+                      {instructor.email}
+                    </p>
                   </div>
                 </Link>
               ) : (
@@ -126,7 +151,10 @@ const AnnouncementCard: FC<{ id: string; close: () => void }> = ({
                 </div>
               )
             ) : (
-              <Link href="/dashboard/about" className="flex items-center gap-4 group">
+              <Link
+                href="/dashboard/about"
+                className="flex items-center gap-4 group"
+              >
                 <Image
                   src="/logoSquare.png"
                   alt="IMBONI Learn"
@@ -135,8 +163,12 @@ const AnnouncementCard: FC<{ id: string; close: () => void }> = ({
                   className="w-16 h-16 rounded-full object-cover border"
                 />
                 <div>
-                  <p className="font-semibold group-hover:underline text-sm">IMBONI Learn</p>
-                  <p className="text-xs text-gray-600 dark:text-gray-300">Your #1 learning partner</p>
+                  <p className="font-semibold group-hover:underline text-sm">
+                    IMBONI Learn
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300">
+                    Your #1 learning partner
+                  </p>
                 </div>
               </Link>
             )}
@@ -161,7 +193,7 @@ const AnnouncementCard: FC<{ id: string; close: () => void }> = ({
             </Link>
             <button
               className="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded"
-              onClick={close}
+              onClick={() => close()}
             >
               Got it
             </button>

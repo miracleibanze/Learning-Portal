@@ -34,7 +34,7 @@ export async function GET(req: Request) {
       const allCourses = await Course.find().select("_id").lean();
       enrolledCourseIds = allCourses.map((course) => course._id);
     } else {
-      enrolledCourseIds = user.myCourses;
+      enrolledCourseIds = user.myCourses.map((item: any) => item.toString());
     }
 
     console.log("📚 Enrolled Course IDs:", enrolledCourseIds);
@@ -74,6 +74,7 @@ export async function GET(req: Request) {
       { $sort: { createdAt: -1 } },
       { $limit: 10 },
     ]);
+    console.log("final announcement : ", announcements[2]);
 
     console.log("📢 Announcements fetched:", announcements.length);
     return NextResponse.json(announcements, { status: 200 });

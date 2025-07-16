@@ -3,21 +3,26 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
 import { FC, useEffect, useState } from "react";
-import { fetchpendingAssignments } from "@redux/slices/assignmentsSlice";
+import {
+  fetchpendingAssignments,
+  MutableAssignment,
+} from "@redux/slices/assignmentsSlice";
 import { LineSkeleton } from "@components/designs/Skeletons";
 import Image from "next/image";
-import { UserCircle2Icon } from "lucide-react";
+import { CheckCheck, UserCircle2Icon } from "lucide-react";
 import Link from "next/link";
 import AssignmentDetailModal from "@components/dashboard/AssignmentDetail";
 import { IAssignment } from "@type/Assignment";
+import { fetchUser } from "@redux/slices/userSlice";
 
 const PendingAssignmentsPage: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [selectedAssignment, setSelectedAssignment] =
-    useState<IAssignment | null>(null);
+    useState<MutableAssignment | null>(null);
   const { data, loading, error } = useSelector(
     (state: RootState) => state.assignment.pendingAssignments
   );
+  const { user } = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     if (!data || data.length === 0) {
@@ -52,8 +57,14 @@ const PendingAssignmentsPage: FC = () => {
                 className="block group mb-4"
                 onClick={() => setSelectedAssignment(assignment)}
               >
-                <h2 className="h5 font-semibold text-blue-700 dark:text-blue-400 group-hover:underline">
-                  {assignment.title}
+                <h2 className="h5 font-semibold text-blue-700 dark:text-blue-400 group-hover:underline flex justify-between">
+                  {assignment.title}{" "}
+                  {user && assignment.students.includes(user._id) && (
+                    <span className="text-green-500 flex mx-2 items-center">
+                      <CheckCheck />
+                      Done
+                    </span>
+                  )}
                 </h2>
                 <p className="body-2 text-gray-600 dark:text-gray-300 mt-1">
                   {assignment.description}
@@ -71,7 +82,7 @@ const PendingAssignmentsPage: FC = () => {
 
               {/* Instructor Info */}
               <Link
-                href={`/dashboard/${assignment.instructor.name}/${assignment.instructor._id}`}
+                href={`/dashboard/${assignment.instructor.name}?pin=${assignment.instructor._id}`}
                 className="flex items-center gap-3 group px-3"
                 aria-label={`Go to instructor profile ${assignment.instructor.name}`}
               >
@@ -131,6 +142,7 @@ const PendingAssignmentsPage: FC = () => {
   ) : (
     <AssignmentDetailModal
       assignment={selectedAssignment}
+      completed={user ? selectedAssignment.students.includes(user._id) : false}
       close={() => setSelectedAssignment(null)}
     />
   );

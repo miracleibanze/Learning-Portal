@@ -31,9 +31,9 @@ const page: FC = () => {
           <p className="text-red-400 body-2">{coursesCreatedError}</p>
         )}
         {coursesCreatedLoading ? (
-          Array(8)
-            .fill("")
-            .map((_, index) => <CourseCardSkeleton key={index} />)
+          Array({ length: 8 }).map((_, index) => (
+            <CourseCardSkeleton key={index} />
+          ))
         ) : data.length > 0 ? (
           data.map((course) => <CourseCard course={course} key={course._id} />)
         ) : (

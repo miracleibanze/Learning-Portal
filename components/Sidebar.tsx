@@ -31,17 +31,6 @@ const Sidebar: FC<SidebarProps> = ({
   handleLinkClick,
   navbarBack,
 }) => {
-  const [showPopup, setShowPopup] = useState<boolean>(false);
-
-  const handleLogout = async () => {
-    try {
-      await signOut({ callbackUrl: "/login" });
-    } catch (error) {
-      console.error("🚨 Error during logout:", error);
-    } finally {
-      setShowPopup(false);
-    }
-  };
   const pathname = usePathname();
 
   useEffect(() => {
@@ -51,7 +40,7 @@ const Sidebar: FC<SidebarProps> = ({
   return (
     <>
       <div
-        className={`fixed inset-0 md:bg-black/40 sm:hidden z-[100] ${
+        className={`fixed inset-0 bg-black/60 md:hidden z-[100] ${
           !isOpenNavigation && "hidden"
         } `}
         onClick={handleToggleSidebar}
@@ -66,10 +55,23 @@ const Sidebar: FC<SidebarProps> = ({
               ? "fixed sm:sticky top-0 left-0" // Fixed on small screens when open
               : "absolute sm:relative " // Hide on small screens when closed, but keep relative on large screens
           }
-         z-[999] max-w-56`}
+         z-[999] max-w-56 overflow-x-hidden`}
       >
+        <header className="relative overflow-hidden mb-12 m">
+          <Link href="/dashboard">
+            <div className="px-3 mb-3">
+              <Image
+                src="/logo.png"
+                alt="logo"
+                width={100}
+                className="h-10 w-auto"
+                height={30}
+              />
+            </div>
+          </Link>
+        </header>
         <main className="overflow-hidden">
-          <Link
+          {/* <Link
             onClick={handleLinkClick} // Close sidebar on link click
             href={
               user?.role === "student"
@@ -107,7 +109,7 @@ const Sidebar: FC<SidebarProps> = ({
                 {user?.role ? user?.role : "..."}
               </button>
             </div>
-          </Link>
+          </Link> */}
           {!navbarBack.state ? (
             <nav>
               {status === "authenticated"
@@ -176,41 +178,6 @@ const Sidebar: FC<SidebarProps> = ({
             </>
           )}
         </main>
-        <footer className="w-full flex justify-between pb-3 px-4 items-center">
-          <Link href="/dashboard/setting">
-            <SettingsIcon />
-          </Link>
-
-          <div className="md:relative">
-            <button
-              onClick={() => setShowPopup(!showPopup)}
-              className="p-2 rounded-full hover:bg-gray-200 focus:outline-none group relative overflow-hidden"
-            >
-              <PowerIcon size={24} className="group-hover:text-sky-500" />
-              <MoreHorizontal
-                size={18}
-                className="absolute -bottom-1 right-1/2 translate-x-1/2 translate-y-2"
-              />
-            </button>
-
-            {showPopup && (
-              <div className="md:absolute fixed md:bottom-full max-md:top-1/2 max-md:-translate-x-1/2 max-md:left-1/2 max-md:-translate-y-1/2 left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 max-w-[90vw] z-50">
-                <p className="text-sm text-gray-700 mb-4">
-                  You will need to enter your credentials the next time you log
-                  in.
-                </p>
-                <button
-                  aria-label="Logout"
-                  role="button"
-                  onClick={handleLogout}
-                  className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none"
-                >
-                  Log Out
-                </button>
-              </div>
-            )}
-          </div>
-        </footer>
       </aside>
     </>
   );

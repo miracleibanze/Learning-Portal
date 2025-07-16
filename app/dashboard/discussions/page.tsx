@@ -1,45 +1,46 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import io, { Socket } from "socket.io-client";
 import { useSession } from "next-auth/react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
 import { fetchMyCourses } from "@redux/slices/coursesSlice";
 import { usePathname } from "next/navigation";
-
-let socket: Socket;
+import socket from "@lib/socket";
 
 export default function ConversationPage() {
   const { data: session } = useSession();
   const { myCourses } = useSelector((state: RootState) => state.courses);
   const dispatch = useDispatch<AppDispatch>();
   const pathname = usePathname();
+
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState("");
 
+  // Fetch courses only once
   useEffect(() => {
-    if (myCourses.data.length > 0) return;
-    dispatch(fetchMyCourses());
+    if (!myCourses.data.length) {
+      dispatch(fetchMyCourses());
+    }
   }, [dispatch, pathname]);
 
+  // Handle socket join/leave and listen for messages
   useEffect(() => {
     if (!selectedCourse) return;
 
-    if (!socket) {
-      socket = io();
-    }
-
     socket.emit("joinCourseRoom", selectedCourse);
 
-    socket.on("messageReceived", (msg) => {
+    const handleMessage = (msg: any) => {
+      alert("received a message");
       setMessages((prev) => [...prev, msg]);
-    });
+    };
+
+    socket.on("messageReceived", handleMessage);
 
     return () => {
       socket.emit("leaveCourseRoom", selectedCourse);
-      socket.off("messageReceived");
+      socket.off("messageReceived", handleMessage);
     };
   }, [selectedCourse]);
 
@@ -51,6 +52,7 @@ export default function ConversationPage() {
         courseId: selectedCourse,
         timestamp: new Date().toISOString(),
       };
+      alert("sending a message");
       socket.emit("sendMessage", msg);
       setMessages((prev) => [...prev, msg]);
       setNewMessage("");
@@ -66,7 +68,10 @@ export default function ConversationPage() {
           myCourses.data.map((course) => (
             <div
               key={course._id}
-              onClick={() => setSelectedCourse(course._id)}
+              onClick={() => {
+                setSelectedCourse(course._id);
+                setMessages([]); // reset messages when switching
+              }}
               className={`p-2 rounded cursor-pointer mb-2 transition hover:bg-blue-100 dark:hover:bg-blue-900 ${
                 selectedCourse === course._id
                   ? "bg-blue-500 text-white"
@@ -77,7 +82,7 @@ export default function ConversationPage() {
             </div>
           ))
         ) : (
-          <div className="min-w-full h-52 flex-1 px-4 py-8 font-bold text-zinc-500 dark:text-white/80 text-center">
+          <div className="text-center text-zinc-500 dark:text-white/80 font-bold">
             Loading...
           </div>
         )}
@@ -92,6 +97,7 @@ export default function ConversationPage() {
               : "Select a course to start chatting"}
           </h2>
         </header>
+
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           {messages.map((msg, index) => (
             <div
@@ -106,6 +112,7 @@ export default function ConversationPage() {
             </div>
           ))}
         </div>
+
         {selectedCourse && (
           <footer className="p-4 border-t border-gray-300 dark:border-white/20 flex gap-2">
             <input

@@ -1,13 +1,24 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "skipLibCheck": true,
     /* Language and Environment */
-    "target": "es2016", // Set the JavaScript language version for emitted JavaScript
-    "lib": ["dom", "dom.iterable", "esnext"], // Include necessary libraries
-    "jsx": "preserve", // Preserve JSX syntax for Next.js
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     /* Modules */
-    "module": "ESNext", // Use ESNext modules
-    "moduleResolution": "node", // Use Node.js-style module resolution
-    "baseUrl": "./", // Base directory for non-relative module names
+    "module": "ESNext",
+    "forceConsistentCasingInFileNames": true,
+    /* TypeScript Support */
+    "isolatedModules": true,
+    "noEmit": true,
+    /* Node.js Support */
+    "types": ["node", "jest", "@testing-library/jest-dom"],
+    /* Paths and Base */
+    "baseUrl": "./",
     "paths": {
       "@testing-library/react": ["node_modules/@testing-library/react"],
       "@testing-library/jest-dom": ["node_modules/@testing-library/jest-dom"],
@@ -15,39 +26,31 @@
         "node_modules/@testing-library/user-events"
       ],
       "@reduxjs/toolkit": ["node_modules/@reduxjs/toolkit"],
-      "@*": ["./*"] // Map imports starting with "@" to the root directory
+      "@*": ["./*"]
     },
-    "resolveJsonModule": true, // Allow importing JSON files
-    /* Type Checking */
-    "strict": true, // Enable all strict type-checking options
-    "esModuleInterop": true, // Enable compatibility with CommonJS modules
-    "skipLibCheck": true, // Skip type checking all .d.ts files
-    "forceConsistentCasingInFileNames": true, // Ensure consistent casing in file names
-    /* Emit */
-    "noEmit": true, // Disable emitting JavaScript files (Next.js handles this)
-    /* TypeScript for Testing */
-    "types": ["jest", "@testing-library/jest-dom"], // Include types for Jest and Testing Library
-    /* Additional Options */
-    "incremental": true, // Enable incremental compilation
-    "isolatedModules": true, // Ensure each file can be safely transpiled independently
+    /* JS support */
     "allowJs": true,
+    /* Plugins */
     "plugins": [
       {
         "name": "next"
       }
-    ]
+    ],
+    "incremental": true,
+    "jsx": "preserve"
   },
   "include": [
-    "next-env.d.ts", // Include Next.js type definitions
+    "next-env.d.ts",
     "public.d.ts",
-    "**/*.ts", // Include all TypeScript files
-    "**/*.tsx", // Include all TypeScript JSX files
-    "next.config.ts", // Include Next.js configuration file
-    "jest.config.ts", // Include Jest configuration file
+    "**/*.ts",
+    "**/*.tsx",
+    "next.config.ts",
+    "jest.config.ts",
     ".next/types/**/*.ts",
     "tailwind.config.js",
     "postcss.config.mjs",
-    "tailwind.config.mjs"
+    "tailwind.config.mjs",
+    "server.ts"
   ],
-  "exclude": ["node_modules"] // Exclude node_modules from compilation
+  "exclude": ["node_modules"]
 }
