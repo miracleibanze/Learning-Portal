@@ -1,0 +1,220 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-assignment h-full min-h-screen flex flex-col;
+}
+main {
+  @apply flex-1;
+}
+@layer components {
+  .button {
+    @apply rounded-md py-2 px-4 hover:scale-105 transition duration-300 text-sm font-semibold;
+  }
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    /* background: ;: ; */
+  }
+  .truncate-two-lines {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    50% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .skeleton-shimmer {
+    animation: shimmer 2.5s infinite linear;
+    background: linear-gradient(
+      140deg,
+      transparent 30%,
+      #ffffffc4 50%,
+      transparent 70%
+    );
+    background-size: 200% 100%;
+  }
+  .scroll-design::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+    background-color: var(--color-opacityPrimary);
+  }
+
+  .scroll-design::-webkit-scrollbar-thumb {
+    height: 8px;
+    background-color: var(--color-darkPrimary);
+    border-radius: 9999px;
+  }
+  .scroll-design::-webkit-scrollbar-track {
+    background-color: var(--color-lightPrimary);
+  }
+
+  .swiper-pagination-bullet {
+    background-color: #ccc;
+  }
+  .swiper-pagination-bullet-active {
+    background-color: #1d4ed8;
+  }
+  .swiper {
+    touch-action: pan-y;
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+  .flex-vertical-center {
+    @apply flex flex-col items-center justify-center;
+  }
+  .label {
+    @apply block mb-4;
+  }
+  .label_text {
+    @apply text-[12px] font-semibold;
+  }
+  .label_note {
+    @apply text-[12px] text-zinc-600 leading-none;
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  .animateIn {
+    animation: dropIn 0.1s ease-in forwards;
+  }
+  @keyframes dropIn {
+    from {
+      transform: translateY(-10rem);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  .animateSlide {
+    /* transform: translateX(5rem); */
+    width: 100%;
+    animation: slideIn 0.1s ease-in forwards;
+  }
+  @keyframes slideIn {
+    0% {
+      transform: translateX(5rem);
+    }
+    100% {
+      transform: translateX(0);
+    }
+  }
+  .animate-shimmer {
+    background: linear-gradient(-45deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  textarea.input {
+    @apply h-full min-h-max;
+  }
+  th {
+    @apply body-1 font-semibold text-start leading-tight py-3 border-x border-zinc-300 px-4;
+  }
+  td {
+    @apply px-2 py-3;
+  }
+  tr.source:hover ~ tr.dest {
+    @apply bg-zinc-300;
+  }
+
+  .navbar-mobile {
+    animation: slideIn 1s ease-in-out forwards;
+    @apply fixed bottom-0 top-0 right-0 max-w-md;
+  }
+  @keyframes slideIn {
+    from {
+      width: 0vw;
+    }
+    to {
+      width: 80vw;
+    }
+  }
+  @keyframes Loading {
+    0% {
+      left: 0%;
+      width: 10%;
+    }
+    50% {
+      left: 30%;
+      width: 50%;
+    }
+    70% {
+      width: 70%;
+    }
+    100% {
+      left: 100%;
+      width: 0%;
+    }
+  }
+  .animate-loading {
+    animation: Loading 2s ease-in-out infinite;
+  }
+  @keyframes animateLoader {
+    0% {
+      width: 80%;
+    }
+    100% {
+      width: 95%;
+    }
+  }
+  .animate95 {
+    animation: animateLoader 1s ease-in-out forwards;
+  }
+  @keyframes animateStart {
+    0% {
+      width: 0%;
+    }
+    100% {
+      width: 80%;
+    }
+  }
+  .animate80 {
+    animation: animateStart 2s ease-in-out forwards;
+  }
+
+  @keyframes animateBell {
+    0%,
+    20%,
+    40%,
+    60%,
+    78% {
+      transform: rotateZ(10deg);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    83% {
+      transform: rotateZ(-10deg);
+    }
+    100% {
+      transform: rotateZ(0deg);
+    }
+  }
+  .animate-bell {
+    transform-origin: top;
+    animation: animateBell 1s ease-in-out infinite alternate;
+  }
+}

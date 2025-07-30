@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "skipLibCheck": true,
+    /* Language and Environment */
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    /* Modules */
+    "module": "ESNext",
+    "forceConsistentCasingInFileNames": true,
+    /* TypeScript Support */
+    "isolatedModules": true,
+    "noEmit": true,
+    /* Node.js Support */
+    "types": ["node", "jest", "@testing-library/jest-dom"],
+    /* Paths and Base */
+    "baseUrl": "./",
+    "paths": {
+      "@testing-library/react": ["node_modules/@testing-library/react"],
+      "@testing-library/jest-dom": ["node_modules/@testing-library/jest-dom"],
+      "@testing-library/user-events": [
+        "node_modules/@testing-library/user-events"
+      ],
+      "@reduxjs/toolkit": ["node_modules/@reduxjs/toolkit"],
+      "@*": ["./*"]
+    },
+    /* JS support */
+    "allowJs": true,
+    /* Plugins */
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "incremental": true,
+    "jsx": "preserve"
+  },
+  "include": [
+    "next-env.d.ts",
+    "public.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next.config.ts",
+    "jest.config.ts",
+    ".next/types/**/*.ts",
+    "tailwind.config.js",
+    "postcss.config.mjs",
+    "tailwind.config.mjs",
+    "server.ts"
+  ],
+  "exclude": ["node_modules"]
+}
