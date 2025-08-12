@@ -148,3 +148,36 @@ export async function POST() {
     );
   }
 }
+
+// import { NextResponse } from "next/server";
+// import { Course } from "@lib/models/Course";
+// import { connectDB } from "@lib/db";
+
+// export async function GET(req: Request) {
+//   await connectDB();
+
+//   const { searchParams } = new URL(req.url);
+//   const status = searchParams.get("status"); // "Published" or "Draft"
+//   const indexParam = searchParams.get("index") || "0";
+//   const index = parseInt(indexParam, 10);
+//   const limit = 12;
+//   const skip = index * limit;
+
+//   try {
+//     const query: any = {};
+//     if (status === "Published" || status === "Draft") {
+//       query.status = status;
+//     }
+
+//     const courses = await Course.find(query)
+//       .select("title description status createdAt")
+//       .skip(skip)
+//       .limit(limit)
+//       .sort({ createdAt: -1 });
+
+//     return NextResponse.json(courses, { status: 200 });
+//   } catch (error) {
+//     console.error("[GET COURSES ERROR]", error);
+//     return NextResponse.json({ message: "Error fetching courses" }, { status: 500 });
+//   }
+// }

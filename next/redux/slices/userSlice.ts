@@ -10,7 +10,8 @@ export interface UserState {
     error: string | null;
   };
   allUsers: {
-    data: Partial<UserType>[];
+    students: UserType[];
+    teachers: UserType[];
     loading: boolean;
     error: string | null;
   };
@@ -31,7 +32,8 @@ const initialState: UserState = {
     error: null,
   },
   allUsers: {
-    data: [],
+    students: [],
+    teachers: [],
     loading: false,
     error: null,
   },
@@ -71,13 +73,29 @@ export const fetchRandomUsers = createAsyncThunk(
   }
 );
 
-// Async thunk to fetch random user data
-export const fetchAllUsers = createAsyncThunk(
-  "user/fetchAllUsers",
+export const fetchStudents = createAsyncThunk(
+  "user/fetchStudents",
   async ({ index }: { index: number }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/api/users?all=true&index=${index}`);
-      return response.data;
+      const response = await axios.get(
+        `/api/users?role=student&index=${index}`
+      );
+      return response.data as UserType[];
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Fetch teachers (instructors)
+export const fetchTeachers = createAsyncThunk(
+  "user/fetchTeachers",
+  async ({ index }: { index: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `/api/users?role=instructor&index=${index}`
+      );
+      return response.data as UserType[];
     } catch (error: any) {
       return rejectWithValue(error.response.data);
     }
@@ -183,23 +201,42 @@ const userSlice = createSlice({
             action.payload?.message || "Failed to fetch user";
         }
       )
-      .addCase(fetchAllUsers.pending, (state) => {
+      // Fetch Students
+      .addCase(fetchStudents.pending, (state) => {
         state.allUsers.loading = true;
         state.allUsers.error = null;
       })
       .addCase(
-        fetchAllUsers.fulfilled,
+        fetchStudents.fulfilled,
         (state, action: PayloadAction<UserType[]>) => {
           state.allUsers.loading = false;
-
-          state.allUsers.data = action.payload;
+          state.allUsers.students = action.payload;
         }
       )
-      .addCase(fetchAllUsers.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(fetchStudents.rejected, (state, action: PayloadAction<any>) => {
         state.allUsers.loading = false;
         state.allUsers.error =
-          action.payload?.message || "Failed to fetch user";
+          action.payload?.message || "Failed to fetch students";
       })
+
+      // Fetch Teachers
+      .addCase(fetchTeachers.pending, (state) => {
+        state.allUsers.loading = true;
+        state.allUsers.error = null;
+      })
+      .addCase(
+        fetchTeachers.fulfilled,
+        (state, action: PayloadAction<UserType[]>) => {
+          state.allUsers.loading = false;
+          state.allUsers.teachers = action.payload;
+        }
+      )
+      .addCase(fetchTeachers.rejected, (state, action: PayloadAction<any>) => {
+        state.allUsers.loading = false;
+        state.allUsers.error =
+          action.payload?.message || "Failed to fetch teachers";
+      })
+
       .addCase(updateUserInfo.pending, (state) => {
         state.loadingUser = true;
         state.error = null;

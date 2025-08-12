@@ -133,6 +133,37 @@ export const fetchDetailedCourseChapters = createAsyncThunk(
     }
   }
 );
+export const fetchPublishedCourses = createAsyncThunk(
+  "courses/fetchPublishedCourses",
+  async ({ index }: { index: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `/api/courses?status=Published&index=${index}`
+      );
+      return response.data as CourseDocument[];
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch published courses"
+      );
+    }
+  }
+);
+
+export const fetchDraftCourses = createAsyncThunk(
+  "courses/fetchDraftCourses",
+  async ({ index }: { index: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `/api/courses?status=Draft&index=${index}`
+      );
+      return response.data as CourseDocument[];
+    } catch (error: any) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch draft courses"
+      );
+    }
+  }
+);
 
 interface CourseState {
   courses: {
@@ -169,6 +200,17 @@ interface CourseState {
     data: { chapters: ChapterDocument[] };
     detailedCourseChaptersLoading: boolean;
     detailedCourseChaptersError: any;
+  };
+
+  publishedCourses: {
+    data: CourseDocument[];
+    loading: boolean;
+    error: string | null;
+  };
+  draftCourses: {
+    data: CourseDocument[];
+    loading: boolean;
+    error: string | null;
   };
 }
 
@@ -209,6 +251,16 @@ const initialState: CourseState = {
     data: { chapters: [] },
     detailedCourseChaptersLoading: true,
     detailedCourseChaptersError: null,
+  },
+  publishedCourses: {
+    data: [],
+    loading: false,
+    error: null,
+  },
+  draftCourses: {
+    data: [],
+    loading: false,
+    error: null,
   },
 };
 
@@ -360,6 +412,42 @@ const courseSlice = createSlice({
           state.detailedCourseChapters.detailedCourseChaptersLoading = false;
           state.detailedCourseChapters.detailedCourseChaptersError =
             action.payload;
+        }
+      )
+      .addCase(fetchPublishedCourses.pending, (state) => {
+        state.publishedCourses.loading = true;
+        state.publishedCourses.error = null;
+      })
+      .addCase(
+        fetchPublishedCourses.fulfilled,
+        (state, action: PayloadAction<CourseDocument[]>) => {
+          state.publishedCourses.loading = false;
+          state.publishedCourses.data = action.payload;
+        }
+      )
+      .addCase(
+        fetchPublishedCourses.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.publishedCourses.loading = false;
+          state.publishedCourses.error = action.payload;
+        }
+      )
+      .addCase(fetchDraftCourses.pending, (state) => {
+        state.draftCourses.loading = true;
+        state.draftCourses.error = null;
+      })
+      .addCase(
+        fetchDraftCourses.fulfilled,
+        (state, action: PayloadAction<CourseDocument[]>) => {
+          state.draftCourses.loading = false;
+          state.draftCourses.data = action.payload;
+        }
+      )
+      .addCase(
+        fetchDraftCourses.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.draftCourses.loading = false;
+          state.draftCourses.error = action.payload;
         }
       );
   },

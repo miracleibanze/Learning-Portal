@@ -19,6 +19,7 @@ export default function AssignmentForm() {
   const [type, setType] = useState<"quiz" | "coding">("quiz");
   const [courseId, setCourseId] = useState("");
   const [codeInstructions, setCodeInstructions] = useState("");
+  const [error, setError] = useState("");
   const [questions, setQuestions] = useState<Question[]>([
     { question: "", options: [], correctIndex: 0 },
   ]);
@@ -50,32 +51,41 @@ export default function AssignmentForm() {
   const handleAddOption = (
     qIndex: number,
     optionText: string,
-    cIndex?: number
+    markCorrect: boolean
   ) => {
-    console.log("inside handleAddOption ");
     if (!optionText.trim()) return;
     setQuestions((prev) =>
-      prev.map((q, i) =>
-        i === qIndex
-          ? cIndex === 1
-            ? { ...q, options: [...q.options, optionText] }
-            : {
-                ...q,
-                options: [...q.options, optionText],
-                correctIndex: qIndex,
-              }
-          : q
-      )
+      prev.map((q, i) => {
+        if (i !== qIndex) return q;
+        const newOptions = [...q.options, optionText];
+        return {
+          ...q,
+          options: newOptions,
+          correctIndex: markCorrect ? newOptions.length - 1 : q.correctIndex,
+        };
+      })
     );
   };
 
   const handleRemoveOption = (qIndex: number, optIndex: number) => {
     setQuestions((prev) =>
-      prev.map((q, i) =>
-        i === qIndex
-          ? { ...q, options: q.options.filter((_, j) => j !== optIndex) }
-          : q
-      )
+      prev.map((q, i) => {
+        if (i !== qIndex) return q;
+        const newOptions = q.options.filter((_, j) => j !== optIndex);
+        let newCorrectIndex = q.correctIndex;
+        if (optIndex === q.correctIndex) {
+          newCorrectIndex = 0; // reset if removed correct option
+        } else if (optIndex < q.correctIndex) {
+          newCorrectIndex = q.correctIndex - 1; // shift index if before correct
+        }
+        return { ...q, options: newOptions, correctIndex: newCorrectIndex };
+      })
+    );
+  };
+
+  const handleSetCorrect = (qIndex: number, optIndex: number) => {
+    setQuestions((prev) =>
+      prev.map((q, i) => (i === qIndex ? { ...q, correctIndex: optIndex } : q))
     );
   };
 
@@ -92,6 +102,35 @@ export default function AssignmentForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Basic required field checks
+    if (!title.trim() || !description.trim() || !deadline || !courseId.trim()) {
+      setError("Please fill in all required fields before submitting.");
+      return;
+    }
+
+    // Quiz-specific validation
+    if (type === "quiz") {
+      if (
+        questions.length === 0 ||
+        questions.some(
+          (q) =>
+            !q.question.trim() || q.options.length < 2 || q.correctIndex == null
+        )
+      ) {
+        alert(
+          "Please make sure all quiz questions have text, at least 2 options, and a correct answer."
+        );
+        return;
+      }
+    }
+
+    // Coding-specific validation
+    if (type === "coding" && !codeInstructions.trim()) {
+      setError("Please provide coding instructions for coding assignments.");
+      return;
+    }
+
     try {
       await axios.post("/api/assignments", {
         title,
@@ -104,6 +143,7 @@ export default function AssignmentForm() {
         questions,
         codeInstructions,
       });
+
       alert("Assignment created successfully");
       router.push(`/iLearn`);
     } catch (error: any) {
@@ -120,6 +160,12 @@ export default function AssignmentForm() {
             You can't create assignment without course
           </p>
         )}
+      {error && (
+        <p className="text-red-500 bg-red-100 p-2 rounded-md text-sm">
+          {error}
+        </p>
+      )}
+
       {/* BASIC FIELDS */}
       <div>
         <label className="block mb-1 font-medium">Title</label>
@@ -216,6 +262,7 @@ export default function AssignmentForm() {
                 placeholder="Enter question"
                 className="w-full mt-1 dark:bg-white/10 border border-opacityPrimary p-2 rounded outline-none"
               />
+
               {/* OPTIONS */}
               <div className="mt-2">
                 {q.options.map((opt, optIndex) => (
@@ -223,7 +270,15 @@ export default function AssignmentForm() {
                     key={optIndex}
                     className="flex items-center justify-between border-b py-1"
                   >
-                    <span>{opt}</span>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name={`correct-${qIndex}`}
+                        checked={q.correctIndex === optIndex}
+                        onChange={() => handleSetCorrect(qIndex, optIndex)}
+                      />
+                      <span>{opt}</span>
+                    </label>
                     <Trash2
                       size={14}
                       color="red"
@@ -233,11 +288,9 @@ export default function AssignmentForm() {
                   </div>
                 ))}
                 <OptionInput
-                  onAdd={({ opt, cIndex }) => {
-                    if (cIndex === 1) {
-                      handleAddOption(qIndex, opt);
-                    }
-                  }}
+                  onAdd={(opt, markCorrect) =>
+                    handleAddOption(qIndex, opt, markCorrect)
+                  }
                 />
               </div>
             </div>
@@ -279,12 +332,13 @@ export default function AssignmentForm() {
 function OptionInput({
   onAdd,
 }: {
-  onAdd: ({ opt, cIndex }: { opt: string; cIndex: number }) => void;
+  onAdd: (opt: string, markCorrect: boolean) => void;
 }) {
   const [value, setValue] = useState("");
-  const [isCorrect, setIsCorrect] = useState(0);
+  const [markCorrect, setMarkCorrect] = useState(false);
+
   return (
-    <div className="flex gap-2 mt-2">
+    <div className="flex gap-2 mt-2 items-center">
       <input
         type="text"
         className="flex-1 dark:bg-white/10 border border-opacityPrimary p-2 rounded outline-none"
@@ -292,12 +346,21 @@ function OptionInput({
         value={value}
         onChange={(e) => setValue(e.target.value)}
       />
+      <label className="flex items-center gap-1 text-sm">
+        <input
+          type="checkbox"
+          checked={markCorrect}
+          onChange={(e) => setMarkCorrect(e.target.checked)}
+        />
+        Correct
+      </label>
       <button
         type="button"
         className="bg-primary text-white px-3 py-1 rounded"
         onClick={() => {
-          onAdd({ opt: value, cIndex: 0 });
+          onAdd(value, markCorrect);
           setValue("");
+          setMarkCorrect(false);
         }}
       >
         Add
