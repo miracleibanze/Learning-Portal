@@ -38,7 +38,6 @@ const PendingAssignmentsPage: FC = () => {
       <h1 className="text-3xl font-bold mb-6 text-darkPrimary dark:text-primary">
         Pending Assignments
       </h1>
-      {JSON.stringify(submittedAssignments)}
       <section className="space-y-5 md:px-6 px-3">
         {loading ? (
           Array.from({ length: 4 }).map((_, index) => (
@@ -94,20 +93,20 @@ const PendingAssignmentsPage: FC = () => {
                     </span>
                   </p>
                   <p className="body-2 font-semibold text-darkPrimary dark:text-primary mt-2">
-                    Role: {assignment.instructor.role}
+                    Role: {assignment.createdBy.role}
                   </p>
                 </div>
 
                 {/* Instructor Info */}
                 <Link
-                  href={`/dashboard/${assignment.instructor.name}?pin=${assignment.instructor._id}`}
+                  href={`/iLearn/${assignment.createdBy.name}?pin=${assignment.createdBy.id}`}
                   className="flex items-center gap-3 group px-3"
-                  aria-label={`Go to instructor profile ${assignment.instructor.name}`}
+                  aria-label={`Go to instructor profile ${assignment.createdBy.name}`}
                 >
-                  {assignment.instructor.picture ? (
+                  {assignment.createdBy.picture ? (
                     <Image
-                      src={assignment.instructor.picture}
-                      alt={`${assignment.instructor.name}'s profile`}
+                      src={assignment.createdBy.picture}
+                      alt={`${assignment.createdBy.name}'s profile`}
                       width={48}
                       height={48}
                       className="w-12 h-12 rounded-full object-cover border"
@@ -117,10 +116,10 @@ const PendingAssignmentsPage: FC = () => {
                   )}
                   <div>
                     <p className="font-semibold text-gray-800 dark:text-white group-hover:underline">
-                      {assignment.instructor.name}
+                      {assignment.createdBy.name}
                     </p>
                     <p className="body-2 text-gray-600 dark:text-gray-400 group-hover:underline">
-                      {assignment.instructor.email}
+                      {assignment.createdBy.email}
                     </p>
                   </div>
                 </Link>

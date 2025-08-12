@@ -24,7 +24,7 @@ const Sidebar = dynamic(() => import("@components/Sidebar"), {
 });
 
 import { Provider } from "react-redux";
-import { store } from "@redux/store";
+import { AppDispatch, store } from "@redux/store";
 import { SessionProvider, useSession } from "next-auth/react";
 import Loading from "@app/loading";
 import { useDispatch, useSelector } from "react-redux";
@@ -42,6 +42,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   return (
     <html lang="en">
       <head>
@@ -50,7 +51,13 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="text-black/90 dark:text-zinc-200 dark:bg-black w-full mx-auto lg:max-w-screen-2xl">
+      <body
+        className={`w-full mx-auto lg:max-w-screen-2xl  ${
+          pathname === "/"
+            ? "!bg-gray-900 !text-white"
+            : "dark:bg-zinc-900/90 bg-zinc-100 text-black dark:text-zinc-200"
+        }`}
+      >
         <Provider store={store}>
           <SessionProvider>
             <MainLayout>{children}</MainLayout>
@@ -63,7 +70,7 @@ export default function RootLayout({
 
 function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { isOpenNavigation, navbarBack, notification } = useSelector(
     (state: RootState) => state.navigation
   );
@@ -81,7 +88,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       /^\/dashboard\/enroll\/[0-9a-fA-F]{24}$/,
       /^\/dashboard\/course\/[0-9a-fA-F]{24}$/,
     ];
-    const startingLinksForBack = ["/dashboard/my-courses/study"];
+    const startingLinksForBack = ["/iLearn/my-courses/study"];
 
     const isSupported =
       supportedLinksForBack.some((pattern) => pattern.test(pathname)) ||
@@ -96,7 +103,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     if (isSupported) {
       const matchedLinks = getLinks({ role: session?.user.role }).filter(
         (link) => {
-          if (pathname.startsWith(link.path) && link.path !== "/dashboard")
+          if (pathname.startsWith(link.path) && link.path !== "/iLearn")
             return link;
         }
       );
@@ -104,21 +111,21 @@ function MainLayout({ children }: { children: React.ReactNode }) {
       if (matchedLinks.length > 0) {
         const matchedLink = matchedLinks[0];
         console.log(matchedLink);
-        if (matchedLink.path === "/dashboard/enroll") {
+        if (matchedLink.path === "/iLearn/enroll") {
           object.title = matchedLink.name;
           object.url = matchedLink.path;
           object.list = coursesToEnroll.data.map((item) => ({
             url: item._id as string,
             name: item.title as string,
           }));
-        } else if (matchedLink.path === "/dashboard/my-courses") {
+        } else if (matchedLink.path === "/iLearn/my-courses") {
           object.title = matchedLink.name;
           object.url = matchedLink.path;
           object.list = myCourses.data.map((item) => ({
             url: encodeURIComponent(item.title) + "/" + item._id,
             name: item.title as string,
           }));
-        } else if (matchedLink.path === "/dashboard/my-courses/study") {
+        } else if (matchedLink.path === "/iLearn/my-courses/study") {
           object.title = matchedLink.name;
           object.url = matchedLink.path;
           object.list = myCourses.data.map((item) => ({
@@ -140,7 +147,8 @@ function MainLayout({ children }: { children: React.ReactNode }) {
     "/education-institutions",
   ];
   const showNavbar = navbarPaths.includes(pathname);
-  const showSidebar = pathname.startsWith("/dashboard");
+  const showSidebar = pathname.startsWith("/iLearn");
+  const isStart = pathname === "/";
 
   const handleToggleSidebar = () => {
     dispatch(toggleNavigation());
@@ -153,11 +161,16 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className={`w-full dark:bg-zinc-900/90 bg-zinc-100 flex`}>
+    <div
+      className={`w-full ${
+        pathname === "/"
+          ? "!bg-gray-900 !text-white"
+          : "dark:bg-zinc-900/90 bg-zinc-100"
+      } ${!isStart ? "flex" : ""}`}
+    >
       {showNavbar && <Navbar user={session?.user?.name} />}
       {showSidebar && isOpenNavigation && (
         <Sidebar
-          user={session?.user}
           {...{
             status,
             isOpenNavigation,

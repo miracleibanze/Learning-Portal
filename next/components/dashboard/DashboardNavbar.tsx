@@ -4,6 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import {
   Bell,
   BellDot,
+  ChevronLeft,
   Dot,
   Search,
   SidebarClose,
@@ -13,7 +14,7 @@ import {
 import { FC, useEffect, useRef, useState } from "react";
 import useFormattedPathSegment from "@features/useFormattedPathSegment";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import themePresets, { ThemeName } from "@lib/ThemePresets";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -21,16 +22,18 @@ import {
   toggleNavigation,
 } from "@redux/slices/navigationSlice";
 import { AppDispatch, RootState } from "@redux/store";
-import { updateUserInfo } from "@redux/slices/userSlice";
+import { updateUserField, updateUserInfo } from "@redux/slices/userSlice";
 import SettingsPopup from "@components/dashboard/SettingPopup";
 import NotificationPopup from "@components/dashboard/NotificationPopup";
 import {
   addSystemNotification,
   silenceAllNotifications,
 } from "@redux/slices/NotificationsSlice";
+import Link from "@node_modules/next/link";
 
 const DashboardNavbar: FC = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.user);
   const notifications = useSelector((state: RootState) => state.notifications);
@@ -43,12 +46,17 @@ const DashboardNavbar: FC = () => {
   const { data: session, status } = useSession();
 
   const [theme, setTheme] = useState<string>(
-    user?.preferredTheme || session?.user.preferredTheme || "light"
+    user?.preferredTheme
+      ? user?.preferredTheme
+      : session?.user.preferredTheme
+      ? session?.user.preferredTheme
+      : ""
   );
 
   const [currentTheme, setCurrentTheme] = useState(
-    user?.preferredColorScheme || session?.user.preferredColorScheme || "sky"
+    user?.preferredColorScheme || session?.user.preferredColorScheme || ""
   );
+  const searchingRef = useRef<HTMLDivElement | null>(null);
   const settingsRef = useRef<HTMLDivElement | null>(null);
   const notificationRef = useRef<HTMLDivElement | null>(null);
 
@@ -58,6 +66,7 @@ const DashboardNavbar: FC = () => {
       : ""
   );
   const [notificationToRead, setNotificationToRead] = useState<boolean>(false);
+  const [searchingText, setSearchingText] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const toggleSearching = () => {
     setIsSearching(!isSearching);
@@ -76,6 +85,15 @@ const DashboardNavbar: FC = () => {
     dispatch(silenceAllNotifications());
   };
 
+  const handleSearchSubmit = () => {
+    if (searchingText.trim()) {
+      router.push(
+        `/iLearn/search?q=${encodeURIComponent(searchingText.trim())}`
+      );
+      setIsSearching(false);
+    }
+  };
+
   useEffect(() => {
     setTitle(() =>
       session?.user.role
@@ -85,18 +103,8 @@ const DashboardNavbar: FC = () => {
   }, [pathname, status]);
 
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    dispatch(
-      updateUserInfo({
-        preferredTheme: theme,
-      })
-    );
-  }, [theme]);
+    console.log("isSearching: ", isSearching);
+  }, [isSearching]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -116,17 +124,42 @@ const DashboardNavbar: FC = () => {
       ) {
         setIsNotificationWindowBoxOpen(false);
       }
+      if (
+        isSearching &&
+        searchingRef.current &&
+        !searchingRef.current.contains(target)
+      ) {
+        setIsSearching(false);
+      }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isSettingWindowBoxOpen, isNotificationWindowBoxOpen]);
+  }, [isSettingWindowBoxOpen, isNotificationWindowBoxOpen, isSearching]);
 
   useEffect(() => {
-    setTheme(() => session?.user.preferredTheme || "light");
-  }, []);
+    if (theme === "dark") {
+      const root = document.documentElement;
+      root.classList.add("dark");
+      console.log("turning theme to dark");
+    } else {
+      const root = document.documentElement;
+      root.classList.remove("dark");
+      console.log("turning theme to light :", theme);
+    }
+    console.log(
+      `user.theme : ${user?.preferredTheme} and session.user.theme: ${session?.user.preferredTheme}`
+    );
+  }, [theme, user]);
+
+  useEffect(() => {
+    if (!user?.preferredTheme) return;
+    if (theme !== user?.preferredTheme) {
+    }
+  }, [user]);
+
   useEffect(() => {
     if (notifications.silent || isNotificationWindowBoxOpen) {
       setNotificationToRead(false);
@@ -136,15 +169,17 @@ const DashboardNavbar: FC = () => {
   }, [notifications.silent]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !session?.user) return;
+    console.log(
+      `color : ${user?.preferredColorScheme} to ${session?.user.preferredColorScheme} \n theme : ${user?.preferredTheme} to ${session?.user.preferredTheme} \n SidebarBg: ${user.preferredSidebarBg}`
+    );
+    setTheme(user.preferredTheme);
     const needToSave =
       user?.preferredTheme !== session?.user?.preferredTheme ||
-      user?.preferredColorScheme !== session?.user?.preferredColorScheme;
-
+      user?.preferredColorScheme !== session?.user?.preferredColorScheme ||
+      user.preferredSidebarBg !== session.user.preferredSidebarBg;
+    setCurrentTheme(user.preferredColorScheme);
     if (needToSave) {
-      console.log(
-        `color : ${user?.preferredColorScheme} to ${session?.user.preferredColorScheme} \n theme : ${user?.preferredTheme} to ${session?.user.preferredTheme}`
-      );
       dispatch(
         addSystemNotification({
           message:
@@ -157,7 +192,12 @@ const DashboardNavbar: FC = () => {
   }, [user]);
 
   const toggleTheme = () => {
-    setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
+    dispatch(
+      updateUserField({
+        preferredTheme: theme === "light" ? "dark" : "light",
+      })
+    );
+    setTheme((theme) => (theme === "light" ? "dark" : "light"));
   };
   const [showPopup, setShowPopup] = useState<boolean>(false);
 
@@ -172,139 +212,175 @@ const DashboardNavbar: FC = () => {
       });
       setCurrentTheme(theme);
       dispatch(
-        updateUserInfo({
+        updateUserField({
           preferredColorScheme: theme,
         })
       );
     }
   };
 
+  const handleCancelChanges = () => {
+    dispatch(
+      updateUserField({
+        preferredTheme: session?.user.preferredTheme,
+        preferredColorScheme: session?.user.preferredColorScheme,
+        preferredSidebarBg: session?.user.preferredSidebarBg,
+      })
+    );
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    if (currentTheme === user.preferredColorScheme)
+      setCurrentTheme(user.preferredColorScheme);
+  }, [document.documentElement.classList]);
+
   return (
-    <nav className="w-full border-b border-zinc-300 dark:border-white/50 sticky top-0 right-0 left-0 z-50 shadow-md">
-      <div
-        className="px-4 py-2 flex items-center justify-between"
-        onClick={() => {
-          if (isNotificationWindowBoxOpen) {
-            setIsNotificationWindowBoxOpen(false);
-          }
-          if (isSettingWindowBoxOpen) {
-            setIsSettingWindowBoxOpen(false);
-          }
-        }}
-      >
+    <nav className="w-full border-b border-zinc-300 dark:border-white/50 sticky top-0 z-50 shadow-md bg-white dark:bg-zinc-900">
+      <div className="px-4 py-2 flex items-center justify-between">
         <div
-          className="flex items-center gap-2 capitalize"
-          onClick={handleToggleSidebar}
+          className={`flex items-center gap-2 capitalize cursor-pointer ${
+            isSearching ? "max-sm:hidden" : ""
+          }`}
+          onClick={() => dispatch(toggleNavigation())}
         >
           {isOpenNavigation ? <SidebarOpen /> : <SidebarClose />}
-          <span className="max-md:hidden">{title}</span>
+          <span className="hidden md:inline-block">{title}</span>
         </div>
-        <div className="w-full flex-1 h-full p-4" onClick={toggleTheme} />
-        <div className="flex gap-3 items-center">
-          <div className="w-lg flex rounded-full border-y border-l border-zinc-200 dark:border-white/30 pl-3 h-9 items-center">
-            <input
-              type="search"
-              name="search"
-              id="searchbox"
-              className={`min-w-44 bg-inherit outline-none ${
-                isOpenNavigation && "max-md:sm:hidden"
-              } ${isSearching ? "" : "max-md:hidden"}`}
-              placeholder="Search..."
-            />
-            <Search
-              className="bg-primary text-white rounded-full p-1.5 border border-zinc-200 dark:border-white/30 h-9 w-9"
-              onClick={toggleSearching}
-            />
+        {isSearching && (
+          <div className="sm:hidden">
+            <ChevronLeft />
           </div>
-          <div
-            className={`relative border-x border-zinc-300 dark:border-white/50 h-12 flex-center px-2 flex-1 ${
-              isSearching ? "max-md:hidden" : ""
+        )}
+        <div
+          ref={searchingRef}
+          className="relative w-full max-w-md sm:mx-6 mx-3 max-md:flex-1 max-sm:mr-2"
+        >
+          <input
+            type="search"
+            value={searchingText}
+            onChange={(e) => setSearchingText(e.target.value)}
+            onFocus={() => setIsSearching(true)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearchSubmit()}
+            placeholder="Search users, courses, etc."
+            className={`w-full px-4 py-2 rounded-md border border-zinc-300 dark:border-white/30 bg-inherit text-sm ${
+              !isSearching ? "max-sm:hidden" : ""
             }`}
+          />
+          <button
+            className={`absolute sm:right-3 right-0 top-1/2 transform -translate-y-1/2 sm:text-zinc-500 ${
+              isSearching ? "right-2" : ""
+            }`}
+            onClick={() => {
+              handleSearchSubmit();
+              handleSearchSubmit();
+              setIsSearching((prev) => !prev);
+            }}
+          >
+            <Search />
+          </button>
+
+          {isSearching && (
+            <div
+              className="absolute top-full left-0 right-0 bg-white dark:bg-zinc-900 shadow-lg border border-t-0 border-zinc-300 dark:border-zinc-600 rounded-b-md overflow-hidden z-10"
+              onClick={() => setIsSearching(false)}
+            >
+              <Link
+                href={`/iLearn/search?q=${encodeURIComponent(searchingText)}`}
+                className="block px-4 py-2 bg-zinc-100 dark:bg-white/10 text-sm"
+              >
+                View all results for <strong>{searchingText}</strong>
+              </Link>
+              <p className="italic text-zinc-500 dark:text-white/50 text-xs border-b border-zinc-500 dark:border-white/50 w-full px-2 bg-zinc-100 dark:bg-white/10">
+                Suggested
+              </p>
+              <Link
+                href={`/iLearn/search?q=${encodeURIComponent(
+                  searchingText
+                )}&category=people`}
+                className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm"
+              >
+                People: {searchingText}
+              </Link>
+              <Link
+                href={`/iLearn/search?q=${encodeURIComponent(
+                  searchingText
+                )}&category=courses`}
+                className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm"
+              >
+                Courses: {searchingText}
+              </Link>
+              <a
+                href={`https://www.google.com/search?q=${encodeURIComponent(
+                  searchingText
+                )}`}
+                className="block px-4 py-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-sm"
+                target="_blank"
+              >
+                Google: {searchingText}
+              </a>
+            </div>
+          )}
+        </div>
+
+        <div
+          className={`flex items-center gap-2 ${
+            isSearching ? "max-sm:hidden" : ""
+          }`}
+        >
+          <div
+            className="relative cursor-pointer border-x px-2 h-10 flex items-center  border-zinc-400 dark:border-white/50"
             onClick={toggleNotificationWindowBox}
           >
-            <Bell className={`${notificationToRead && "animate-bell"}`} />
-
+            <Bell className={notificationToRead ? "animate-bell" : ""} />
             {notificationToRead && (
-              <div className="absolute top-2 right-2 bg-lightPrimary dark:bg-primary h-3 w-3 rounded-full overflow-hidden">
-                <div className="w-full h-full animate-ping bg-secondary"></div>
-              </div>
+              <span className="absolute top-1.5 right-2 w-2.5 h-2.5 bg-secondary rounded-full overflow-hidden">
+                <div className="w-full h-full animate-pulse bg-lightPrimary" />
+              </span>
             )}
           </div>
+
           <div
-            className={`px-2 flex cursor-pointer ${
-              isSearching ? "max-md:hidden" : ""
-            }`}
+            className="cursor-pointer flex items-center gap-2 min-w-max"
             onClick={toggleSettingWindowBox}
           >
-            {session?.user.picture && session?.user.picture !== "" ? (
+            {session?.user.picture ? (
               <Image
                 src={session.user.picture}
                 alt="profile"
-                height={80}
-                width={80}
-                className="w-10 h-10 object-cover object-center rounded-full"
+                height={40}
+                width={40}
+                className="w-10 h-10 object-cover rounded-full"
               />
             ) : (
-              <UserCircle className="my-auto" />
+              <UserCircle className="w-8 h-8" />
             )}
-            <div
-              className={`text-sm flex flex-col justify-center leading-tight ml-2 max-md:hidden ${
-                isOpenNavigation && "max-lg:md:hidden"
-              }`}
-            >
-              <p className="font-semibold">{session?.user.name}</p>
-              <p>{session?.user.role}</p>
+            <div className="hidden md:block text-sm">
+              <p className="font-semibold leading-none">{session?.user.name}</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-300 flex-0">
+                {session?.user.role}
+              </p>
             </div>
           </div>
         </div>
-        {/* <div className="w-full flex justify-between pb-3 px-4 items-center overflow-hidden">
-          <Link href="/dashboard/setting">
-            <SettingsIcon />
-          </Link> */}
-
-        {/* <div className="md:relative">
-            <button
-              onClick={() => setShowPopup(!showPopup)}
-              className="p-2 rounded-full hover:bg-gray-200 focus:outline-none group relative overflow-hidden"
-            >
-              <PowerIcon size={24} className="group-hover:text-primary" />
-              <MoreHorizontal
-                size={18}
-                className="absolute -bottom-1 right-1/2 translate-x-1/2 translate-y-2"
-              />
-            </button>
-
-            {showPopup && (
-              <div className="md:absolute fixed md:bottom-full max-md:top-1/2 max-md:-translate-x-1/2 max-md:left-1/2 max-md:-translate-y-1/2 left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-4 w-64 max-w-[90vw] z-50">
-                <p className="text-sm text-gray-700 mb-4">
-                  You will need to enter your credentials the next time you log
-                  in.
-                </p>
-                <button
-                  aria-label="Logout"
-                  role="button"
-                  onClick={handleLogout}
-                  className="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 focus:outline-none"
-                >
-                  Log Out
-                </button>
-              </div>
-            )}
-          </div> */}
-        {/* </div> */}
       </div>
+
       {isNotificationWindowBoxOpen && (
         <div
           ref={notificationRef}
-          className="absolute top-full right-0 md:-translate-x-32 max-w-[20rem] md:w-full max-md:left-1/3 h-[30rem] bg-white dark:bg-darkPrimary px-2 py-3 border border-zinc-400 flex flex-col"
+          className="absolute right-4 top-full w-80 bg-white dark:bg-darkPrimary border border-zinc-400 shadow-md rounded-md z-50 py-3 popupHeight overflow-y-auto overflow-x-hidden"
         >
-          <NotificationPopup closePopup={toggleNotificationWindowBox} />
+          <NotificationPopup
+            handleCancelChanges={() => setIsNotificationWindowBoxOpen(false)}
+            closePopup={toggleNotificationWindowBox}
+          />
         </div>
       )}
+
       {isSettingWindowBoxOpen && (
         <div
           ref={settingsRef}
-          className="absolute top-full right-0 max-w-[20rem] w-full h-[30rem] bg-white dark:bg-darkPrimary p-3 border border-zinc-400"
+          className="absolute right-0 top-full w-80 bg-white dark:bg-darkPrimary border border-zinc-400 shadow-md rounded-s-md z-50 py-3 popupHeight overflow-y-auto overflow-x-hidden"
         >
           <SettingsPopup
             {...{
@@ -312,7 +388,6 @@ const DashboardNavbar: FC = () => {
               themeMode: theme,
               toggleTheme,
               handleThemeChange,
-              user: session?.user,
             }}
             closePopup={toggleSettingWindowBox}
             toggleThemeMode={toggleTheme}

@@ -24,6 +24,7 @@ import {
 import { AppDispatch, RootState } from "@redux/store";
 import { usePathname, useRouter } from "next/navigation";
 import { fetchTop4Courses } from "@redux/slices/coursesSlice";
+import { CourseCardSkeleton } from "@components/designs/Skeletons";
 
 const Home: FC = () => {
   const pathname = usePathname();
@@ -63,7 +64,7 @@ const Home: FC = () => {
     }
   };
   return (
-    <>
+    <div className="bg-gray-900 text-white">
       <header
         id="header-banner"
         ref={homeRef}
@@ -82,20 +83,20 @@ const Home: FC = () => {
             <div className="mt-8 flex flex-col md:flex-row gap-4 justify-center md:justify-start">
               <button
                 onClick={() => scrollToSection(aboutRef)}
-                className="bg-white text-darkPrimary hover:bg-opacityPrimary px-6 py-3 text-lg font-semibold shadow-md transition rounded-full"
+                className="bg-white text-sky-800 hover:bg-sky-600/30 px-6 py-3 text-lg font-semibold shadow-md transition rounded-full"
               >
                 Explore Features
               </button>
               <button
                 onClick={() => scrollToSection(coursesRef)}
-                className="bg-darkPrimary hover:bg-violet-700 px-6 py-3 text-white text-lg font-semibold shadow-md transition rounded-full z-[10]"
+                className="bg-sky-800 hover:bg-violet-700 px-6 py-3 text-white text-lg font-semibold shadow-md transition rounded-full z-[10]"
               >
                 Browse Courses
               </button>
             </div>
           </div>
           <div className="absolute inset-0 w-full">
-            <div className="absolute inset-0 bg-gradient-to-r w-full from-primary via-indigo-600 to-transparent z-[10]" />
+            <div className="absolute inset-0 bg-gradient-to-r w-full from-sky-600 via-indigo-600 to-transparent z-[10]" />
             <Image
               src={pcBulb}
               alt="Learning Illustration"
@@ -108,11 +109,9 @@ const Home: FC = () => {
       <section
         id="about"
         ref={aboutRef}
-        className="w-full max-w-screen-lg mx-auto px-6 text-center py-16 bg-darkPrimary dark:text-zinc-200"
+        className="w-full max-w-screen-lg mx-auto px-6 text-center py-16 text-zinc-200"
       >
-        <h2 className="h2 font-bold text-gray-800 dark:text-zinc-100">
-          About Us
-        </h2>
+        <h2 className="h2 font-bold text-zinc-100">About Us</h2>
         <p className="mt-4 body-1">
           IMBONI Learn is an innovative platform offering high-quality
           educational content from a global netassignment of instructors. Our
@@ -135,24 +134,20 @@ const Home: FC = () => {
         </p>
       </section>
 
-      <section
-        id="features"
-        ref={featuresRef}
-        className="py-16 bg-gray-100 dark:bg-zinc-900 mx-auto px-6"
-      >
-        <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-zinc-100">
+      <section id="features" ref={featuresRef} className="py-16 mx-auto px-6">
+        <h2 className="h2 font-bold text-center dark:text-zinc-100">
           Why Choose IMBONI Learn?
         </h2>
-        <p className="mt-4 text-lg text-center text-gray-600 dark:text-gray-400">
+        <p className="mt-4 text-lg text-center text-gray-400">
           Discover the powerful features and tools that make learning with us
           engaging and impactful.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
+        <div className="flex flex-wrap justify-center gap-8 mt-12">
           {features.map((feature, index) => (
             <div
               key={index}
-              className="block relative p-0.5 bg-no-repeat bg-[length:100%_100%] md:max-w-[24rem] group"
+              className="block relative p-0.5 bg-no-repeat bg-[length:100%_100%] md:max-w-[24rem] group hover:scale-[1.02]"
               style={{ backgroundImage: `url("${featuresCard}")` }}
             >
               <div className="relative z-2 flex flex-col min-h-[22rem] p-[2.4rem] pointer-events-none z-[100]">
@@ -162,11 +157,17 @@ const Home: FC = () => {
                 <p className="body-2 leading-tight">{feature.description}</p>
                 <div className="flex items-center justify-between mt-auto">
                   <div
-                    className={`flex items-center justify-center w-12 h-12 rounded-full ${feature.bgColor} group-hover:bg-gray-300`}
+                    className={`flex items-center justify-center w-12 h-12 rounded-full group-hover:bg-gray-300`}
+                    style={{
+                      backgroundColor: feature.color,
+                    }}
                   >
-                    <i className={`${feature.icon} text-2xl z-[10]`}></i>
+                    <feature.icon
+                      className="text-2xl"
+                      color={feature.black ? "black" : `white`}
+                    />
                   </div>
-                  <span className="flex items-center space-x-2 body-1 group-hover:bg-darkPrimary group-hover:text-white rounded-full pl-4 py-2 group-hover:pr-2">
+                  <span className="flex items-center space-x-2 body-1 group-hover:bg-sky-800 group-hover:text-white rounded-full pl-4 py-2 group-hover:pr-2">
                     <span className="text-sm leading-tight">Explore more</span>
                     <Arrow />
                   </span>
@@ -176,7 +177,7 @@ const Home: FC = () => {
                 className="absolute inset-0.5 bg-n-8"
                 style={{ clipPath: "url(#benefits)" }}
               >
-                <div className="absolute inset-0 opacity-30 transition-opacity hover:opacity-50">
+                <div className="absolute inset-0 opacity-30 transition-opacity hover:opacity-10">
                   <Image
                     src={pcBook3}
                     height={380}
@@ -193,64 +194,60 @@ const Home: FC = () => {
       </section>
 
       <section id="courses" ref={coursesRef} className="py-16 px-6">
-        <h2 className="text-3xl font-bold text-gray-800 text-center dark:text-zinc-100 py-4">
-          Our Courses
-        </h2>
-        <div className="relative max-w-full overflow-x-scroll">
-          <div className="flex relative mb-4 gap-8 mt-8 w-max">
-            {top4Courses.data.length > 0 ? (
-              top4Courses.data.map((item, index) => (
-                <div
-                  className="w-[18rem] h-[28rem] bg-white rounded-lg shadow-md shadow-black/90 dark:bg-zinc-800/50 dark:shadow-slate-200 flex-0"
-                  key={item._id + index}
-                >
-                  <div className="w-full aspect-video bg-zinc-300">
-                    <Image
-                      src={pcBook2}
-                      alt="course"
-                      className="w-full h-full object-cover object-center"
-                    />
+        <h2 className="h2 font-bold text-center py-4">Our Courses</h2>
+        <div className="relative max-w-full overflow-x-auto">
+          <div className="flex relative justify-end mb-4 gap-8 mt-8 w-max">
+            {!top4Courses.top4CoursesLoading
+              ? top4Courses.data.map((item, index) => (
+                  <div
+                    className="w-[18rem] h-[28rem] rounded-lg shadow-md bg-zinc-800/50 shadow-slate-200 flex-0 overflow-hidden"
+                    key={item._id + index}
+                  >
+                    <div className="w-full aspect-video bg-zinc-300">
+                      <Image
+                        src={pcBook2}
+                        alt="course"
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h5 className="body-1 leading-tight font-semibold text-gray-100">
+                        {item.title}
+                      </h5>
+                      <p className="mt-4 body-2 truncate-two-lines">
+                        {item.description}
+                      </p>
+                      <p className="mt-4 body-2 flex gap-x-3 flex-wrap gap-y-2">
+                        {item.tags.map((tag) => (
+                          <span
+                            className="py-1 rounded-full bg-sky-400 text-black text-sm px-3 body-2 leading-none"
+                            key={index + ": " + tag}
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </p>
+                      <p className="mt-4">
+                        By: {item.instructor.name || "Private instructor"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <h5 className="body-1 leading-tight font-semibold text-gray-800 dark:text-gray-100">
-                      {item.title}
-                    </h5>
-                    <p className="mt-4 body-2 truncate-two-lines">
-                      {item.description}
-                    </p>
-                    <p className="mt-4 body-2 flex gap-x-3 flex-wrap gap-y-2">
-                      {item.tags.map((tag) => (
-                        <span
-                          className="py-1 rounded-full bg-zinc-300/80 dark:text-black px-3 body-2 leading-none"
-                          key={index + ": " + tag}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </p>
-                    <p className="mt-4">
-                      By: {item.instructor.name || "Private instructor"}
-                    </p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <SectionLoader />
-            )}
+                ))
+              : Array.from({ length: 4 }).map((_, i) => (
+                  <CourseCardSkeleton key={i} />
+                ))}
           </div>
         </div>
         <div className="w-full h-full flex-1 flex items-end mt-4 justify-end">
-          <button className="button bg-primary dark:bg-lightPrimary text-white dark:text-darkPrimary px-8">
+          <button className="button bg-sky-600 dark:bg-sky-400 text-white dark:text-sky-800 px-8">
             See More Courses
           </button>
         </div>
       </section>
 
-      <section className="py-32 bg-gray-100 dark:bg-zinc-900 mx-auto px-6">
-        <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-zinc-100">
-          Meet Our Experts
-        </h2>
-        <p className="mt-4 text-lg text-center text-gray-600 dark:text-gray-400">
+      <section className="py-32 mx-auto px-6">
+        <h2 className="h2 font-bold text-center">Meet Our Experts</h2>
+        <p className="mt-4 text-lg text-center text-white/80">
           Our instructors are experienced professionals who are passionate about
           helping you succeed.
         </p>
@@ -259,23 +256,21 @@ const Home: FC = () => {
           {instructors.map((instructor, index) => (
             <div
               key={index}
-              className="bg-white dark:bg-zinc-800 p-6 rounded-lg knob relative shadow-md shadow-black/90"
+              className="p-6 rounded-lg knob relative shadow-md bg-zinc-800/50 shadow-slate-200"
             >
               <Image
                 src={instructor.image}
                 alt="Instructor"
                 className="w-full h-48 object-cover rounded-2xl bg-zinc-300 object-top"
               />
-              <h3 className="mt-6 text-xl font-bold text-gray-800 dark:text-zinc-100">
+              <h3 className="mt-6 text-xl font-bold text-zinc-100">
                 {instructor.name}
               </h3>
-              <p className="mt-2 text-gray-600 dark:text-gray-300">
-                {instructor.role}
-              </p>
-              <p className="mt-2 body-2 leading-tight text-gray-600 dark:text-gray-300">
+              <p className="mt-2 text-gray-300">{instructor.role}</p>
+              <p className="mt-2 body-2 leading-tight text-gray-300 text-white/60">
                 {instructor.description}
               </p>
-              <button className="button !bg-primary mt-8 hover:scale-105 duration-300 transition">
+              <button className="button !bg-sky-600 mt-8 hover:scale-105 duration-300 transition">
                 Connect
               </button>
             </div>
@@ -283,13 +278,8 @@ const Home: FC = () => {
         </div>
       </section>
 
-      <section
-        id="testimonials"
-        className="py-32 bg-gray-50 dark:bg-zinc-800 mx-auto px-6"
-      >
-        <h2 className="text-4xl font-bold text-center text-gray-800 dark:text-zinc-100">
-          What Our Learners Say
-        </h2>
+      <section id="testimonials" className="py-32 mx-auto px-6">
+        <h2 className="h2 font-bold text-center">What Our Learners Say</h2>
         <div className="flex flex-wrap justify-center gap-8 mt-8">
           {testimonies.map((item) => (
             <div
@@ -322,9 +312,9 @@ const Home: FC = () => {
       <section
         id="pricing"
         ref={pricingRef}
-        className="py-32 bg-gradient-to-br from-primary to-violet-700 text-white mx-auto px-6 text-center"
+        className="py-32 bg-gradient-to-br from-sky-600 to-violet-700 text-white w-full px-6 text-center"
       >
-        <h2 className="text-4xl font-extrabold">Affordable Pricing</h2>
+        <h2 className="h2 font-extrabold">Affordable Pricing</h2>
         <p className="mt-4 text-lg max-w-2xl mx-auto">
           Choose from a range of pricing options that fit your budget and
           learning needs. Get started today and access high-quality education at
@@ -336,12 +326,12 @@ const Home: FC = () => {
             <div
               key={index}
               className={`relative bg-white text-gray-800 max-2xl:mt-10 p-8 rounded-2xl shadow-lg max-w-sm transform transition duration-300 flex flex-col justify-between hover:scale-105 ${
-                plan.isPopular ? "border-4 border-secondary" : ""
+                plan.isPopular ? "border-4 border-yellow-600" : ""
               }`}
             >
               <div className="relative">
                 {plan.isPopular && (
-                  <div className="absolute top-0 right-0 bg-secondary text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
+                  <div className="absolute top-0 right-0 bg-yellow-600 text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
                     Popular
                   </div>
                 )}
@@ -351,7 +341,7 @@ const Home: FC = () => {
                 </div>
 
                 <h3 className="mt-2 text-2xl font-bold">{plan.title}</h3>
-                <p className="mt-4 text-xl font-semibold text-darkPrimary">
+                <p className="mt-4 text-xl font-semibold text-sky-800">
                   {plan.price}
                 </p>
                 <p className="mt-4 text-gray-600">{plan.description}</p>
@@ -359,23 +349,23 @@ const Home: FC = () => {
                 <ul className="mt-6 text-left space-y-3">
                   {plan.benefits.map((benefit, idx) => (
                     <li key={idx} className="flex items-center">
-                      <i className="fas fa-check text-darkPrimary mr-2"></i>
+                      <i className="fas fa-check text-sky-800 mr-2"></i>
                       {benefit}
                     </li>
                   ))}
                 </ul>
               </div>
-              <button className="mt-8 !bg-primary hover:bg-primary text-white px-6 py-3 rounded-full font-semibold transition duration-200">
+              <button className="mt-8 !bg-sky-600 hover:bg-sky-600 text-white px-6 py-3 rounded-full font-semibold transition duration-200">
                 {plan.buttonText}
               </button>
               <div
-                className={`absolute top-full w-[90%] mx-auto z-1 h-6 right-0 left-0 bg-darkPrimary shadow-xl rounded-b-[1.25rem] lg:h-5 ${
-                  plan.isPopular && "border-t-4 border-[3px] border-secondary"
+                className={`absolute top-full w-[90%] mx-auto z-1 h-6 right-0 left-0 bg-sky-800 shadow-xl rounded-b-[1.25rem] lg:h-5 ${
+                  plan.isPopular && "border-t-4 border-[3px] border-yellow-600"
                 }`}
               />
               <div
                 className={`absolute top-full w-[70%] mx-auto z-1 h-6 right-0 left-0 bg-neutral-800/70 shadow-xl rounded-b-[1.25rem] lg:h-5 translate-y-5 ${
-                  plan.isPopular && "border-t-none border-2 border-secondary"
+                  plan.isPopular && "border-t-none border-2 border-yellow-600"
                 }`}
               />
             </div>
@@ -383,7 +373,7 @@ const Home: FC = () => {
         </div>
       </section>
 
-      <footer className="bg-white mt-32 text-black dark:text-white dark:bg-black px-12 py-10 container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+      <footer className="mt-32 px-12 py-10 container mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
         <div className="col-span-2">
           <h4 className="text-lg font-bold mb-4">About IMBONI Learn</h4>
           <p className="text-sm">
@@ -429,12 +419,12 @@ const Home: FC = () => {
               href="mailto:miracleibanze@gmail.com"
               className="hover:text-teal-400"
             >
-              support@imbonilearn.com
+              support@imboniLearn.com
             </a>
           </p>
           <p className="text-sm mt-2">Phone: +250 123 456 789</p>
           <p className="text-sm mt-2">Location: Kigali, Rwanda</p>
-          <button className="button !bg-primary mt-4">Contact us</button>
+          <button className="button !bg-sky-600 mt-4">Contact us</button>
         </div>
 
         <div>
@@ -455,7 +445,7 @@ const Home: FC = () => {
           &copy; {new Date().getFullYear()} IMBONI Learn. All rights reserved.
         </p>
       </footer>
-    </>
+    </div>
   );
 };
 

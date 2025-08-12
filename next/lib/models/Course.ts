@@ -53,12 +53,7 @@ export interface DetailedCourseDocument extends Document {
   chapters: number;
 }
 
-const ChapterSchema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  order: { type: Number, required: true },
-  content: { type: String, required: true }, // string only
-});
+const ChapterSchema = new Schema();
 
 export const Chapter =
   mongoose.models.Chapter || mongoose.model("Chapter", ChapterSchema);
@@ -75,7 +70,14 @@ const CourseSchema = new Schema({
   status: { type: String, enum: ["Draft", "Published"], default: "Draft" },
   tags: [{ type: String }],
   students: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  chapters: [{ type: Schema.Types.ObjectId, ref: "Chapter" }],
+  chapters: [
+    {
+      title: { type: String, required: true },
+      description: { type: String, required: true },
+      order: { type: Number, required: true },
+      content: { type: String, required: true },
+    },
+  ],
 });
 
 export const Course =

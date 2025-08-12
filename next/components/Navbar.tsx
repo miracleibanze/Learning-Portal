@@ -31,7 +31,7 @@ const Navbar: FC<{ user?: string }> = ({ user }) => {
   };
 
   return (
-    <nav className="w-full flex justify-between items-center sticky top-0 z-[9990] bg-primary dark:bg-darkPrimary border-b border-white/50 px-4 text-white">
+    <nav className="w-full flex justify-between items-center bg-sky-600 sticky top-0 z-[9990] dark:bg-sky-800 border-b border-white/50 px-4 text-white h-14">
       <Image
         src="/logo.png"
         alt="logo"
@@ -45,18 +45,18 @@ const Navbar: FC<{ user?: string }> = ({ user }) => {
           onClick={() => setOpenNavigation(false)}
         />
       )}
-      <div className="flex items-center h-full">
+      <div className="flex items-center h-full p-2">
         <ul
-          className={`flex space-x-2 lg:justify-end max-lg:pt-24 h-full items-center max-lg:flex-col pt-2 lg:relative fixed max-lg:bg-primary max-lg:text-white ${
+          className={`flex flex-1 space-x-2 lg:justify-end max-lg:py-24 h-full items-center max-lg:flex-col lg:relative fixed max-lg:bg-green-600 max-lg:text-white ${
             openNavigation
-              ? "max-lg:navbar-mobile pb-16 overflow-y-scroll"
+              ? "max-lg:navbar-mobile max-lg:pb-16 max-lg:overflow-y-auto"
               : "max-lg:hidden"
           }`}
         >
           {navLinks.map((item, index) => (
             <li
               key={item.link + index}
-              className="max-lg:w-full"
+              className="flex-center max-lg:w-full flex body-2 relative lg:px-3 px-5 border-black/70 flex-1 h-full hover:bg-white/30 duration-300 rounded-md items-center max-lg:text-white text-left"
               onClick={() => {
                 setOpenNavigation(false);
                 // Scroll to the section when clicked
@@ -79,18 +79,12 @@ const Navbar: FC<{ user?: string }> = ({ user }) => {
                 }
               }}
             >
-              <span className="flex body-2 relative lg:px-3 px-5 border-black/70 h-10 mb-2 hover:bg-zinc-400/50 duration-300 rounded-md items-center max-lg:text-white textLeft">
-                {item.name}
-              </span>
+              {item.name}
             </li>
           ))}
-          <Link href={"/login"}>
-            <button
-              className={`h-10 flex items-center ml-2 mb-2 px-4 hover:bg-zinc-300/50 duration-300 rounded-md lg:hidden w-full ${
-                pathname.startsWith("/dashboard") && "hidden"
-              }`}
-            >
-              Login/ Register
+          <Link href="/login" className="h-10">
+            <button className="button h-10 lg:flex items-center ml-2 bg-zinc-300 hover:scale-105 text-black hover:bg-sky-400 duration-300 rounded-md px-4 py-2">
+              Login / Register
             </button>
           </Link>
           <svg
@@ -109,10 +103,6 @@ const Navbar: FC<{ user?: string }> = ({ user }) => {
             <line x1="18" y1="6" x2="6" y2="18" />
             <line x1="6" y1="6" x2="18" y2="18" />
           </svg>
-          <div className="lg:hidden flex relative top-full w-full h-12 overflow-visible bg-inherit">
-            &copy; {new Date().getFullYear()} IMBONI Learn. <br />
-            All rights reserved.
-          </div>
         </ul>
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -131,13 +121,6 @@ const Navbar: FC<{ user?: string }> = ({ user }) => {
           <line x1="3" y1="6" x2="21" y2="6" />
           <line x1="3" y1="18" x2="21" y2="18" />
         </svg>
-        {pathname === "/" && (
-          <Link href={user ? "/dashboard" : "/login"}>
-            <button className="h-10 lg:flex items-center ml-2 hidden bg-zinc-300 hover:scale-105 text-black hover:bg-lightPrimary/70 duration-300 rounded-md px-4 py-2">
-              Dashboard
-            </button>
-          </Link>
-        )}
       </div>
     </nav>
   );

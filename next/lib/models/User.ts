@@ -4,20 +4,17 @@ import { Course } from "@lib/models/Course"; // Ensure Course is imported
 const UserSchema = new Schema(
   {
     name: { type: String, required: true },
-    username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
+    username: { type: String, required: true, unique: true }, // as referrence
+    about: { type: String, required: true, unique: true }, // as referrence
     password: { type: String, required: true },
     picture: { type: String },
     updates: { type: Boolean, default: false },
     lastActive: { type: Number },
     preferredTheme: { type: String, default: "light" },
     preferredColorScheme: { type: String, default: "sky" },
+    preferredSidebarBg: { type: String },
     role: { type: String, default: "student", required: true },
-    settings: {
-      darkMode: { type: Boolean, default: false },
-      notifications: { type: Boolean, default: true },
-      language: { type: String, default: "en" },
-    },
     progress: [
       {
         courseId: {
@@ -39,6 +36,7 @@ const UserSchema = new Schema(
       },
     ],
     myCourses: [{ type: Schema.Types.ObjectId, ref: "Course" }], // Array of enrolled courses
+    joinRequests: [{ type: Schema.Types.ObjectId, ref: "JoinRequest" }], // Array of enrolled courses
   },
   { timestamps: true }
 );

@@ -19,6 +19,7 @@ const config = {
         lightPrimary: "var(--color-lightPrimary)",
         darkPrimary: "var(--color-darkPrimary)",
         opacityPrimary: "var(--color-opacityPrimary)",
+        overlayPrimary: "var(--color-overlayPrimary)",
       },
     },
   },

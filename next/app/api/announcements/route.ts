@@ -34,7 +34,7 @@ export async function GET(req: Request) {
       const allCourses = await Course.find().select("_id").lean();
       enrolledCourseIds = allCourses.map((course) => course._id);
     } else {
-      enrolledCourseIds = user.myCourses.map((item: any) => item.toString());
+      enrolledCourseIds = user.myCourses;
     }
 
     console.log("📚 Enrolled Course IDs:", enrolledCourseIds);
@@ -65,7 +65,6 @@ export async function GET(req: Request) {
                 description: "$$course.description",
                 category: "$$course.category",
                 thumbnail: "$$course.thumbnail",
-                instructor: "$$course.instructor",
               },
             },
           },
@@ -74,7 +73,7 @@ export async function GET(req: Request) {
       { $sort: { createdAt: -1 } },
       { $limit: 10 },
     ]);
-    console.log("final announcement : ", announcements[2]);
+    // console.log("final announcement : ", announcements[2]);
 
     console.log("📢 Announcements fetched:", announcements.length);
     return NextResponse.json(announcements, { status: 200 });
@@ -82,6 +81,47 @@ export async function GET(req: Request) {
     console.error("🚨 Error fetching announcements:", error);
     return NextResponse.json(
       { error: "Server error", details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  await connectDB();
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    console.log("❌ Unauthorized access attempt");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { title, description, courseId } = body;
+    const teacher = {
+      id: session.user._id.toString(),
+      name: session.user.name,
+      about: session.user.about,
+      picture: session.user.picture,
+      role: session.user.role,
+    };
+    const newAnnouncement = new Announcement({
+      title,
+      description,
+      courseId,
+      createdBy: teacher,
+    });
+    console.log("newAnnouncemnt :", newAnnouncement);
+    console.log(
+      `"createdBy :", ${session.user.role} and about: ${session.user.about}`
+    );
+    await newAnnouncement.save();
+
+    return NextResponse.json({ status: 200 });
+  } catch (error) {
+    console.error("🚨 Error updating announcement:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to update announcement" },
       { status: 500 }
     );
   }

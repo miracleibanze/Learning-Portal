@@ -36,7 +36,7 @@ export default function DashLayout({
 
   const title =
     !session?.user.role || status !== "authenticated"
-      ? "DashBoard"
+      ? "iLearn"
       : useFormattedPathSegment(session?.user.role, pathname);
 
   // Update document title
@@ -49,7 +49,7 @@ export default function DashLayout({
     if (!session?.user && status === "unauthenticated") {
       setTimeout(() => {
         redirect(
-          pathname !== "/dashboard"
+          pathname !== "/iLearn"
             ? `/login?callbackUrl=${encodeURIComponent(pathname)}`
             : "/login"
         );
@@ -83,7 +83,7 @@ export default function DashLayout({
     if (!socket) return;
 
     const handleMessage = (msg: MessageType) => {
-      if (pathname !== "/dashboard/discussions")
+      if (pathname !== "/iLearn/discussions")
         dispatch(addUnreadMessage(msg.courseId));
     };
 
@@ -103,7 +103,7 @@ export default function DashLayout({
             addGeneralNotification({
               message:
                 "You have unread messages in the discussion section of courses.",
-              href: "/dashboard/discussions",
+              href: "/iLearn/discussions",
               tag: "unreadMessages",
             })
           );

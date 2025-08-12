@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IJoinRequest extends Document {
+  _id: string;
   courseId: string;
   courseName: string;
   instructorId: string;
@@ -8,6 +9,7 @@ export interface IJoinRequest extends Document {
   name: string;
   userId: string;
   coursePrice: string;
+  createdAt: Date;
 }
 
 const JoinRequestSchema = new Schema<IJoinRequest>(

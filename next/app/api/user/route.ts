@@ -7,6 +7,8 @@ import { User } from "@lib/models/User";
 export async function GET(req: Request) {
   try {
     await connectDB();
+    const { searchParams } = new URL(req.url);
+    const username = searchParams.get("username")?.trim() || null;
 
     const session = await getServerSession(authOptions);
 
@@ -15,7 +17,9 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const userId = session?.user._id;
-    const user = await User.findById(userId).select("-password"); // Fetch user without password field
+    const user = !username
+      ? await User.findById(userId).select("-password")
+      : await User.find({ username: username }).select("-password").exec();
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -50,6 +54,8 @@ export async function PUT(req: NextRequest) {
     )
       .lean()
       .exec();
+
+    // console.log(updatedUser);
 
     if (!updatedUser) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });

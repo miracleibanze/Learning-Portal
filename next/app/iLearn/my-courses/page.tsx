@@ -37,7 +37,7 @@ const page: FC = () => {
         {data.length > 0 ? (
           data.map((course, index) => (
             <Link
-              href={`/dashboard/my-courses/${course._id}`}
+              href={`/iLearn/my-courses/${course._id}`}
               key={course._id + " " + index}
               className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
             >
@@ -49,7 +49,7 @@ const page: FC = () => {
             </Link>
           ))
         ) : myCourseLoading ? (
-          Array({ length: 8 }).map((_, index) => (
+          Array.from({ length: 8 }).map((_, index) => (
             <CourseCardSkeleton key={index} />
           ))
         ) : (

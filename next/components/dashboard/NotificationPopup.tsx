@@ -13,25 +13,34 @@ import { FC, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { signIn, useSession } from "next-auth/react";
 import PopupModal from "@components/designs/PopupModal";
-import { RootState } from "@redux/store";
+import { AppDispatch, RootState } from "@redux/store";
 import {
   addGeneralNotification,
   clearAllNotifications,
   removeGeneralNotification,
   removeSystemNotification,
 } from "@redux/slices/NotificationsSlice";
-import Link from "@node_modules/next/link";
+import Link from "next/link";
+import { updateUserField, updateUserInfo } from "@redux/slices/userSlice";
+import { User } from "next-auth";
+import { UserType } from "@type/User";
+// import {updateUserField} from '@redux/slices/userSlice'
 
 interface NotificationPopupProps {
   closePopup: () => void;
+  handleCancelChanges: () => void;
 }
 
-const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
+const NotificationPopup: FC<NotificationPopupProps> = ({
+  handleCancelChanges,
+  closePopup,
+}) => {
   const { data: session } = useSession();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { system, general } = useSelector(
     (state: RootState) => state.notifications
   );
+  const { user } = useSelector((state: RootState) => state.user);
 
   const [isConfirming, setIsConfirming] = useState<string>("");
   const [password, setPassword] = useState("");
@@ -48,7 +57,15 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
 
   const handleComfirm = async () => {
     setIsSaving(true);
+    if (!user) return;
     try {
+      dispatch(
+        updateUserInfo({
+          preferredTheme: user.preferredTheme,
+          preferredColorScheme: user.preferredColorScheme,
+          preferredSidebarBg: user.preferredSidebarBg,
+        })
+      );
       const result = await signIn("credentials", {
         email: session?.user.email,
         password,
@@ -82,9 +99,33 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
     if (saved) setTimeout(() => setSaved(false), 2000);
   }, [saved]);
 
+  // const handleUserChange = ({
+  //   theme,
+  //   themeMode,
+  // }: {
+  //   theme: string;
+  //   themeMode: string;
+  // }) => {
+  //   dispatch(
+  //     updateUserField({
+  //       preferredTheme: theme,
+  //     })
+  //   );
+  // };
+
+  // const handleThemeChange = (theme: string) => {
+  //   const root = document.documentElement;
+  //     dispatch(
+  //       updateUserField({
+  //         preferredColorScheme: theme,
+  //       })
+  //     );
+  //   }
+  // };
+
   return (
     <>
-      <p className="body-1 font-semibold mb-4">Notifications</p>
+      <p className="body-1 font-semibold mb-4 px-3">Notifications</p>
       <div className="w-full flex-1 mb-4 overflow-y-auto scroll-design px-2">
         {/* System Notification Section */}
         <span className="text-xs text-zinc-700 dark:text-zinc-300 w-full border-b dark:border-zinc-300 border-zinc-700">
@@ -111,7 +152,7 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
             .sort((a, b) => b.createdAt - a.createdAt)
             .map((item) => (
               <div
-                className={`w-full px-2 py-1 ${
+                className={`w-full ${
                   openLinks === item.id
                     ? "border border-zinc-300 dark:border-white/40 rounded"
                     : ""
@@ -119,7 +160,7 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
                 key={item.id}
                 onClick={() => setOpenLinks(item.id)}
               >
-                <div className="w-full flex items-start justify-between gap-2 cursor-pointer py-2">
+                <div className="w-full flex items-start justify-between gap-2 cursor-pointer py-2 hover:bg-zinc-200 dark:hover:bg-white/20 px-2 rounded">
                   <Settings2
                     size={20}
                     className="bg-zinc-300 dark:bg-white/30 rounded-full p-0.5 mt-0.5"
@@ -128,14 +169,6 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
                 </div>
                 {openLinks === item.id && (
                   <div className="w-full px-2 py-1 bg-zinc-300 dark:bg-white/10 rounded-sm flex gap-2 justify-end">
-                    {item.needComfirm && (
-                      <button
-                        onClick={() => setIsConfirming(item.id)}
-                        className="px-3 py-1.5 rounded text-sm bg-zinc-300 dark:bg-primary hover:scale-105 duration-300 transition"
-                      >
-                        Confirm
-                      </button>
-                    )}
                     {item.href && (
                       <Link href={item.href}>
                         <button
@@ -146,15 +179,39 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
                         </button>
                       </Link>
                     )}
-                    <button
-                      className="py-1 px-2 rounded bg-red-600 dark:bg-red-400 flex-center text-white gap-1"
-                      onClick={() => {
-                        dispatch(removeSystemNotification(item.id));
-                        setOpenLinks("");
-                      }}
-                    >
-                      <Trash2 size={12} /> remove
-                    </button>
+                    {item.tag && item.tag === "theme" ? (
+                      <>
+                        <button
+                          onClick={() => setIsConfirming(item.id)}
+                          className="px-3 py-1.5 rounded text-sm bg-secondary dark:bg-primary hover:scale-105 duration-300 transition"
+                        >
+                          Confirm
+                        </button>
+                        <button
+                          className="py-1 px-2 rounded bg-red-600 dark:bg-red-400 flex-center text-white gap-1"
+                          onClick={async () => {
+                            dispatch(removeSystemNotification(item.id));
+                            console.log(
+                              `return to ${session?.user.preferredTheme} and ${session?.user.preferredColorScheme} `
+                            );
+                            handleCancelChanges();
+                            setOpenLinks("");
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="py-1 px-2 rounded bg-red-600 dark:bg-red-400 flex-center text-white gap-1"
+                        onClick={() => {
+                          dispatch(removeSystemNotification(item.id));
+                          setOpenLinks("");
+                        }}
+                      >
+                        <Trash2 size={12} /> remove
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -179,14 +236,14 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
                 return (
                   <li
                     key={note.id}
-                    className={`bg-white/80 dark:bg-white/10 rounded px-2 py-1 ${
+                    className={`bg-white/80 dark:bg-white/10 rounded ${
                       openLinks === note.id
                         ? "border border-zinc-300 dark:border-white/40"
                         : ""
-                    }`}
+                    } hover:bg-zinc-200 dark:hover:bg-white/20 rounded`}
                     onClick={() => setOpenLinks(note.id)}
                   >
-                    <div className="w-full flex items-center justify-between gap-2 cursor-pointer">
+                    <div className="w-full flex items-center justify-between gap-2 cursor-pointer px-2 py-1">
                       <div className="flex-0 flex items-start gap-2">
                         <div className="flex-0">
                           <Bell
@@ -239,19 +296,15 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
           <div className="w-full flex justify-end items-center py-6">
             <button
               className="text-[12px] flex items-center font-normal cursor-pointer underline"
-              onClick={() => dispatch(clearAllNotifications())}
+              onClick={() => {
+                dispatch(clearAllNotifications());
+                closePopup();
+              }}
             >
               Clear All <GanttChart size={16} />{" "}
             </button>
           </div>
         )}
-      </div>
-      {/* Close Popup */}
-      <div
-        className="w-full p-3 text-darkPrimary dark:text-white cursor-pointer absolute bottom-0 text-center flex justify-center shadow-md"
-        onClick={closePopup}
-      >
-        <ChevronUp />
       </div>
 
       {/* Confirm Modal */}
@@ -273,7 +326,10 @@ const NotificationPopup: FC<NotificationPopupProps> = ({ closePopup }) => {
               placeholder="Your password"
               className="w-full dark:bg-opacityPrimary border p-2 rounded"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                if (error !== "") setError("");
+                setPassword(e.target.value);
+              }}
               onKeyDown={(e) => e.key === "Enter" && handleComfirm()}
               required
             />

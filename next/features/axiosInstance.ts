@@ -6,7 +6,7 @@ import axios, {
 } from "axios";
 
 // Use environment variable
-const origin = import.meta.env.VITE_API_URL as string;
+const origin = process.env.VITE_API_URL as string;
 
 if (!origin) {
   throw new Error("VITE_API_URL is not defined in the environment variables.");

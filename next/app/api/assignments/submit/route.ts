@@ -10,7 +10,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { userId, type, name, assignmentId, answers, codeAnswer } = body;
 
-    console.log(body);
+    // console.log(body);
 
     if (!userId || !assignmentId || !type) {
       return NextResponse.json(
@@ -79,7 +79,7 @@ export async function PATCH(req: Request) {
     marks,
   };
 
-  console.log("to update :", body);
+  // console.log("to update :", body);
   const update = await Assignment.findByIdAndUpdate(
     assignmentId,
     { $push: { marks: mark } },

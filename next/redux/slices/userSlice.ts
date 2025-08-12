@@ -4,6 +4,16 @@ import axios from "axios";
 
 // Define the initial state
 export interface UserState {
+  randomUsers: {
+    data: UserType[];
+    loading: boolean;
+    error: string | null;
+  };
+  allUsers: {
+    data: Partial<UserType>[];
+    loading: boolean;
+    error: string | null;
+  };
   detailedUser: {
     data: UserType | null;
     loading: boolean;
@@ -15,6 +25,16 @@ export interface UserState {
 }
 
 const initialState: UserState = {
+  randomUsers: {
+    data: [],
+    loading: false,
+    error: null,
+  },
+  allUsers: {
+    data: [],
+    loading: false,
+    error: null,
+  },
   detailedUser: {
     data: null,
     loading: false,
@@ -28,9 +48,35 @@ const initialState: UserState = {
 // Async thunk to fetch user data
 export const fetchUser = createAsyncThunk(
   "user/fetchUser",
-  async (userId: string, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(`/api/user`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk to fetch random user data
+export const fetchRandomUsers = createAsyncThunk(
+  "user/fetchRandomUsers",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/api/users`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk to fetch random user data
+export const fetchAllUsers = createAsyncThunk(
+  "user/fetchAllUsers",
+  async ({ index }: { index: number }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/api/users?all=true&index=${index}`);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response.data);
@@ -42,6 +88,7 @@ export const updateUserInfo = createAsyncThunk(
   "user/updateUserInfo",
   async (updates: Partial<UserType>, { rejectWithValue }) => {
     try {
+      console.log("updating user ...", updates);
       const response = await axios.put(`/api/user`, updates);
       updateUserField(response.data);
       return response.data;
@@ -53,9 +100,9 @@ export const updateUserInfo = createAsyncThunk(
 
 export const fetchDetailedUser = createAsyncThunk(
   "user/fetchDetailedUser",
-  async (userId: string, { rejectWithValue }) => {
+  async (username: string, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`/api/user`);
+      const response = await axios.get(`/api/user?username=${username}`);
       return response.data;
     } catch (error: any) {
       return rejectWithValue(error.response.data);
@@ -93,6 +140,7 @@ const userSlice = createSlice({
   reducers: {
     // Sync action to update any field of the user object
     updateUserField: (state, action: PayloadAction<Partial<UserType>>) => {
+      console.log("changes being made on user : ", action.payload);
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }
@@ -115,6 +163,42 @@ const userSlice = createSlice({
       .addCase(fetchUser.rejected, (state, action: PayloadAction<any>) => {
         state.loadingUser = false;
         state.error = action.payload?.message || "Failed to fetch user";
+      })
+      .addCase(fetchRandomUsers.pending, (state) => {
+        state.randomUsers.loading = true;
+        state.randomUsers.error = null;
+      })
+      .addCase(
+        fetchRandomUsers.fulfilled,
+        (state, action: PayloadAction<UserType[]>) => {
+          state.randomUsers.loading = false;
+          state.randomUsers.data = action.payload;
+        }
+      )
+      .addCase(
+        fetchRandomUsers.rejected,
+        (state, action: PayloadAction<any>) => {
+          state.randomUsers.loading = false;
+          state.randomUsers.error =
+            action.payload?.message || "Failed to fetch user";
+        }
+      )
+      .addCase(fetchAllUsers.pending, (state) => {
+        state.allUsers.loading = true;
+        state.allUsers.error = null;
+      })
+      .addCase(
+        fetchAllUsers.fulfilled,
+        (state, action: PayloadAction<UserType[]>) => {
+          state.allUsers.loading = false;
+
+          state.allUsers.data = action.payload;
+        }
+      )
+      .addCase(fetchAllUsers.rejected, (state, action: PayloadAction<any>) => {
+        state.allUsers.loading = false;
+        state.allUsers.error =
+          action.payload?.message || "Failed to fetch user";
       })
       .addCase(updateUserInfo.pending, (state) => {
         state.loadingUser = true;

@@ -105,7 +105,7 @@ export default function InstructorDashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2 text-zinc-400 max-md:pt-2">
-            <Link href="/dashboard/instructor/create/announcement">
+            <Link href="/iLearn/instructor/create/announcement">
               <button className="button bg-primary text-white flex items-center">
                 <PlusIcon /> Create
               </button>
@@ -187,7 +187,7 @@ export default function InstructorDashboardPage() {
                 )
               ) : (
                 <Link
-                  href="/dashboard/about"
+                  href="/iLearn/about"
                   className="flex items-center gap-4 group"
                 >
                   <Image
@@ -218,8 +218,8 @@ export default function InstructorDashboardPage() {
               <Link
                 href={
                   selectedAnnouncement.courseId.toString() === "all"
-                    ? "/dashboard/my-courses"
-                    : `/dashboard/my-courses/${selectedAnnouncement.courseId}`
+                    ? "/iLearn/my-courses"
+                    : `/iLearn/my-courses/${selectedAnnouncement.courseId}`
                 }
               >
                 <button className="bg-secondary hover:bg-secondary text-white px-4 py-2 rounded">
@@ -276,7 +276,7 @@ export default function InstructorDashboardPage() {
         {announcements?.length > 3 && (
           <div className="w-full px-3 border-t py-2 text-darkPrimary underline text-center">
             <Link
-              href="/dashboard/announcements"
+              href="/iLearn/announcements"
               className="flex justify-center items-center gap-1"
             >
               <EyeIcon /> See all announcements
@@ -316,7 +316,7 @@ export default function InstructorDashboardPage() {
 
         <div className="w-full px-3 border-t py-2 text-darkPrimary underline text-center">
           <Link
-            href="/dashboard/instructor/assignments"
+            href="/iLearn/instructor/assignments"
             className="flex justify-center gap-1"
           >
             <EyeIcon /> Manage all
@@ -339,19 +339,19 @@ export default function InstructorDashboardPage() {
             <h4 className="h4 text-primary font-semibold">Your Courses</h4>
             <p className="text-primary text-sm">Courses you've created.</p>
           </div>
-          <Link href="/dashboard/instructor/courses">
+          <Link href="/iLearn/instructor/courses">
             <button className="button bg-primary text-white">Manage</button>
           </Link>
         </div>
         <div className="flex flex-row overflow-x-auto gap-5 pb-5">
           {top4Courses?.top4CoursesLoading ? (
-            Array(4)
-              .fill("")
-              .map((_, i) => <CourseCardSkeleton key={i} />)
+            Array.from({ length: 4 }).map((_, i) => (
+              <CourseCardSkeleton key={i} />
+            ))
           ) : top4Courses?.data?.length > 0 ? (
             top4Courses.data.map((course, i) => (
               <Link
-                href={`/dashboard/instructor/courses/${course._id}`}
+                href={`/iLearn/instructor/courses/${course._id}`}
                 key={course._id + i}
                 className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg"
               >

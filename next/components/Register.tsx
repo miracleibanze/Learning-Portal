@@ -9,7 +9,7 @@ import Loading from "@app/loading";
 
 const RegisterComponent: FC = () => {
   const searchParams = useSearchParams();
-  const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard";
+  const callBackUrl = searchParams?.get("callbackUrl") || "/iLearn";
   const [password, setPassword] = useState("");
   const [passwordTest, setPasswordTest] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -28,7 +28,6 @@ const RegisterComponent: FC = () => {
 
   const [formData, setFormData] = useState({
     name: "",
-    username: "",
     email: "",
     password: "",
     role: "",
@@ -161,18 +160,6 @@ const RegisterComponent: FC = () => {
                     placeholder="Full names"
                     name="name"
                     value={formData.name}
-                    onChange={handleFormData}
-                    required
-                  />
-                </label>
-                <label>
-                  Username&nbsp;:
-                  <input
-                    className="input !text-white mb-3"
-                    type="text"
-                    name="username"
-                    placeholder="Choose username"
-                    value={formData.username}
                     onChange={handleFormData}
                     required
                   />

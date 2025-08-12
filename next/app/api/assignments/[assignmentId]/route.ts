@@ -10,7 +10,7 @@ export async function GET(
 ) {
   await connectDB();
 
-  const { assignmentId } = params;
+  const { assignmentId } = await params;
 
   const session = await getServerSession(authOptions);
   const user = session?.user;

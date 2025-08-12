@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ChevronRight, Settings, UserCircle2Icon } from "lucide-react";
 import Link from "next/link";
 import { pcBook2 } from "@assets";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { CourseDocument, DetailedCourseDocument } from "@lib/models/Course";
 import { useRouter } from "next/navigation";
 import { CourseDetailsSkeleton } from "@components/designs/Skeletons";
@@ -12,8 +12,10 @@ import GoBack from "@components/GoBack";
 import PopupModal from "@components/designs/PopupModal";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleCourseStatus } from "@redux/slices/coursesSlice";
+import { AppDispatch, RootState } from "@redux/store";
+import { updateUserField } from "@redux/slices/userSlice";
 
 interface Props {
   course: DetailedCourseDocument;
@@ -43,12 +45,12 @@ const CourseDetails: FC<CourseDetailsProps> = ({
     course?.status === "Published"
   );
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-  const dispatch = useDispatch();
-
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.user);
   const hasPrice = course?.price && course.price > 0;
 
   const handleSendRequest = async () => {
-    if (!course) return;
+    if (!course || !user) return;
     if (!agreedToTerms) {
       alert("Please agree to the terms and conditions first.");
       return;
@@ -68,7 +70,7 @@ const CourseDetails: FC<CourseDetailsProps> = ({
         body: JSON.stringify({
           courseId: course._id,
           courseName: course.title,
-          instructorId: course.instructor._id,
+          instructorId: course.instructor.id,
           instructorName: course.instructor.name,
           coursePrice: course.price,
         }),
@@ -80,11 +82,17 @@ const CourseDetails: FC<CourseDetailsProps> = ({
         setSubmitStatus(false);
         return;
       }
+      const currentJoinRequestArray: string[] = user.joinRequests;
+      dispatch(
+        updateUserField({
+          joinRequests: [...currentJoinRequestArray, course._id],
+        })
+      );
 
       setSubmitStatus(true);
       setTimeout(() => {
         close();
-      }, 1500);
+      }, 500);
     } catch (err) {
       setSubmitStatus(false);
     } finally {
@@ -108,6 +116,13 @@ const CourseDetails: FC<CourseDetailsProps> = ({
       setIsUpdatingStatus(false);
     }
   };
+
+  useEffect(() => {
+    if (course && user?.joinRequests.includes(course?._id)) {
+      setSubmitStatus(true);
+    } else {
+    }
+  }, [user, course]);
 
   return (
     <>
@@ -166,7 +181,7 @@ const CourseDetails: FC<CourseDetailsProps> = ({
               <p>Category: {course?.category}</p>
               <p className="text-primary">Instructor</p>
               <Link
-                href={course?.instructor._id ? course?.instructor._id : ""}
+                href={course?.instructor.id ? course?.instructor.id : ""}
                 className="flex items-center"
               >
                 {course?.instructor?.picture ? (
@@ -184,7 +199,7 @@ const CourseDetails: FC<CourseDetailsProps> = ({
                   <p className="text-gray-800 dark:text-zinc-200 font-semibold">
                     {course?.instructor.name}
                     {session &&
-                      course?.instructor._id === session?.user._id &&
+                      course?.instructor.id === session?.user._id &&
                       " (You)"}
                   </p>
                   <p className="text-gray-600 dark:text-zinc-100 text-sm">
@@ -201,12 +216,12 @@ const CourseDetails: FC<CourseDetailsProps> = ({
               )}
               <div
                 className={`w-full flex pt-6 px-4 gap-2 ${
-                  course?.instructor._id === session?.user._id || enrolled
+                  course?.instructor.id === session?.user._id || enrolled
                     ? "justify-between"
                     : "justify-end"
                 }`}
               >
-                {(course?.instructor._id === session?.user._id || enrolled) && (
+                {(course?.instructor.id === session?.user._id || enrolled) && (
                   <button
                     className="button bg-secondary text-white flex gap-2 items-center"
                     onClick={() => SetIsSettingWindowOpen(true)}
@@ -218,14 +233,14 @@ const CourseDetails: FC<CourseDetailsProps> = ({
                 <button
                   className="button bg-primary text-white flex gap-2 items-center disabled:bg-zinc-700/50"
                   disabled={
-                    course?.instructor._id !== session?.user._id &&
+                    course?.instructor.id !== session?.user._id &&
                     course?.status !== "Published"
                   }
                   onClick={() =>
                     enrolled
                       ? router.push(
                           course
-                            ? `/dashboard/my-courses/study/${encodeURIComponent(
+                            ? `/iLearn/my-courses/study/${encodeURIComponent(
                                 course.title
                               )}/${course?._id}`
                             : ""
@@ -280,9 +295,7 @@ const CourseDetails: FC<CourseDetailsProps> = ({
                 />
                 <span>
                   I accept to pay the course fee of{" "}
-                  <strong className="text-darkPrimary">
-                    {course.price} RWF
-                  </strong>
+                  <strong className="text-secondary">{course.price} RWF</strong>
                   .
                 </span>
               </label>
@@ -290,16 +303,20 @@ const CourseDetails: FC<CourseDetailsProps> = ({
           </div>
 
           {hasPrice && agreedToPay && (
-            <div className="mt-4 p-3 rounded-md bg-opacityPrimary dark:bg-darkPrimary/20 border border-lightPrimary dark:border-primary text-sm text-darkPrimary dark:text-primary">
+            <div className="mt-4 p-3 rounded-md bg-opacityPrimary dark:bg-darkPrimary/20 border border-lightPrimary dark:border-primary text-sm dark:text-gray-300">
               <p className="mb-1 font-semibold">Payment Instructions:</p>
               <ul className="list-disc list-inside space-y-1">
                 <li>
                   <strong>Bank:</strong> Bank of Kigali, Account Number:{" "}
-                  <code>123456789</code>
+                  <code>
+                    <u>123456789</u>
+                  </code>
                 </li>
                 <li>
                   <strong>Mobile Money:</strong> MTN MoMo:{" "}
-                  <code>0788 123 456</code>
+                  <code>
+                    <u>0788 123 456</u>
+                  </code>
                 </li>
                 <li>Use your full name as the payment reference.</li>
               </ul>
@@ -312,17 +329,21 @@ const CourseDetails: FC<CourseDetailsProps> = ({
             </p>
           )}
           {!isSubmitting && submitStatus === true && (
-            <p className="body-2 leadin-tight py-2 mt-6 px-4 text-darkPrimary">
+            <p className="body-2 leadin-tight py-2 mt-6 px-4 text-darkPrimary dark:text-green-400">
               Join request sent successfully.
             </p>
           )}
 
           <button
             onClick={handleSendRequest}
-            disabled={isSubmitting}
+            disabled={submitStatus ? submitStatus : isSubmitting}
             className="w-full mt-6 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? "Sending..." : "Send Join Request"}
+            {isSubmitting
+              ? "Sending..."
+              : submitStatus === false
+              ? "try again"
+              : "Send Join Request"}
           </button>
         </PopupModal>
       )}
@@ -363,7 +384,7 @@ const CourseDetails: FC<CourseDetailsProps> = ({
                 <button
                   onClick={() =>
                     router.push(
-                      `/dashboard/instructor/course/${course?._id}/manage`
+                      `/iLearn/instructor/course/${course?._id}/manage`
                     )
                   }
                   className="button bg-primary text-white"

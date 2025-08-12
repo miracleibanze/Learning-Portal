@@ -16,18 +16,20 @@ const AssignmentSchema = new Schema(
     title: { type: String, required: true },
     description: { type: String, required: true },
     createdAt: { type: Date, default: Date.now() },
-    createdBy: { type: String, default: "Teacher" },
+    createdBy: {
+      id: { type: String },
+      name: { type: String },
+      role: { type: String },
+      about: { type: String },
+      picture: { type: String },
+    },
+    courseTitle: { type: String, required: true },
     deadline: { type: Date, default: Date.now() },
     type: { type: String, required: true },
-    instructor: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",
-      required: true,
     },
     questions: [{ type: Schema.Types.ObjectId, ref: "Question" }],
     codeInstructions: { type: String },

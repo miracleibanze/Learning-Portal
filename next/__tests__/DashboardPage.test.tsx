@@ -3,7 +3,7 @@ import { Provider } from "react-redux";
 import { store } from "@redux/store";
 import { useSession } from "next-auth/react";
 import React from "react";
-import DashboardPage from "@app/dashboard/page";
+import DashboardPage from "@app/iLearn/page";
 
 // Mock next-auth
 jest.mock("next-auth/react", () => ({

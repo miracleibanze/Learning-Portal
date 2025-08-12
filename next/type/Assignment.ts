@@ -12,11 +12,17 @@ export interface IAssignment extends Document {
   _id: string;
   title: string;
   description: string;
-  instructor: User;
   type: "quiz" | "coding";
   deadline: Date;
   createdAt: Date;
-  createdBy: string;
+  courseTitle: string;
+  createdBy: {
+    id: string;
+    name: string;
+    picture?: string;
+    about?: string;
+    role: string;
+  };
   courseId: string;
   questions?: Question[];
   codeInstructions?: string;

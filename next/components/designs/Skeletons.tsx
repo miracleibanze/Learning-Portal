@@ -14,10 +14,12 @@ export const LineSkeleton = ({
       } border-gray-300 dark:border-white/30 py-2 px-3`}
     >
       <div className="w-1/2 dark:bg-white/50 h-5 rounded-md bg-zinc-300 skeleton-shimmer" />
-
-      <div
-        className={`w-full h-3 dark:bg-white/50 rounded-md bg-zinc-300 mt-2 skeleton-shimmer`}
-      />
+      {Array.from({ length: index ? index - 2 : 1 }).map((_, index) => (
+        <div
+          key={index}
+          className={`w-full h-3 dark:bg-white/50 rounded-md bg-zinc-300 mt-2 skeleton-shimmer`}
+        />
+      ))}
 
       {index && index > 2 && (
         <div className="w-1/3 max-w-[10rem] dark:bg-white/50 h-3 rounded-md bg-zinc-300 mt-2 skeleton-shimmer" />
@@ -72,14 +74,12 @@ export const CourseDetailsSkeleton = () => {
       <div className="mb-6 w-1/2 h-4 bg-zinc-300 dark:bg-white/20 rounded-lg skeleton-shimmer" />
 
       <div className="mt-4 flex justify-start gap-2 relative">
-        {Array(4)
-          .fill("")
-          .map((_, index) => (
-            <div
-              className="mb-4 w-full max-w-[4rem] h-6 bg-zinc-300 dark:bg-white/20 rounded-full flex-0"
-              key={index}
-            ></div>
-          ))}
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            className="mb-4 w-full max-w-[4rem] h-6 bg-zinc-300 dark:bg-white/20 rounded-full flex-0"
+            key={index}
+          ></div>
+        ))}
       </div>
       <div className="mb-4 w-1/3 h-4 bg-zinc-300 dark:bg-white/20 rounded-lg skeleton-shimmer" />
       <div className="mb-4 w-1/3 h-4 bg-zinc-300 dark:bg-white/20 rounded-lg skeleton-shimmer" />

@@ -139,6 +139,7 @@ export default function AssignmentSubmissions({
         <>
           <h2 className="text-2xl font-bold mb-4">Assignments</h2>
           <div className="w-full p-2">
+            {coursesCreated.data && coursesCreated.data.length}
             {coursesCreated.coursesCreatedLoading ? (
               <div className="w-full text-bold h-40 flex-center flex-col font-semibold gap-3">
                 <span>Loading...</span>
@@ -153,7 +154,7 @@ export default function AssignmentSubmissions({
                   />
                 </div>
               </div>
-            ) : coursesCreated.data ? (
+            ) : coursesCreated.data.length > 0 ? (
               coursesCreated.data.map((course) => {
                 const relatedAssignments = createdAssignments.data?.filter(
                   (item) => item.courseId === course._id
@@ -182,7 +183,7 @@ export default function AssignmentSubmissions({
               })
             ) : (
               <p className="w-full text-bold text-center">
-                You have no course yet.
+                You have create no course yet.
               </p>
             )}
           </div>

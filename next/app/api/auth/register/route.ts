@@ -6,7 +6,7 @@ import { User } from "@lib/models/User";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, username, email, password, role, updates } = body;
+    const { name, email, password, role, updates } = body;
     console.log("received: ", body);
     console.log("received role of: ", typeof role);
     await connectDB();
@@ -26,7 +26,6 @@ export async function POST(req: Request) {
     // Create new user
     const newUser = new User({
       name,
-      username,
       email,
       password: hashedPassword,
       role,

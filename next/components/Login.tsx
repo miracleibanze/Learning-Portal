@@ -14,7 +14,7 @@ const LoginComponent: FC = () => {
   const [error, setError] = useState("");
   const [isLogginIn, setIsLogginIn] = useState(false);
   const searchParams = useSearchParams();
-  const callBackUrl = searchParams?.get("callbackUrl") || "/dashboard";
+  const callBackUrl = searchParams?.get("callbackUrl") || "/iLearn";
   useEffect(() => {
     setError("");
   }, [password, email]);

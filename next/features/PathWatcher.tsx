@@ -3,19 +3,19 @@
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@redux/store";
+import { AppDispatch, RootState } from "@redux/store";
 import { silenceUnreadMessageNotifications } from "@redux/slices/NotificationsSlice";
 
 const PathWatcher = () => {
   const pathname = usePathname();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const unreadMessageStatus = useSelector(
     (state: RootState) => state.notifications.unreadMessageStatus
   );
 
   useEffect(() => {
-    if (pathname === "/dashboard/discussions" && unreadMessageStatus) {
+    if (pathname === "/iLearn/discussions" && unreadMessageStatus) {
       dispatch(silenceUnreadMessageNotifications());
     }
   }, [pathname, unreadMessageStatus, dispatch]);

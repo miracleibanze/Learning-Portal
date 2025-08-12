@@ -5,6 +5,7 @@ const themePresets = {
     "--color-lightPrimary": "#0ea5e9", // sky-300
     "--color-darkPrimary": "#0c4a6e", // sky-900
     "--color-opacityPrimary": "#0284c74d", // sky-600/30
+    "--color-overlayPrimary": "#0284c733", // sky-600/10
   },
   emerald: {
     "--color-primary": "#059669", // emerald-600
@@ -12,6 +13,7 @@ const themePresets = {
     "--color-lightPrimary": "#34d399", // emerald-300
     "--color-darkPrimary": "#065f46", // emerald-900
     "--color-opacityPrimary": "#0596694d", // emerald-600/30
+    "--color-overlayPrimary": "#05966933", // emerald-600/10
   },
   rose: {
     "--color-primary": "#e11d48", // rose-600
@@ -19,6 +21,7 @@ const themePresets = {
     "--color-lightPrimary": "#fda4af", // rose-300
     "--color-darkPrimary": "#881337", // rose-900
     "--color-opacityPrimary": "#e11d484d", // rose-600/30
+    "--color-overlayPrimary": "#e11d4833", // rose-600/10
   },
   lime: {
     "--color-primary": "#65a30d", // lime-600
@@ -26,6 +29,7 @@ const themePresets = {
     "--color-lightPrimary": "#bef264", // lime-300
     "--color-darkPrimary": "#365314", // lime-900
     "--color-opacityPrimary": "#65a30d4d", // lime-600/30
+    "--color-overlayPrimary": "#65a30d33", // lime-600/10
   },
   violet: {
     "--color-primary": "#7c3aed", // violet-600
@@ -33,6 +37,7 @@ const themePresets = {
     "--color-lightPrimary": "#a78bfa", // violet-400
     "--color-darkPrimary": "#4c1d95", // violet-900
     "--color-opacityPrimary": "#7c3aed4d", // violet-600/30
+    "--color-overlayPrimary": "#7c3aed33", // violet-600/10
   },
   orange: {
     "--color-primary": "#ea580c", // orange-600
@@ -40,6 +45,7 @@ const themePresets = {
     "--color-lightPrimary": "#fb923c", // orange-400
     "--color-darkPrimary": "#7c2d12", // orange-900
     "--color-opacityPrimary": "#ea580c4d", // orange-600/30
+    "--color-overlayPrimary": "#ea580c33", // orange-600/20
   },
   neutral: {
     "--color-primary": "#737373", // neutral-500
@@ -47,6 +53,7 @@ const themePresets = {
     "--color-lightPrimary": "#a3a3a3", // neutral-400
     "--color-darkPrimary": "#171717", // neutral-900
     "--color-opacityPrimary": "#7373734d", // neutral-500/30
+    "--color-overlayPrimary": "#52525233", // neutral-600/20
   },
 } as const;
 

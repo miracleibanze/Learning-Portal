@@ -1,3 +1,5 @@
+"use client";
+
 import { FC, useEffect, useState } from "react";
 import {
   SettingsIcon,
@@ -10,12 +12,15 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { User } from "next-auth";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import getLinks from "@features/SidebarLinks";
 import { navbarBackType } from "@redux/slices/navigationSlice";
+import { backgroundBulb, backgroundCats, backgroundFuturistic } from "@assets";
+import { SideBarBackgounds } from "@features/constants";
+import { useSelector } from "@node_modules/react-redux/dist/react-redux";
+import { RootState } from "@redux/store";
 
 interface SidebarProps {
-  user: User | undefined;
   status?: string;
   isOpenNavigation?: boolean;
   handleToggleSidebar: () => void;
@@ -24,7 +29,6 @@ interface SidebarProps {
 }
 
 const Sidebar: FC<SidebarProps> = ({
-  user,
   status,
   isOpenNavigation,
   handleToggleSidebar,
@@ -32,7 +36,12 @@ const Sidebar: FC<SidebarProps> = ({
   navbarBack,
 }) => {
   const pathname = usePathname();
+  const session = useSession().data;
+  const { user } = useSelector((state: RootState) => state.user);
 
+  const Background = SideBarBackgounds.find(
+    (bg) => bg.code === user?.preferredSidebarBg
+  );
   useEffect(() => {
     window.innerWidth < 768 && handleToggleSidebar(); // only if it should auto-close
   }, [pathname]);
@@ -48,7 +57,7 @@ const Sidebar: FC<SidebarProps> = ({
       <aside
         className={`
           ${isOpenNavigation ? "w-full" : "w-0 max-md:hidden"}
-          bg-lightPrimary dark:bg-darkPrimary text-white dark:text-white h-screen py-4 flex flex-col justify-between dark:border-r border-white/50
+          bg-primary dark:bg-darkPrimary text-white dark:text-white h-screen py-4 flex flex-col justify-between dark:border-r border-white/50
           transition-all duration-300 ease-in-out 
           ${
             isOpenNavigation
@@ -57,8 +66,19 @@ const Sidebar: FC<SidebarProps> = ({
           }
          z-[999] max-w-56 overflow-x-hidden`}
       >
+        {Background && (
+          <div className="absolute inset-0 -z-10 overflow-hidden">
+            <Image
+              src={Background.image}
+              alt={Background.name}
+              className="h-full object-cover object-left"
+            />
+            <div className="absolute inset-0 bg-overlayPrimary dark:bg-opacityPrimary" />
+          </div>
+        )}
+
         <header className="relative overflow-hidden mb-12 m">
-          <Link href="/dashboard">
+          <Link href="/iLearn">
             <div className="px-3 mb-3">
               <Image
                 src="/logo.png"
@@ -75,10 +95,10 @@ const Sidebar: FC<SidebarProps> = ({
             onClick={handleLinkClick} // Close sidebar on link click
             href={
               user?.role === "student"
-                ? `/dashboard/${encodeURIComponent(user?.name as string)}?pin=${
+                ? `/iLearn/${encodeURIComponent(user?.name as string)}?pin=${
                     user?._id
                   }`
-                : `/dashboard/${user?.role}/${encodeURIComponent(
+                : `/iLearn/${user?.role}/${encodeURIComponent(
                     user?.name as string
                   )}?pin=${user?._id}`
             }
@@ -113,20 +133,22 @@ const Sidebar: FC<SidebarProps> = ({
           {!navbarBack.state ? (
             <nav>
               {status === "authenticated"
-                ? getLinks({ role: user?.role }).map((link, index) => (
+                ? getLinks({ role: session?.user?.role }).map((link, index) => (
                     <Link
                       key={index}
                       href={link.path || ""}
                       onClick={handleLinkClick} // Close sidebar on link click
                       className={`flex items-center space-x-2 py-2 px-4 text-sm ${
                         pathname.startsWith(link.path) &&
-                        link.path !== "/dashboard"
-                          ? "border-l-4 border-secondary bg-primary pl-3"
-                          : "hover:bg-opacityPrimary"
+                        link.path !== "/iLearn"
+                          ? "border-l-4 border-secondary bg-lightPrimary pl-3"
+                          : Background
+                          ? "hover:bg-opacityPrimary"
+                          : "hover:bg-white/30"
                       }
                     ${
-                      pathname === "/dashboard" &&
-                      link.path === "/dashboard" &&
+                      pathname === "/iLearn" &&
+                      link.path === "/iLearn" &&
                       "border-l-4 border-secondary bg-primary pl-3"
                     }
                     `}
@@ -135,14 +157,12 @@ const Sidebar: FC<SidebarProps> = ({
                       <span>{link.name}</span>
                     </Link>
                   ))
-                : Array(5)
-                    .fill("")
-                    .map((_, index) => (
-                      <div
-                        key={index}
-                        className={`h-8 px-4 bg-white/40 w-full mb-1`}
-                      />
-                    ))}
+                : Array.from({ length: 5 }).map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-8 px-4 bg-white/40 w-full mb-1`}
+                    />
+                  ))}
             </nav>
           ) : (
             <>

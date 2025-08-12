@@ -1,7 +1,8 @@
 "use client";
 
+import themePresets, { ThemeName } from "@lib/ThemePresets";
 import { useState, useEffect } from "react";
-import themePresets, { ThemeName } from "@constants/themePresets";
+// import themePresets, { ThemeName } from "@constants/themePresets";
 
 const ThemeSelector = () => {
   const [darkMode, setDarkMode] = useState(false);

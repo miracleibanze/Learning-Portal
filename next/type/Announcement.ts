@@ -6,8 +6,14 @@ export interface IAnnouncement extends Document {
   title: string;
   description: string;
   createdAt: Date;
-  createdBy: string;
-  courseId: Types.ObjectId; // Reference to the Course model
+  createdBy: {
+    id: string;
+    name: string;
+    picture?: string;
+    about?: string;
+    role: string;
+  };
+  courseId: string; // Reference to the Course model
   courseInfo: CourseDocument[];
-  students: string[];
+  students?: string[];
 }

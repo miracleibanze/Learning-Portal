@@ -11,7 +11,7 @@ export default function CourseForm() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Web development");
   const [language, setLanguage] = useState("English");
   const [level, setLevel] = useState<"Beginner" | "Intermediate" | "Advanced">(
     "Beginner"
@@ -64,7 +64,7 @@ export default function CourseForm() {
 
     try {
       const response = await axios.post("/api/courses/create", courseData);
-      router.push(`/dashboard/my-courses/${response.data._id}`);
+      router.push(`/iLearn/my-courses/${response.data._id}`);
     } catch (error: any) {
       console.error("Failed to create course:", error);
       alert(error.response?.data?.error || "Failed to create course.");
@@ -105,13 +105,13 @@ export default function CourseForm() {
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value as any)}
-            className="w-full dark:bg-white/10 border border-opacityPrimary p-2 rounded outline-none"
+            className="w-full dark:bg-primary border border-opacityPrimary p-2 rounded outline-none"
           >
-            <option value="Beginner">Web development</option>
-            <option value="Intermediate">Design</option>
-            <option value="Advanced">Programming</option>
-            <option value="Advanced">Data analysis</option>
-            <option value="Advanced">Marketing</option>
+            <option value="Web development">Web development</option>
+            <option value="Design">Design</option>
+            <option value="Programming">Programming</option>
+            <option value="Data analysis">Data analysis</option>
+            <option value="Marketing">Marketing</option>
           </select>
         </div>
 
@@ -132,7 +132,7 @@ export default function CourseForm() {
           <select
             value={level}
             onChange={(e) => setLevel(e.target.value as any)}
-            className="w-full dark:bg-white/10 border border-opacityPrimary p-2 rounded outline-none"
+            className="w-full dark:bg-primary border border-opacityPrimary p-2 rounded outline-none"
           >
             <option value="Beginner">Beginner</option>
             <option value="Intermediate">Intermediate</option>

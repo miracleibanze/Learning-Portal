@@ -6,6 +6,8 @@ declare module "next-auth" {
       _id: string;
       id: string;
       name: string;
+      username: string;
+      about: string;
       email: string;
       role: string;
       premium: boolean;
@@ -13,6 +15,7 @@ declare module "next-auth" {
       lastActive: number;
       preferredTheme: string;
       preferredColorScheme: string;
+      preferredSidebarBg: string;
     };
   }
 
@@ -20,6 +23,8 @@ declare module "next-auth" {
     _id: string;
     id: string;
     name: string;
+    username: string;
+    about: string;
     email: string;
     role: string;
     premium: boolean;
@@ -27,17 +32,21 @@ declare module "next-auth" {
     lastActive: number;
     preferredTheme: string;
     preferredColorScheme: string;
+    preferredSidebarBg: string;
   }
 
   interface JWT {
     id: string;
     role: string;
     name: string;
+    username: string;
+    about: string;
     email: string;
     premium: boolean;
     picture?: string;
     lastActive: number;
-  preferredTheme: string;
+    preferredTheme: string;
     preferredColorScheme: string;
+    preferredSidebarBg: string;
   }
 }

@@ -164,7 +164,7 @@ export default function DashboardPage() {
               </p>
             </div>
             {session.user.role !== "student" && (
-              <Link href="/dashboard/instructor/create?type=Announcement">
+              <Link href="/iLearn/instructor/create?type=Announcement">
                 <button
                   className="button bg-primary text-white flex items-center"
                   data-testid="create-announcement-button"
@@ -219,64 +219,32 @@ export default function DashboardPage() {
 
             {/* Author Info */}
             <div className="mt-6 flex items-center gap-4 border-t border-gray-300 dark:border-white/30 pt-4">
-              {selectedAnnouncement.createdBy !== "admin" ? (
-                instructor ? (
-                  <Link
-                    href={`/Person/${instructor._id}`}
-                    className="flex items-center gap-4 group"
-                  >
-                    {instructor.picture ? (
-                      <Image
-                        src={instructor.picture}
-                        alt="instructor"
-                        width={64}
-                        height={64}
-                        className="w-16 h-16 rounded-full object-cover border"
-                      />
-                    ) : (
-                      <User2 className="w-16 h-16 bg-zinc-300 rounded-full text-white p-2" />
-                    )}
-                    <div>
-                      <p className="font-semibold group-hover:underline text-sm">
-                        {instructor.name}{" "}
-                        {session?.user._id === instructor._id && "(You)"}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
-                        {instructor.email}
-                      </p>
-                    </div>
-                  </Link>
-                ) : (
-                  <div className="flex gap-4 items-center">
-                    <div className="w-16 h-16 rounded-full bg-gray-300 animate-pulse" />
-                    <div className="space-y-2">
-                      <div className="w-28 h-4 rounded-full bg-gray-300 animate-pulse" />
-                      <div className="w-40 h-4 rounded-full bg-gray-300 animate-pulse" />
-                    </div>
-                  </div>
-                )
-              ) : (
-                <Link
-                  href="/dashboard/about"
-                  className="flex items-center gap-4 group"
-                >
+              <Link
+                href={`/Person/${selectedAnnouncement.createdBy.id}`}
+                className="flex items-center gap-4 group"
+              >
+                {selectedAnnouncement.createdBy.picture ? (
                   <Image
-                    src="/logoSquare.png"
-                    alt="IMBONI Learn"
+                    src={selectedAnnouncement.createdBy.picture}
+                    alt="selectedAnnouncement.createdBy"
                     width={64}
                     height={64}
                     className="w-16 h-16 rounded-full object-cover border"
                   />
-                  <div>
-                    <p className="font-semibold group-hover:underline text-sm">
-                      IMBONI Learn
-                    </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-300">
-                      Your #1 learning partner
-                    </p>
-                  </div>
-                </Link>
-              )}
+                ) : (
+                  <User2 className="w-16 h-16 bg-zinc-300 rounded-full text-white p-2" />
+                )}
+                <div>
+                  <p className="font-semibold group-hover:underline text-sm">
+                    {selectedAnnouncement.createdBy.name}{" "}
+                    {session?.user._id === selectedAnnouncement.createdBy.id &&
+                      "(You)"}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300">
+                    {selectedAnnouncement.createdBy.about}
+                  </p>
+                </div>
+              </Link>
               <span className="ml-auto text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                 <i className="fa fa-clock" />{" "}
                 {new Date(selectedAnnouncement.createdAt).toLocaleString()}
@@ -288,8 +256,8 @@ export default function DashboardPage() {
               <Link
                 href={
                   selectedAnnouncement.courseId.toString() === "all"
-                    ? "/dashboard/my-courses"
-                    : `/dashboard/my-courses/${selectedAnnouncement.courseId}`
+                    ? "/iLearn/my-courses"
+                    : `/iLearn/my-courses/${selectedAnnouncement.courseId}`
                 }
               >
                 <button className="bg-secondary hover:bg-secondary text-white px-4 py-2 rounded">
@@ -334,10 +302,10 @@ export default function DashboardPage() {
                         : "bg-zinc-200 dark:bg-white/10"
                       : "hover:bg-gray-200 dark:hover:bg-gray-200/10"
                   }  cursor-pointer border-gray-300 dark:border-white/30 py-2 ${
-                    item.createdBy === "admin" &&
+                    item.createdBy.role === "admin" &&
                     "border-l-4 !border-l-lightPrimary"
                   } ${
-                    item.createdBy === "instructor" &&
+                    item.createdBy.role === "instructor" &&
                     "border-l-4 !border-l-secondary"
                   } px-3 dark:text-white/90`}
                   data-testid={`announcement-${item._id}`}
@@ -387,7 +355,7 @@ export default function DashboardPage() {
             announcements?.length <= 3 && "hidden"
           } text-darkPrimary underline gap-1`}
         >
-          <Link href="/dashboard/announcements" className="flex">
+          <Link href="/iLearn/announcements" className="flex">
             <EyeIcon />
             <span> See more</span>
           </Link>
@@ -436,7 +404,7 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <Link
-                    href={`/dashboard/instructor/assignments?ref=${item._id}`}
+                    href={`/iLearn/instructor/assignments?ref=${item._id}`}
                     className="w-full px-3 border-t border-gray-300 dark:border-white/50 py-2 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-200/10 flex"
                     key={index}
                   >
@@ -474,7 +442,7 @@ export default function DashboardPage() {
               pendingAssignments.data?.length <= 3 && "hidden"
             } text-darkPrimary underline`}
           >
-            <Link href="/dashboard/assignments" className="flex gap-1">
+            <Link href="/iLearn/assignments" className="flex gap-1">
               <EyeIcon /> See more
             </Link>
           </div>
@@ -515,8 +483,8 @@ export default function DashboardPage() {
           className="ml-auto"
           href={
             session.user.role === "student"
-              ? "/dashboard/enroll"
-              : `/dashboard/${session.user.role}/courses`
+              ? "/iLearn/enroll"
+              : `/iLearn/${session.user.role}/courses`
           }
         >
           <button
@@ -538,7 +506,7 @@ export default function DashboardPage() {
         ) : top4Courses?.data?.length > 0 ? (
           top4Courses?.data.map((course, index) => (
             <Link
-              href={`/dashboard/${
+              href={`/iLearn/${
                 (currentUser.user?.myCourses ?? []).includes(course._id)
                   ? "my-courses"
                   : "enroll"

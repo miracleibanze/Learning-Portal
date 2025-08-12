@@ -75,7 +75,7 @@ main {
   }
 
   .flex-center {
-    @apply flex items-center justify-center;
+    @apply flex !items-center !justify-center;
   }
   .flex-vertical-center {
     @apply flex flex-col items-center justify-center;
@@ -139,9 +139,12 @@ main {
     @apply bg-zinc-300;
   }
 
+  .popupHeight {
+    max-height: calc(100dvh - 4rem) !important;
+  }
   .navbar-mobile {
     animation: slideIn 1s ease-in-out forwards;
-    @apply fixed bottom-0 top-0 right-0 max-w-md;
+    @apply fixed bottom-0 top-0 right-0 max-w-md popupHeight;
   }
   @keyframes slideIn {
     from {
@@ -216,5 +219,10 @@ main {
   .animate-bell {
     transform-origin: top;
     animation: animateBell 1s ease-in-out infinite alternate;
+  }
+
+  .ol li {
+    list-style: disc;
+    list-style-position: inside;
   }
 }

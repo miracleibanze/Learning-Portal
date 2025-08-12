@@ -33,7 +33,6 @@ export async function GET(req: NextRequest) {
     const pendingAssignments = await Assignment.find({
       courseId: { $in: courseIds },
     })
-      .populate("instructor", "name email picture role")
       .sort({ createdAt: -1 })
       .limit(10)
       .lean(); // Convert to plain objects

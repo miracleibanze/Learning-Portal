@@ -2,21 +2,56 @@ import { NextResponse } from "next/server";
 import { Course } from "@lib/models/Course";
 import { connectDB } from "@lib/db";
 
-export async function GET() {
-  try {
-    await connectDB();
+export async function GET(req: Request) {
+  await connectDB();
 
-    const courses = await Course.find()
-      .select("title description tags price category")
-      .exec();
+  const { searchParams } = new URL(req.url);
+  if (searchParams) {
+    const query = searchParams.get("q")?.trim() || "";
+    const indexParam = searchParams.get("index") || "0";
 
-    return NextResponse.json({ success: true, data: courses }, { status: 200 });
-  } catch (error) {
-    console.error("🚨 Error fetching courses:", error);
-    return NextResponse.json(
-      { success: false, message: "Failed to fetch courses" },
-      { status: 500 }
-    );
+    const index = parseInt(indexParam, 10);
+    const limit = 12;
+    const skip = index * limit;
+
+    if (!query) {
+      return NextResponse.json([], { status: 200 });
+    }
+
+    const regex = new RegExp(query.split(" ").join("|"), "i");
+
+    try {
+      const courses = await Course.find({
+        $or: [{ title: { $regex: regex } }, { description: { $regex: regex } }],
+      })
+        .populate("instructor", "name picture email") // Optional
+        .skip(skip)
+        .limit(limit);
+
+      return NextResponse.json(courses, { status: 200 });
+    } catch (error) {
+      console.error("[SEARCH COURSES ERROR]", error);
+      return NextResponse.json(
+        { message: "Error searching courses" },
+        { status: 500 }
+      );
+    }
+  } else {
+    try {
+      const courses = await Course.find()
+        .select("title description tags price category")
+        .exec();
+
+      console.log("courses found : ", courses);
+
+      return NextResponse.json(courses, { status: 200 });
+    } catch (error) {
+      console.error("🚨 Error fetching courses:", error);
+      return NextResponse.json(
+        { success: false, message: "Failed to fetch courses" },
+        { status: 500 }
+      );
+    }
   }
 }
 

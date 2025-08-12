@@ -10,23 +10,28 @@ import {
   ClipboardList,
   ChartNoAxesCombined,
   BookOpenCheck,
+  UserPlus,
+  Search,
 } from "lucide-react";
 
-const commonLinks = [{ name: "Dashboard", icon: Home, path: "/dashboard" }];
+const commonLinks = [
+  { name: "Dashbaord", icon: Home, path: "/iLearn" },
+  { name: "Explore", icon: Search, path: "/iLearn/search" },
+];
 
 const studentLinks = [
-  { name: "My Courses", icon: BookOpen, path: "/dashboard/my-courses" },
-  { name: "Enroll", icon: GraduationCap, path: "/dashboard/enroll" },
-  { name: "Rankings", icon: Users, path: "/dashboard/rankings" },
+  { name: "My Courses", icon: BookOpen, path: "/iLearn/my-courses" },
+  { name: "Enroll", icon: GraduationCap, path: "/iLearn/enroll" },
+  { name: "Rankings", icon: Users, path: "/iLearn/rankings" },
   {
     name: "Assignments",
     icon: ClipboardList,
-    path: "/dashboard/assignments",
+    path: "/iLearn/assignments",
   },
   {
     name: "Discussions",
     icon: MessageSquare,
-    path: "/dashboard/discussions",
+    path: "/iLearn/discussions",
   },
 ];
 
@@ -34,46 +39,60 @@ const instructorLinks = [
   {
     name: "My Courses",
     icon: BookOpen,
-    path: "/dashboard/instructor/courses",
+    path: "/iLearn/instructor/courses",
   },
   {
     name: "Create Content",
     icon: PlusSquare,
-    path: "/dashboard/instructor/create",
+    path: "/iLearn/create",
   },
   {
     name: "Assignments",
     icon: BookOpenCheck,
-    path: "/dashboard/instructor/assignments",
+    path: "/iLearn/instructor/assignments",
   },
   {
     name: "Grading",
     icon: ClipboardList,
-    path: "/dashboard/instructor/grading",
+    path: "/iLearn/instructor/grading",
+  },
+  {
+    name: "Requests",
+    icon: UserPlus,
+    path: "/iLearn/instructor/requests",
   },
 ];
 
 const adminLinks = [
-  { name: "User Management", icon: Users, path: "/dashboard/admin/users" },
+  {
+    name: "Create Content",
+    icon: PlusSquare,
+    path: "/iLearn/create",
+  },
+  {
+    name: "User Management",
+    icon: Users,
+    path: "/iLearn/admin/users",
+  },
   {
     name: "Course Management",
     icon: BookOpen,
-    path: "/dashboard/admin/courses",
+    path: "/iLearn/admin/courses",
   },
   {
     name: "Analytics",
     icon: ChartNoAxesCombined,
-    path: "/dashboard/admin/analytics",
+    path: "/iLearn/admin/analytics",
   },
   {
     name: "Subscriptions",
     icon: DollarSign,
-    path: "/dashboard/admin/subscriptions",
+    path: "/iLearn/admin/subscriptions",
   },
 ];
 
 const premiumLinks = [
-  { name: "Chatbot", icon: MessageSquare, path: "/dashboard/chatbot" },
+  { name: "Chatbot", icon: MessageSquare, path: "/iLearn/chatbot" },
 ];
 
 const getLinks = ({ role }: { role?: string }) => {

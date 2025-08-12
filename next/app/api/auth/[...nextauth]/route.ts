@@ -24,7 +24,6 @@ export const authOptions: NextAuthOptions = {
         const user = await User.findOne({ email: credentials.email }).select(
           "+password"
         );
-
         if (!user) {
           throw new Error("User not found. Please check your email.");
         }
@@ -34,13 +33,15 @@ export const authOptions: NextAuthOptions = {
           user.password
         );
         if (!isValid) {
-          throw new Error("Invalid password. Please check your password.");
+          throw new Error("Wrong password. Please check your password.");
         }
 
         return {
           _id: user._id.toString(),
           id: user._id.toString(),
           name: user.name,
+          username: user.username,
+          about: user.about,
           email: user.email,
           role: user.role,
           premium: user.premium,
@@ -48,6 +49,7 @@ export const authOptions: NextAuthOptions = {
           lastActive: user.lastActive,
           preferredTheme: user.preferredTheme,
           preferredColorScheme: user.preferredColorScheme,
+          preferredSidebarBg: user.preferredSidebarBg,
         };
       },
     }),
@@ -59,12 +61,15 @@ export const authOptions: NextAuthOptions = {
         token._id = user._id;
         token.role = user.role;
         token.name = user.name;
+        token.username = user.username;
+        token.about = user.about;
         token.email = user.email;
         token.premium = user.premium;
         token.picture = user.picture;
         token.lastActive = user.lastActive;
         token.preferredTheme = user.preferredTheme;
         token.preferredColorScheme = user.preferredColorScheme;
+        token.preferredSidebarBg = user.preferredSidebarBg;
       }
       return token;
     },
@@ -78,12 +83,15 @@ export const authOptions: NextAuthOptions = {
           _id: token._id,
           role: token.role,
           name: token.name,
+          username: token.username,
+          about: token.about,
           email: token.email,
           premium: token.premium,
           picture: token.picture,
           lastActive: token.lastActive,
           preferredTheme: token.preferredTheme,
           preferredColorScheme: token.preferredColorScheme,
+          preferredSidebarBg: token.preferredSidebarBg,
         },
       };
     },

@@ -37,7 +37,7 @@ const SendJoinRequest: FC<Props> = ({ course, close }) => {
         body: JSON.stringify({
           courseId: course._id,
           courseName: course.title,
-          instructorId: course.instructor._id,
+          instructorId: course.instructor.id,
           instructorName: course.instructor.name,
           coursePrice: course.price,
         }),

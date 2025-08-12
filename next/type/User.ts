@@ -1,20 +1,17 @@
 export interface UserType {
   _id: string;
   name: string;
-  username: string;
   email: string;
+  username: string;
   password: string;
+  about: string;
   picture?: string;
   updates: boolean;
   preferredTheme: string;
   preferredColorScheme: string;
+  preferredSidebarBg: string;
   lastActive: number;
   role: string;
-  settings: {
-    darkMode: boolean;
-    notifications: boolean;
-    language: string;
-  };
   progress: Array<{
     courseId: string; // Use string for IDs
     completedModules: number;
@@ -28,6 +25,7 @@ export interface UserType {
     completed: boolean;
   }>;
   myCourses: string[]; // Use string[] for IDs
+  joinRequests: string[]; // Use string[] for IDs
   createdAt: Date;
   updatedAt: Date;
 }

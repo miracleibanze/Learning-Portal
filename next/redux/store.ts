@@ -6,6 +6,8 @@ import coursesReducer from "@redux/slices/coursesSlice";
 import assignmentReducer from "@redux/slices/assignmentsSlice";
 import announcementsReducer from "@redux/slices/announcementsSlice";
 import notificationsReducer from "@redux/slices/NotificationsSlice";
+import joinRequestsReducer from "@redux/slices/requestsSlice";
+import searchReducer from "@redux/slices/searchSlice";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +18,8 @@ export const store = configureStore({
     assignment: assignmentReducer,
     announcements: announcementsReducer,
     notifications: notificationsReducer,
+    joinRequests: joinRequestsReducer,
+    search: searchReducer,
   },
 });
 

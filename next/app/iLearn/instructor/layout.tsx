@@ -38,7 +38,7 @@ export default function DashLayout({
     if (!session?.user && status === "unauthenticated") {
       setTimeout(() => {
         redirect(
-          pathname !== "/dashboard"
+          pathname !== "/iLearn"
             ? `/login?callbackUrl=${encodeURIComponent(pathname)}`
             : "/login"
         );
@@ -47,7 +47,7 @@ export default function DashLayout({
 
     if (status === "authenticated" && session?.user._id) {
       if (!user || user._id !== session.user._id) {
-        dispatch(fetchUser(session.user._id));
+        dispatch(fetchUser());
       }
     }
   }, [session, user, dispatch]);

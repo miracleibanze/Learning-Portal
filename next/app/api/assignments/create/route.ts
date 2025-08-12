@@ -18,7 +18,7 @@ export default async function handler(
 
     const session = await getServerSession(req, res, authOptions);
 
-    if (!session || !session.user || session.user.role !== "instructor") {
+    if (!session || !session.user || session.user.role === "student") {
       console.warn("❌ Unauthorized access attempt");
       return res.status(401).json({ error: "Unauthorized" });
     }
@@ -38,6 +38,14 @@ export default async function handler(
       return res.status(400).json({ message: "Missing required fields" });
     }
 
+    const teacher = {
+      id: session.user._id.toString(),
+      name: session.user.name,
+      about: session.user.about,
+      picture: session.user.picture,
+      role: session.user.role,
+    };
+
     const assignment = new Assignment({
       title,
       description,
@@ -45,7 +53,7 @@ export default async function handler(
       courseId,
       codeInstructions,
       deadline,
-      createdBy: session.user._id,
+      createdBy: teacher,
       questions,
     });
 

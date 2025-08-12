@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Content } from "@/lib/models/Content";
 import { Question } from "@lib/models/Answers";
+import { Chapter } from "@lib/models/Course";
 
 export async function connectDB() {
   if (mongoose.connection.readyState >= 1) {

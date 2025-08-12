@@ -1,4 +1,18 @@
 import {
+  Award,
+  BookMarked,
+  Brain,
+  ChartSpline,
+  GraduationCap,
+  Handshake,
+  Smartphone,
+  Tags,
+  UserPen,
+} from "lucide-react";
+import {
+  backgroundBulb,
+  backgroundCats,
+  backgroundFuturistic,
   instructor,
   instructor2,
   instructor3,
@@ -44,64 +58,66 @@ export const features = [
     title: "Interactive Learning Environment",
     description:
       "Engage in live sessions, quizzes, and hands-on projects designed to provide a dynamic and immersive learning experience. With real-time interactions and collaborative tasks, you'll never feel alone on your learning journey.",
-    icon: "fas fa-graduation-cap",
-    bgColor: "text-darkPrimary",
+    icon: GraduationCap,
+    color: "green",
   },
   {
     title: "AI-Powered Personalized Learning",
     description:
       "Track your progress, identify areas for improvement, and receive personalized learning paths. Our AI-driven system ensures that every student gets a tailored experience to maximize their potential.",
-    icon: "fas fa-brain",
-    bgColor: "text-darkPrimary",
+    icon: Brain,
+    color: "blue",
   },
   {
     title: "Diverse Course Library",
     description:
       "Explore a comprehensive range of courses across various fields, including technology, business, art, and more. All courses are developed by experienced instructors to ensure quality and relevance.",
-    icon: "fas fa-book",
-    bgColor: "text-red-500",
+    icon: BookMarked,
+    color: "red",
   },
   {
     title: "Expert Instructors",
     description:
       "Learn from a team of seasoned professionals who bring real-world experience to the virtual classroom. Benefit from their industry insights and practical knowledge to enhance your skills.",
-    icon: "fas fa-user-tie",
-    bgColor: "text-secondary",
+    icon: UserPen,
+    color: "yellow",
+    black: true,
   },
   {
     title: "Progress Tracking & Analytics",
     description:
       "Monitor your achievements, assess your learning outcomes, and gain insights through detailed analytics. Stay motivated as you watch your progress unfold in real-time.",
-    icon: "fas fa-chart-line",
-    bgColor: "text-purple-500",
+    icon: ChartSpline,
+    color: "purple",
   },
   {
     title: "Collaborative Learning",
     description:
       "Connect with peers and instructors through interactive forums, group projects, and live discussions. Share ideas, ask questions, and grow together in a supportive learning community.",
-    icon: "fas fa-handshake",
-    bgColor: "text-indigo-500",
+    icon: Handshake,
+    color: "indigo",
   },
   {
     title: "Certifications",
     description:
       "Earn certifications that are recognized and respected by employers and institutions worldwide. Showcase your skills and achievements to advance your career or academic pursuits.",
-    icon: "fas fa-certificate",
-    bgColor: "text-teal-500",
+    icon: Award,
+    color: "teal",
   },
   {
     title: "Mobile-Friendly Access",
     description:
       "Access all features and resources seamlessly on any device. Whether you're at home, at assignment, or on the go, our platform adapts to your needs to ensure uninterrupted learning.",
-    icon: "fas fa-mobile-alt",
-    bgColor: "text-gray-500",
+    icon: Smartphone,
+    color: "brown",
   },
   {
     title: "Affordable Pricing",
     description:
       "Gain access to high-quality education without breaking the bank. Choose from a variety of affordable plans and free options to match your budget and learning goals.",
-    icon: "fas fa-tags",
-    bgColor: "text-cyan-500",
+    icon: Tags,
+    color: "cyan",
+    black: true,
   },
 ];
 
@@ -268,5 +284,23 @@ export const courses: Course[] = [
     instructor: {
       name: "Miracle IBANZE",
     },
+  },
+];
+
+export const SideBarBackgounds = [
+  {
+    name: "cats",
+    image: backgroundCats,
+    code: "bgCats",
+  },
+  {
+    name: "bulb",
+    image: backgroundBulb,
+    code: "bgBulb",
+  },
+  {
+    name: "cyber",
+    image: backgroundFuturistic,
+    code: "bgCyber",
   },
 ];

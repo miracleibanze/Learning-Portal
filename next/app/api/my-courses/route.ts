@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { Course } from "@lib/models/Course";
 import { connectDB } from "@lib/db";
 import { User } from "@lib/models/User";
@@ -32,7 +32,7 @@ export async function GET(
     const courses = await Course.find({
       _id: { $in: user.myCourses },
     })
-      .select("title description tags category")
+      .select("title description tags category status")
       .exec();
     console.error("This is the length of my courses: ", courses.length);
     return NextResponse.json({ success: true, data: courses }, { status: 200 });
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     const courses = await Course.find({
       _id: { $nin: user.myCourses }, // Use $nin to exclude multiple IDs
     })
-      .select("title description tags students price category")
+      .select("title description tags students price category status")
       .exec();
 
     console.log("Number of courses found:", courses.length);
@@ -91,5 +91,39 @@ export async function POST(request: Request) {
       { success: false, message: "Failed to fetch top courses" },
       { status: 500 }
     );
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  await connectDB();
+
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?._id) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const updates = await req.json();
+
+    console.log("updates: ", updates);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      session.user._id,
+      { $set: updates },
+      { new: true }
+    )
+      .lean()
+      .exec();
+
+    if (!updatedUser) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    // console.log("Update user : ", updatedUser);
+
+    return NextResponse.json(updatedUser);
+  } catch (error) {
+    console.error("Failed to update user:", error);
+    return NextResponse.json({ message: "Update failed" }, { status: 500 });
   }
 }

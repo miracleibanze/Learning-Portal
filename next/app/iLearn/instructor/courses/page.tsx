@@ -32,13 +32,13 @@ const Page: FC = () => {
           <p className="text-red-400 body-2">{coursesCreatedError}</p>
         )}
         {coursesCreatedLoading ? (
-          Array({ length: 8 }).map((_, index) => (
+          Array.from({ length: 8 }).map((_, index) => (
             <CourseCardSkeleton key={index} />
           ))
         ) : data.length > 0 ? (
           data.map((course) => (
             <Link
-              href={`/dashboard/enroll/${course._id}`}
+              href={`/iLearn/enroll/${course._id}`}
               key={course._id}
               className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
             >
@@ -46,7 +46,7 @@ const Page: FC = () => {
             </Link>
           ))
         ) : (
-          <p>No course you have created yet</p>
+          <p>You have created no course yet</p>
         )}
       </div>
     </main>

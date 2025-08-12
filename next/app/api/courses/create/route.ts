@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { connectDB } from "@/lib/db";
 import { Course, Chapter } from "@/lib/models/Course";
+import { User } from "@lib/models/User";
 
 export async function POST(req: Request) {
   try {
@@ -27,17 +28,9 @@ export async function POST(req: Request) {
       chapters,
     } = body;
 
+    console.log("body :", body);
     // Basic validation
-    if (
-      !title ||
-      !description ||
-      !category ||
-      !language ||
-      !level ||
-      price == null ||
-      !thumbnail ||
-      !Array.isArray(chapters)
-    ) {
+    if (!title || !description) {
       return NextResponse.json(
         { error: "Missing or invalid required fields" },
         { status: 400 }
@@ -73,6 +66,14 @@ export async function POST(req: Request) {
     });
 
     const createdCourse = await newCourse.save();
+
+    await User.findByIdAndUpdate(session.user._id, {
+      $addToSet: { myCourses: newCourse._id },
+    })
+      .lean()
+      .exec();
+
+    console.log("created course:", createdCourse);
 
     return NextResponse.json(createdCourse, { status: 201 });
   } catch (error: any) {

@@ -13,7 +13,13 @@ export interface MutableAssignment {
   deadline: Date;
   createdAt: Date;
   students: string[];
-  createdBy: string;
+  createdBy: {
+    id: string;
+    name: string;
+    about?: string;
+    picture?: string;
+    role: string;
+  };
   courseId: string; // Simplified courseId type
   questions?: Question[];
   codeInstructions?: string;

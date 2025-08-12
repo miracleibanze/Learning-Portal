@@ -21,6 +21,11 @@ import person from "./images/person.png";
 import person2 from "./images/person2.png";
 import person3 from "./images/person3.png";
 
+import backgroundCats from "./images/background-cats.jpg";
+import backgroundFuturistic from "./images/background-futuristic.jpg";
+import backgroundBulb from "./images/background-bulb.jpg";
+
+import OopsImage from "./images/Oops-Image.png";
 import featuresCard from "./svgs/card-1.svg";
 
 export {
@@ -45,4 +50,8 @@ export {
   person2,
   person3,
   featuresCard,
+  backgroundCats,
+  backgroundFuturistic,
+  backgroundBulb,
+  OopsImage,
 };
