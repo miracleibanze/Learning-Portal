@@ -35,6 +35,7 @@ export interface CourseDocument extends Document {
   tags: string[];
   thumbnail: string;
   chapters: ChapterDocument[];
+  createdAt: Date;
 }
 
 export interface DetailedCourseDocument extends Document {
@@ -51,6 +52,7 @@ export interface DetailedCourseDocument extends Document {
   tags: string[];
   thumbnail: string;
   chapters: number;
+  createdAt: Date;
 }
 
 const ChapterSchema = new Schema();
@@ -58,27 +60,30 @@ const ChapterSchema = new Schema();
 export const Chapter =
   mongoose.models.Chapter || mongoose.model("Chapter", ChapterSchema);
 
-const CourseSchema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  instructor: { type: Schema.Types.ObjectId, ref: "User", required: true },
-  category: { type: String },
-  level: { type: String },
-  language: { type: String },
-  price: { type: Number },
-  thumbnail: { type: String },
-  status: { type: String, enum: ["Draft", "Published"], default: "Draft" },
-  tags: [{ type: String }],
-  students: [{ type: Schema.Types.ObjectId, ref: "User" }],
-  chapters: [
-    {
-      title: { type: String, required: true },
-      description: { type: String, required: true },
-      order: { type: Number, required: true },
-      content: { type: String, required: true },
-    },
-  ],
-});
+const CourseSchema = new Schema(
+  {
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    instructor: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    category: { type: String },
+    level: { type: String },
+    language: { type: String },
+    price: { type: Number },
+    thumbnail: { type: String },
+    status: { type: String, enum: ["Draft", "Published"], default: "Draft" },
+    tags: [{ type: String }],
+    students: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    chapters: [
+      {
+        title: { type: String, required: true },
+        description: { type: String, required: true },
+        order: { type: Number, required: true },
+        content: { type: String, required: true },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 export const Course =
   mongoose.models.Course || mongoose.model("Course", CourseSchema);

@@ -7,7 +7,7 @@ import { AppDispatch, RootState } from "@redux/store";
 import { FC, useEffect } from "react";
 import CourseCard from "@components/CourseCard";
 import { CourseCardSkeleton } from "@components/designs/Skeletons";
-import Link from "@node_modules/next/link";
+import Link from "next/link";
 
 const Page: FC = () => {
   const { data: session } = useSession();

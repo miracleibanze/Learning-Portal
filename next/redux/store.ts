@@ -8,6 +8,7 @@ import announcementsReducer from "@redux/slices/announcementsSlice";
 import notificationsReducer from "@redux/slices/NotificationsSlice";
 import joinRequestsReducer from "@redux/slices/requestsSlice";
 import searchReducer from "@redux/slices/searchSlice";
+import analyticsReducer from "@redux/slices/AnalyticsSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ export const store = configureStore({
     notifications: notificationsReducer,
     joinRequests: joinRequestsReducer,
     search: searchReducer,
+    analytics: analyticsReducer,
   },
 });
 

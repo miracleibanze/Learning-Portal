@@ -6,18 +6,14 @@ export async function GET(req: Request) {
   await connectDB();
 
   const { searchParams } = new URL(req.url);
-  if (searchParams) {
-    const query = searchParams.get("q")?.trim() || "";
-    const indexParam = searchParams.get("index") || "0";
+  const query = searchParams.get("q")?.trim() || "";
+  const indexParam = searchParams.get("index") || "0";
 
-    const index = parseInt(indexParam, 10);
-    const limit = 12;
-    const skip = index * limit;
+  const index = parseInt(indexParam, 10);
+  const limit = 12;
+  const skip = index * limit;
 
-    if (!query) {
-      return NextResponse.json([], { status: 200 });
-    }
-
+  if (query) {
     const regex = new RegExp(query.split(" ").join("|"), "i");
 
     try {
@@ -37,10 +33,19 @@ export async function GET(req: Request) {
       );
     }
   } else {
+    const status = searchParams.get("status");
+
     try {
-      const courses = await Course.find()
-        .select("title description tags price category")
-        .exec();
+      const query: any = {};
+      if (status === "Published" || status === "Draft") {
+        query.status = status;
+      }
+
+      const courses = await Course.find(query)
+        .select("title description status createdAt")
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 });
 
       console.log("courses found : ", courses);
 

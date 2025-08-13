@@ -17,7 +17,7 @@ import getLinks from "@features/SidebarLinks";
 import { navbarBackType } from "@redux/slices/navigationSlice";
 import { backgroundBulb, backgroundCats, backgroundFuturistic } from "@assets";
 import { SideBarBackgounds } from "@features/constants";
-import { useSelector } from "@node_modules/react-redux/dist/react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "@redux/store";
 
 interface SidebarProps {

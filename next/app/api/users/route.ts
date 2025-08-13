@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const query = searchParams.get("q")?.trim() || null;
   const indexParam = searchParams.get("index") || "";
-  const isAll = searchParams.get("all") || null;
+  const role = searchParams.get("role") || "";
   console.error(
     "users searchParams : ",
     query && indexParam ? "true" : "false"
@@ -28,7 +28,7 @@ export async function GET(req: Request) {
       const users = await User.find({
         $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
       })
-        .select("name email about role picture")
+        .select("name email about role picture username")
         .skip(skip)
         .limit(limit);
 
@@ -45,17 +45,15 @@ export async function GET(req: Request) {
     const limit = 12;
     const skip = index * limit;
 
-    const users = isAll
-      ? await User.find({
-          $or: [{ role: "student" }, { role: "instructor" }],
-        })
-          .select("name email about role picture")
+    const users = role
+      ? await User.find({ role: role })
+          .select("name email about role picture username")
           .skip(skip)
           .limit(limit)
       : await User.find({
           $or: [{ role: "student" }, { role: "instructor" }],
         })
-          .select("name email about role picture")
+          .select("name email about role picture username")
           .sort({ createdAt: -1 })
           .limit(12)
           .exec();

@@ -22,12 +22,12 @@ const Profile: FC<ProfileProps> = ({ user }) => {
               <i className="fas fa-user text-[3rem]"></i>
             </div>
           )}
-          <h2 className="text-xl font-bold">{user.name}</h2>
-          <p className="text-gray-600 dark:text-white/70">{user.email}</p>
         </>
       ) : (
         <p>User not found.</p>
       )}
+      <h2 className="text-xl font-bold">{user?.name}</h2>
+      <p className="text-gray-600 dark:text-white/70">{user?.email}</p>
     </div>
   );
 };

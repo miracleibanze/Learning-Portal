@@ -16,7 +16,7 @@ const initialState: JoinRequestState = {
   error: null,
 };
 
-// Thunk action to fetch pending assignments
+// Thunk action to fetch pending requestss
 export const fetchJoinRequests = createAsyncThunk(
   "joinRequest/fetchjoinrequests",
   async (_, { rejectWithValue }) => {
@@ -31,8 +31,8 @@ export const fetchJoinRequests = createAsyncThunk(
   }
 );
 
-// Assignment slice creation
-const assignmentSlice = createSlice({
+// Requests slice creation
+const requestsSlice = createSlice({
   name: "joinRequest",
   initialState,
   reducers: {},
@@ -54,9 +54,9 @@ const assignmentSlice = createSlice({
 
 // Exporting actions
 // export const {
-//   setpendingAssignments,
-//   setSubmittedAssignments,
-//   setCreatedAssignments,
-// } = assignmentSlice.actions;
+//   setpendingRequestss,
+//   setSubmittedRequestss,
+//   setCreatedRequestss,
+// } = requestsSlice.actions;
 
-export default assignmentSlice.reducer;
+export default requestsSlice.reducer;

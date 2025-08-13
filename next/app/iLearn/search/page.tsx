@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@redux/store";
-import { fetchUser } from "@redux/slices/userSlice";
+import { fetchRandomUsers, fetchUser } from "@redux/slices/userSlice";
 import {
   fetchCourses,
   fetchPeople,
@@ -16,6 +16,7 @@ import { User } from "lucide-react";
 import Link from "next/link";
 import CourseCard from "@components/CourseCard";
 import { useSession } from "next-auth/react";
+import { fetchTop4Courses } from "@redux/slices/coursesSlice";
 
 const Page = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -26,10 +27,11 @@ const Page = () => {
   const [selectedCategory, setSelectedCategory] = useState(category);
 
   const { data: session } = useSession();
-  const { user } = useSelector((state: RootState) => state.user);
+  const { user, randomUsers } = useSelector((state: RootState) => state.user);
   const { people, courses, context } = useSelector(
     (state: RootState) => state.search
   );
+  const { top4Courses } = useSelector((state: RootState) => state.courses);
 
   const [peopleList, setPeopleList] = useState(people.data);
   const [courseList, setCourseList] = useState(courses.data);
@@ -73,7 +75,14 @@ const Page = () => {
         }
       );
     }
-  }, [searchText, category, pathname]);
+
+    if (top4Courses.data && top4Courses.data.length === 0) {
+      dispatch(fetchTop4Courses());
+    }
+    if (randomUsers.data && randomUsers.data.length === 0) {
+      dispatch(fetchRandomUsers());
+    }
+  }, [searchText, category, pathname, dispatch]);
 
   const loadMorePeople = () => {
     const nextIndex = peoplePageIndex + 1;
@@ -109,35 +118,39 @@ const Page = () => {
   };
 
   return (
-    <main>
-      <h3 className="h3 mb-6">
-        Search results for "{decodeURIComponent(searchText)}"
-      </h3>
+    <div className="pt-12">
+      {searchText !== "" && (
+        <>
+          <h3 className="h3 mb-6">
+            Search results for "{decodeURIComponent(searchText)}"
+          </h3>
 
-      <ul className="flex flex-wrap gap-2 my-6">
-        {filterOptions.map((type) => (
-          <li key={type}>
-            <Link
-              href={`/iLearn/search?q=${encodeURIComponent(
-                searchText
-              )}&category=${type}`}
-            >
-              <button
-                className={`px-4 py-1 rounded-lg text-sm font-medium capitalize ${
-                  selectedCategory === type
-                    ? "bg-secondary text-white"
-                    : "bg-gray-200 dark:bg-white/10 dark:text-white hover:bg-gray-300"
-                }`}
-              >
-                {type}
-              </button>
-            </Link>
-          </li>
-        ))}
-      </ul>
+          <ul className="flex flex-wrap gap-2 my-6">
+            {filterOptions.map((type) => (
+              <li key={type}>
+                <Link
+                  href={`/iLearn/search?q=${encodeURIComponent(
+                    searchText
+                  )}&category=${type}`}
+                >
+                  <button
+                    className={`px-4 py-1 rounded-lg text-sm font-medium capitalize ${
+                      selectedCategory === type
+                        ? "bg-secondary text-white"
+                        : "bg-gray-200 dark:bg-white/10 dark:text-white hover:bg-gray-300"
+                    }`}
+                  >
+                    {type}
+                  </button>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
 
       {/* People Results */}
-      {selectedCategory !== "courses" && (
+      {searchText !== "" && selectedCategory !== "courses" && (
         <>
           <h4 className="h4 text-primary font-semibold border-b mb-4 w-full shadow-b">
             People
@@ -196,9 +209,11 @@ const Page = () => {
                       <button className="bg-primary text-white rounded-md py-1 text-sm px-3">
                         Contact
                       </button>
-                      <button className="bg-primary text-white rounded-md py-1 text-sm px-3">
-                        Details
-                      </button>
+                      <Link href={`/iLearn/profile/${person.username}`}>
+                        <button className="bg-primary text-white rounded-md py-1 text-sm px-3">
+                          Details
+                        </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -223,7 +238,7 @@ const Page = () => {
       )}
 
       {/* Courses Results */}
-      {selectedCategory !== "people" && (
+      {searchText !== "" && selectedCategory !== "people" && (
         <>
           <h4 className="h4 text-primary font-semibold border-b mb-4 w-full shadow-b">
             Courses
@@ -274,7 +289,120 @@ const Page = () => {
           )}
         </>
       )}
-    </main>
+      {searchText === "" && (
+        <>
+          <h4 className="h4 text-primary font-semibold border-b mb-4 w-full shadow-b">
+            Suggested Courses
+          </h4>
+          <div className="w-full flex gap-x-2 flex-wrap gap-y-4 px-4 mb-8">
+            {top4Courses.top4CoursesLoading ? (
+              Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  className="w-52 h-72 rounded-lg border shadow flex flex-col"
+                  key={index}
+                >
+                  <div className="w-full bg-zinc-200 dark:bg-white/20 h-20 skeleton-shimmer" />
+                  <div className="w-20 bg-white dark:bg-zinc-900 h-20 aspect-square -translate-y-1/2 rounded-full ml-2" />
+                  <div className="w-full h-full flex-1 -translate-y-8">
+                    <LineSkeleton noBorder index={4} />
+                  </div>
+                </div>
+              ))
+            ) : top4Courses.data.length > 0 ? (
+              top4Courses.data.map((course) => (
+                <Link
+                  key={course._id}
+                  href={courseLink(course._id)}
+                  className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
+                >
+                  <CourseCard
+                    course={course}
+                    purchased={user?.myCourses?.includes(course._id)}
+                    created={session?.user?.role === "instructor"}
+                  />
+                </Link>
+              ))
+            ) : (
+              <p className="min-w-full px-4 py-8 font-bold text-zinc-500 dark:text-white/80 text-center">
+                No courses found.
+              </p>
+            )}
+          </div>
+          <h4 className="h4 text-primary font-semibold border-b mb-4 w-full shadow-b">
+            People you may know
+          </h4>
+          <div className="w-full flex gap-x-2 flex-wrap gap-y-4 px-4">
+            {randomUsers.loading ? (
+              Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  className="w-52 h-72 rounded-lg border shadow flex flex-col"
+                  key={index}
+                >
+                  <div className="w-full bg-zinc-200 dark:bg-white/20 h-20 skeleton-shimmer" />
+                  <div className="w-20 bg-white dark:bg-zinc-900 h-20 aspect-square -translate-y-1/2 rounded-full ml-2" />
+                  <div className="w-full h-full flex-1 -translate-y-8">
+                    <LineSkeleton noBorder index={4} />
+                  </div>
+                </div>
+              ))
+            ) : randomUsers.data.length > 0 ? (
+              randomUsers.data.map((person) => (
+                <div
+                  key={person._id}
+                  className="w-52 h-72 rounded-lg border shadow flex flex-col overflow-hidden hover:scale-105 transition-all"
+                >
+                  <div className="w-full bg-primary dark:bg-darkPrimary h-20">
+                    <Image
+                      src="/logo.png"
+                      alt="logo"
+                      width={80}
+                      height={80}
+                      className="w-full h-full p-5 pr-2 object-contain"
+                    />
+                  </div>
+                  {person.picture ? (
+                    <Image
+                      src={person.picture}
+                      alt="profile"
+                      width={80}
+                      height={80}
+                      className="object-cover w-20 h-20 aspect-square -translate-y-1/2 rounded-full ml-2"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 aspect-square -translate-y-1/2 rounded-full bg-zinc-300 dark:bg-white p-3 ml-2">
+                      <User className="w-full h-full" color="white" />
+                    </div>
+                  )}
+                  <div className="flex-1 -translate-y-10 p-3">
+                    <p className="font-semibold">{person.name}</p>
+                    <p className="truncate-two-lines text-sm mb-2">
+                      {person.about || "No description available."}
+                    </p>
+                    <p className="text-sm text-zinc-500 dark:text-white/70 italic mb-4">
+                      {person.email}
+                    </p>
+                    <div className="flex justify-between">
+                      <button className="bg-primary text-white rounded-md py-1 text-sm px-3">
+                        Contact
+                      </button>
+                      <Link href={`/iLearn/profile/${person.username}`}>
+                        <button className="bg-primary text-white rounded-md py-1 text-sm px-3">
+                          Details
+                        </button>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="min-w-full px-4 py-8 font-bold text-zinc-500 dark:text-white/80 text-center">
+                No people found.
+              </p>
+            )}
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

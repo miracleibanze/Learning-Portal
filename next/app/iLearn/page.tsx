@@ -37,6 +37,8 @@ import Image from "next/image";
 import { instructorType } from "@lib/models/Course";
 import { User } from "next-auth";
 import axios from "axios";
+import AdminDashboardChart from "@components/dashboard/AdminDashboardChart";
+import { fetchAnalytics } from "@redux/slices/AnalyticsSlice";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -53,6 +55,8 @@ export default function DashboardPage() {
   const [selectedAnnouncementId, setSelectedAnnouncementId] = useState<
     string | null
   >(null);
+
+  const analytics = useSelector((state: RootState) => state.analytics.data);
 
   const { readAnnouncements } = useSelector(
     (state: RootState) => state.announcements
@@ -93,8 +97,9 @@ export default function DashboardPage() {
         dispatch(fetchTop4Courses());
       if (!announcements || announcements.length === 0)
         dispatch(fetchAnnouncements());
+      if (!analytics) dispatch(fetchAnalytics());
     }
-  }, [session?.user, dispatch]);
+  }, [session?.user, dispatch, pathname]);
 
   if (!session?.user)
     return (
@@ -460,6 +465,12 @@ export default function DashboardPage() {
           )}
         </div>
       )}
+      <div className="col-span-1 w-full border-2 rounded border-zinc-300 dark:border-white/50 overflow-hidden flex flex-col shadow-md">
+        <div className="p-6 bg-white rounded shadow-md max-w-3xl mx-auto h-full flex flex-col overflow-x-auto">
+          <h1 className="text-2xl font-bold mb-6">Admin Dashboard Overview</h1>
+          <AdminDashboardChart data={analytics?.monthlyCourseCounts} />
+        </div>
+      </div>
 
       <div
         className="w-full mt-3 lg:col-span-3 col-span-1 flex pr-8 md:flex-row flex-col"

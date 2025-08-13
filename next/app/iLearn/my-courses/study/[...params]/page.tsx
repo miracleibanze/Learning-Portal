@@ -9,7 +9,7 @@ import {
   fetchDetailedCourseChapters,
 } from "@redux/slices/coursesSlice";
 import { LineSkeleton } from "@components/designs/Skeletons";
-import axios from "@node_modules/axios";
+import axios from "axios";
 import { ContentType } from "@lib/models/Content";
 import { ChapterDocument } from "@lib/models/Course";
 import GoBack from "@components/GoBack";

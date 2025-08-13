@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 const commonLinks = [
-  { name: "Dashbaord", icon: Home, path: "/iLearn" },
+  { name: "Dashboard", icon: Home, path: "/iLearn" },
   { name: "Explore", icon: Search, path: "/iLearn/search" },
 ];
 

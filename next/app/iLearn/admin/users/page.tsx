@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@redux/store";
 import { fetchStudents, fetchTeachers } from "@redux/slices/userSlice";
+import Link from "next/link";
 
 export default function UsersAdminPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,13 +25,15 @@ export default function UsersAdminPage() {
   const users = view === "students" ? students : teachers;
 
   return (
-    <div className="p-4">
-      <h1 className="text-xl font-bold mb-4">Manage Users</h1>
+    <div className="p-4 max-w-5xl w-full mx-auto">
+      <h3 className="h3 font-bold mb-6">Manage Users</h3>
 
       <div className="mb-4">
         <button
           className={`px-4 py-2 mr-2 rounded ${
-            view === "students" ? "bg-blue-600 text-white" : "bg-gray-200"
+            view === "students"
+              ? "bg-primary text-white"
+              : "bg-gray-200 hover:scale-[1.03] transition-all"
           }`}
           onClick={() => setView("students")}
         >
@@ -38,7 +41,9 @@ export default function UsersAdminPage() {
         </button>
         <button
           className={`px-4 py-2 rounded ${
-            view === "teachers" ? "bg-blue-600 text-white" : "bg-gray-200"
+            view === "teachers"
+              ? "bg-primary text-white"
+              : "bg-gray-200 hover:scale-[1.03] transition-all"
           }`}
           onClick={() => setView("teachers")}
         >
@@ -46,42 +51,65 @@ export default function UsersAdminPage() {
         </button>
       </div>
 
-      {loading ? (
-        <p>Loading {view}...</p>
-      ) : error ? (
-        <p className="text-red-600">Error: {error}</p>
-      ) : (
-        <table className="w-full border-collapse border border-gray-300">
-          <thead>
+      <table className="w-full border-collapse border border-gray-300">
+        {loading && (
+          <p className="absolute top-1/2 -translate-y-1/2 right-1/2 -translate-x-1/2">
+            <p className="w-20 h-20 rounded-full aspect-square border-y-secondary border-x-primary border-4 flex-0 animate-spin transition-[1s]"></p>
+          </p>
+        )}
+        {error && <p className="text-red-600 italic">{error}</p>}
+
+        <thead>
+          <tr>
+            <th className="border border-gray-300 p-2">Name</th>
+            <th className="border border-gray-300 p-2">Email</th>
+            <th className="border border-gray-300 p-2">Role</th>
+            <th className="border border-gray-300 p-2">About</th>
+          </tr>
+        </thead>
+        <tbody className="relative">
+          {loading ? (
+            Array.from({ length: 8 }).map((_, index) => (
+              <tr key={index}>
+                <td className="border border-gray-300 p-2">...</td>
+                <td className="border border-gray-300 p-2">...</td>
+                <td className="border border-gray-300 p-2">...</td>
+                <td className="border border-gray-300 p-2">...</td>
+              </tr>
+            ))
+          ) : error ? (
+            Array.from({ length: 8 }).map((_, index) => (
+              <tr key={index}>
+                <td className="border border-gray-300 p-2">...</td>
+                <td className="border border-gray-300 p-2">...</td>
+                <td className="border border-gray-300 p-2">...</td>
+                <td className="border border-gray-300 p-2">...</td>
+              </tr>
+            ))
+          ) : users.length === 0 ? (
             <tr>
-              <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Email</th>
-              <th className="border border-gray-300 p-2">Role</th>
-              <th className="border border-gray-300 p-2">About</th>
+              <td colSpan={4} className="text-center p-4">
+                No more {view} found.
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {users.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="text-center p-4">
-                  No {view} found.
+          ) : (
+            users.map((user) => (
+              <tr key={user._id}>
+                <td className="border border-gray-300 p-2 text-sky-600 dark:text-sky-400 hover:underline">
+                  <Link href={`/iLearn/profile/${user.username}`}>
+                    {user.name}
+                  </Link>
+                </td>
+                <td className="border border-gray-300 p-2">{user.email}</td>
+                <td className="border border-gray-300 p-2">{user.role}</td>
+                <td className="border border-gray-300 p-2">
+                  {user.about || "-"}
                 </td>
               </tr>
-            ) : (
-              users.map((user) => (
-                <tr key={user._id}>
-                  <td className="border border-gray-300 p-2">{user.name}</td>
-                  <td className="border border-gray-300 p-2">{user.email}</td>
-                  <td className="border border-gray-300 p-2">{user.role}</td>
-                  <td className="border border-gray-300 p-2">
-                    {user.about || "-"}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
+            ))
+          )}
+        </tbody>
+      </table>
 
       <div className="mt-4 flex justify-between">
         <button

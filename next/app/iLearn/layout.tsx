@@ -122,7 +122,7 @@ export default function DashLayout({
         </>
       )}
       <DashboardNavbar />
-      <div className="px-4 flex flex-col w-full flex-1 ">{children}</div>
+      <div className="px-4 flex flex-col w-full flex-1">{children}</div>
     </>
   );
 }

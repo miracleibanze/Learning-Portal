@@ -29,7 +29,7 @@ import {
   addSystemNotification,
   silenceAllNotifications,
 } from "@redux/slices/NotificationsSlice";
-import Link from "@node_modules/next/link";
+import Link from "next/link";
 
 const DashboardNavbar: FC = () => {
   const pathname = usePathname();

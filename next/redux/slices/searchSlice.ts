@@ -10,6 +10,7 @@ export interface searchState {
       _id: string;
       name: string;
       email: string;
+      username: string;
       about: string;
       role: string;
       picture?: string;

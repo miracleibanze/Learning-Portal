@@ -203,12 +203,12 @@ interface CourseState {
   };
 
   publishedCourses: {
-    data: CourseDocument[];
+    data: DetailedCourseDocument[];
     loading: boolean;
     error: string | null;
   };
   draftCourses: {
-    data: CourseDocument[];
+    data: DetailedCourseDocument[];
     loading: boolean;
     error: string | null;
   };
@@ -422,7 +422,9 @@ const courseSlice = createSlice({
         fetchPublishedCourses.fulfilled,
         (state, action: PayloadAction<CourseDocument[]>) => {
           state.publishedCourses.loading = false;
-          state.publishedCourses.data = action.payload;
+          state.publishedCourses.data = JSON.parse(
+            JSON.stringify(action.payload)
+          );
         }
       )
       .addCase(
@@ -440,7 +442,7 @@ const courseSlice = createSlice({
         fetchDraftCourses.fulfilled,
         (state, action: PayloadAction<CourseDocument[]>) => {
           state.draftCourses.loading = false;
-          state.draftCourses.data = action.payload;
+          state.draftCourses.data = JSON.parse(JSON.stringify(action.payload));
         }
       )
       .addCase(

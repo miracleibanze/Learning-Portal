@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -22,22 +22,43 @@ ChartJS.register(
 );
 
 interface AdminDashboardChartProps {
-  labels: string[];
-  data: number[];
+  data?: {
+    month: string;
+    count: number;
+  }[];
 }
 
-const AdminDashboardChart: React.FC<AdminDashboardChartProps> = ({
-  labels,
-  data,
-}) => {
+const AdminDashboardChart: React.FC<AdminDashboardChartProps> = ({ data }) => {
+  if (!data)
+    return (
+      <div className="w-full flex-1 h-full flex-center">
+        <div className="w-20 h-20 rounded-full aspect-square border-y-secondary border-x-primary border-[40px] flex-0 animate-spin transition-[1s]" />
+      </div>
+    );
+
+  const analyticsLabels: string[] = [];
+  const analyticsData: number[] = [];
+
+  for (let index = 0; index < data.length; index++) {
+    analyticsData.push(data[index].count);
+    analyticsLabels.push(data[index].month);
+  }
+
+  useEffect(() => {
+    if (analyticsData.length === data.length)
+      console.log("analytics data: ", analyticsData);
+    if (analyticsLabels.length === data.length)
+      console.log("analytics lebels: ", analyticsLabels);
+  }, [analyticsData, analyticsLabels]);
+
   const chartData = {
-    labels,
+    labels: analyticsLabels,
     datasets: [
       {
         label: "Courses Created",
-        data,
+        data: analyticsData,
         backgroundColor: "rgba(37, 99, 235, 0.7)", // blue color
-        borderRadius: 4,
+        borderRadius: 2,
       },
     ],
   };
@@ -51,7 +72,7 @@ const AdminDashboardChart: React.FC<AdminDashboardChartProps> = ({
       title: {
         display: true,
         text: "Monthly Course Creation",
-        font: { size: 18 },
+        font: { size: 12 },
       },
     },
     scales: {
@@ -78,10 +99,6 @@ export default AdminDashboardChart;
 //   const courseCreationCounts = [4, 7, 3, 5, 8, 6];
 
 //   return (
-//     <div className="p-6 bg-white rounded shadow-md max-w-3xl mx-auto">
-//       <h1 className="text-2xl font-bold mb-6">Admin Dashboard Overview</h1>
-//       <AdminDashboardChart labels={labels} data={courseCreationCounts} />
-//     </div>
 //   );
 // };
 
