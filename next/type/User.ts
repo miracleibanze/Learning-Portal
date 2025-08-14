@@ -10,6 +10,8 @@ export interface UserType {
   preferredTheme: string;
   preferredColorScheme: string;
   preferredSidebarBg: string;
+  subscriptionPlan: string;
+  fees: string;
   lastActive: number;
   role: string;
   progress: Array<{

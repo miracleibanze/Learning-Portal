@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Check,
   CheckCheck,
+  Clock10,
   EyeIcon,
   Loader,
   PlusIcon,
@@ -37,8 +38,9 @@ import Image from "next/image";
 import { instructorType } from "@lib/models/Course";
 import { User } from "next-auth";
 import axios from "axios";
-import AdminDashboardChart from "@components/dashboard/AdminDashboardChart";
 import { fetchAnalytics } from "@redux/slices/AnalyticsSlice";
+import AdminDashboardCircleChart from "@components/dashboard/AdminDashboardCircleChart";
+import AdminDashboardChart from "@components/dashboard/AdminDashboardChart";
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -251,7 +253,7 @@ export default function DashboardPage() {
                 </div>
               </Link>
               <span className="ml-auto text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                <i className="fa fa-clock" />{" "}
+                <Clock10 size={16} />
                 {new Date(selectedAnnouncement.createdAt).toLocaleString()}
               </span>
             </div>
@@ -465,10 +467,11 @@ export default function DashboardPage() {
           )}
         </div>
       )}
+
       <div className="col-span-1 w-full border-2 rounded border-zinc-300 dark:border-white/50 overflow-hidden flex flex-col shadow-md">
-        <div className="p-6 bg-white rounded shadow-md max-w-3xl mx-auto h-full flex flex-col overflow-x-auto">
+        <div className="p-6 bg-white dark:bg-white/10 rounded shadow-md max-w-3xl mx-auto h-full flex flex-col overflow-x-auto">
           <h1 className="text-2xl font-bold mb-6">Admin Dashboard Overview</h1>
-          <AdminDashboardChart data={analytics?.monthlyCourseCounts} />
+          <AdminDashboardChart data={analytics?.monthlyCourseCounts || []} />
         </div>
       </div>
 
@@ -523,7 +526,7 @@ export default function DashboardPage() {
                   : "enroll"
               }/${course._id}`}
               key={course._id + " " + index}
-              className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
+              className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
             >
               <CourseCard
                 course={course}

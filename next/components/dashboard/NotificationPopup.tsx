@@ -292,10 +292,10 @@ const NotificationPopup: FC<NotificationPopupProps> = ({
             Add Notification
           </button>
         </div>
-        {(system.length > 0 || general.length > 0) && (
-          <div className="w-full flex justify-end items-center py-6">
+        <div className="w-full flex flex-row-reverse justify-between items-center py-6 px-4">
+          {(system.length > 0 || general.length > 0) && (
             <button
-              className="text-[12px] flex items-center font-normal cursor-pointer underline"
+              className="text-[12px] flex items-center font-normal cursor-pointer bg-zinc-300 dark:bg-white/20 py-1 px-3 rounded-full"
               onClick={() => {
                 dispatch(clearAllNotifications());
                 closePopup();
@@ -303,8 +303,17 @@ const NotificationPopup: FC<NotificationPopupProps> = ({
             >
               Clear All <GanttChart size={16} />{" "}
             </button>
-          </div>
-        )}
+          )}
+          <button
+            className="text-[12px] flex items-center font-normal cursor-pointer bg-zinc-300 dark:bg-white/20 py-1 px-3 rounded-full"
+            onClick={() => {
+              dispatch(clearAllNotifications());
+              closePopup();
+            }}
+          >
+            Notification Setting
+          </button>
+        </div>
       </div>
 
       {/* Confirm Modal */}

@@ -342,6 +342,7 @@ const DashboardNavbar: FC = () => {
 
           <div
             className="cursor-pointer flex items-center gap-2 min-w-max"
+            ref={settingsRef}
             onClick={toggleSettingWindowBox}
           >
             {session?.user.picture ? (
@@ -368,7 +369,7 @@ const DashboardNavbar: FC = () => {
       {isNotificationWindowBoxOpen && (
         <div
           ref={notificationRef}
-          className="absolute right-4 top-full w-80 bg-white dark:bg-darkPrimary border border-zinc-400 shadow-md rounded-md z-50 py-3 popupHeight overflow-y-auto overflow-x-hidden"
+          className="absolute max-[400px]:right-0 right-4 top-full w-80 max-[400px]:w-full bg-white dark:bg-darkPrimary border border-zinc-400 shadow-md rounded-md z-50 py-3 popupHeight overflow-y-auto overflow-x-hidden"
         >
           <NotificationPopup
             handleCancelChanges={() => setIsNotificationWindowBoxOpen(false)}
@@ -380,7 +381,7 @@ const DashboardNavbar: FC = () => {
       {isSettingWindowBoxOpen && (
         <div
           ref={settingsRef}
-          className="absolute right-0 top-full w-80 bg-white dark:bg-darkPrimary border border-zinc-400 shadow-md rounded-s-md z-50 py-3 popupHeight overflow-y-auto overflow-x-hidden"
+          className="absolute right-0 top-full w-80 max-[400px]:w-full bg-white dark:bg-darkPrimary border border-zinc-400 shadow-md rounded-s-md z-50 py-3 popupHeight overflow-y-auto overflow-x-hidden"
         >
           <SettingsPopup
             {...{

@@ -13,13 +13,12 @@ const useFormattedPathSegment = (role: string, pathname: string) => {
         : segments[1] === role
         ? segments[2]
         : segments[1];
-
+    console.log("segment : ", selectedSegment);
     return selectedSegment
       ? decodeURIComponent(selectedSegment.replace(/-/g, " "))
       : "";
   } else {
-    selectedSegment = segments[0];
-    return selectedSegment;
+    return "dashboard";
   }
 };
 

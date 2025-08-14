@@ -16,7 +16,7 @@ const CourseCard: FC<CourseCardProps> = ({
   searched,
 }) => {
   return (
-    <div className="shrink-0 md:w-64 w-full h-full bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col">
+    <div className="shrink-0 md:w-64 w-full h-full bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col">
       <div className="relative w-full bg-lightPrimary dark:bg-darkPrimary aspect-[3/2]">
         <Image
           src="/logo.png"

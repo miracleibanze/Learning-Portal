@@ -44,7 +44,8 @@ export const authOptions: NextAuthOptions = {
           about: user.about,
           email: user.email,
           role: user.role,
-          premium: user.premium,
+          subscriptionPlan: user.subscriptionPlan,
+          fees: user.fees,
           picture: user.picture,
           lastActive: user.lastActive,
           preferredTheme: user.preferredTheme,
@@ -64,7 +65,8 @@ export const authOptions: NextAuthOptions = {
         token.username = user.username;
         token.about = user.about;
         token.email = user.email;
-        token.premium = user.premium;
+        token.subscriptionPlan = user.subscriptionPlan;
+        token.fees = user.fees;
         token.picture = user.picture;
         token.lastActive = user.lastActive;
         token.preferredTheme = user.preferredTheme;
@@ -86,7 +88,8 @@ export const authOptions: NextAuthOptions = {
           username: token.username,
           about: token.about,
           email: token.email,
-          premium: token.premium,
+          subscriptionPlan: token.subscriptionPlan,
+          fees: token.fees,
           picture: token.picture,
           lastActive: token.lastActive,
           preferredTheme: token.preferredTheme,

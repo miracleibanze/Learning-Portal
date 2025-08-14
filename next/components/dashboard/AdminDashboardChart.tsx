@@ -29,7 +29,7 @@ interface AdminDashboardChartProps {
 }
 
 const AdminDashboardChart: React.FC<AdminDashboardChartProps> = ({ data }) => {
-  if (!data)
+  if (!data || data.length === 0)
     return (
       <div className="w-full flex-1 h-full flex-center">
         <div className="w-20 h-20 rounded-full aspect-square border-y-secondary border-x-primary border-[40px] flex-0 animate-spin transition-[1s]" />
@@ -85,21 +85,7 @@ const AdminDashboardChart: React.FC<AdminDashboardChartProps> = ({ data }) => {
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return <Bar data={chartData} options={options} className="flex-1" />;
 };
 
 export default AdminDashboardChart;
-
-// import React from "react";
-// import AdminDashboardChart from "./AdminDashboardChart";
-
-// const AdminLandingPage = () => {
-//   // Example static data, you can fetch this from your analytics API
-//   const labels = ["Mar", "Apr", "May", "Jun", "Jul", "Aug"];
-//   const courseCreationCounts = [4, 7, 3, 5, 8, 6];
-
-//   return (
-//   );
-// };
-
-// export default AdminLandingPage;

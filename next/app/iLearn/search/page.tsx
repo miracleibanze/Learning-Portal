@@ -10,7 +10,10 @@ import {
   fetchPeople,
   setSearchingContext,
 } from "@redux/slices/searchSlice";
-import { LineSkeleton } from "@components/designs/Skeletons";
+import {
+  CourseCardSkeleton,
+  LineSkeleton,
+} from "@components/designs/Skeletons";
 import Image from "next/image";
 import { User } from "lucide-react";
 import Link from "next/link";
@@ -173,7 +176,7 @@ const Page = () => {
               peopleList.map((person) => (
                 <div
                   key={person._id}
-                  className="w-52 h-72 rounded-lg border shadow flex flex-col overflow-hidden hover:scale-105 transition-all"
+                  className="w-52 h-72 rounded-lg border shadow flex flex-col overflow-hidden"
                 >
                   <div className="w-full bg-primary dark:bg-darkPrimary h-20">
                     <Image
@@ -262,7 +265,7 @@ const Page = () => {
                 <Link
                   key={course._id}
                   href={courseLink(course._id)}
-                  className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
+                  className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-white/60 hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
                 >
                   <CourseCard
                     course={course}
@@ -297,23 +300,14 @@ const Page = () => {
           <div className="w-full flex gap-x-2 flex-wrap gap-y-4 px-4 mb-8">
             {top4Courses.top4CoursesLoading ? (
               Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  className="w-52 h-72 rounded-lg border shadow flex flex-col"
-                  key={index}
-                >
-                  <div className="w-full bg-zinc-200 dark:bg-white/20 h-20 skeleton-shimmer" />
-                  <div className="w-20 bg-white dark:bg-zinc-900 h-20 aspect-square -translate-y-1/2 rounded-full ml-2" />
-                  <div className="w-full h-full flex-1 -translate-y-8">
-                    <LineSkeleton noBorder index={4} />
-                  </div>
-                </div>
+                <CourseCardSkeleton key={index} />
               ))
             ) : top4Courses.data.length > 0 ? (
               top4Courses.data.map((course) => (
                 <Link
                   key={course._id}
                   href={courseLink(course._id)}
-                  className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
+                  className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-white/60 hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
                 >
                   <CourseCard
                     course={course}
@@ -349,7 +343,7 @@ const Page = () => {
               randomUsers.data.map((person) => (
                 <div
                   key={person._id}
-                  className="w-52 h-72 rounded-lg border shadow flex flex-col overflow-hidden hover:scale-105 transition-all"
+                  className="w-52 h-72 rounded-lg border shadow flex flex-col overflow-hidden "
                 >
                   <div className="w-full bg-primary dark:bg-darkPrimary h-20">
                     <Image

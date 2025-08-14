@@ -8,9 +8,10 @@ declare module "next-auth" {
       name: string;
       username: string;
       about: string;
+      subscriptionPlan: string;
       email: string;
       role: string;
-      premium: boolean;
+      fees: string;
       picture?: string;
       lastActive: number;
       preferredTheme: string;
@@ -25,9 +26,10 @@ declare module "next-auth" {
     name: string;
     username: string;
     about: string;
+    subscriptionPlan: string;
     email: string;
     role: string;
-    premium: boolean;
+    fees: string;
     picture?: string;
     lastActive: number;
     preferredTheme: string;
@@ -41,8 +43,9 @@ declare module "next-auth" {
     name: string;
     username: string;
     about: string;
+    subscriptionPlan: string;
     email: string;
-    premium: boolean;
+    fees: string;
     picture?: string;
     lastActive: number;
     preferredTheme: string;

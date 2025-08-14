@@ -115,6 +115,21 @@ export const updateUserInfo = createAsyncThunk(
     }
   }
 );
+export const updateOtherUserField = createAsyncThunk(
+  "user/updateUserInfo",
+  async (
+    { updates, userId }: { updates: Partial<UserType>; userId: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      console.log("updating user ...", updates);
+      const response = await axios.put(`/api/user?userId=${userId}`, updates);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const fetchDetailedUser = createAsyncThunk(
   "user/fetchDetailedUser",

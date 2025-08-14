@@ -37,6 +37,8 @@ export async function GET(req: Request) {
 export async function PUT(req: NextRequest) {
   await connectDB();
 
+  const { searchParams } = new URL(req.url);
+  const userId = searchParams.get("userId")?.trim() || null;
   const session = await getServerSession(authOptions);
   if (!session || !session.user?._id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -48,7 +50,7 @@ export async function PUT(req: NextRequest) {
     console.log("updates: ", updates);
 
     const updatedUser = await User.findByIdAndUpdate(
-      session.user._id,
+      userId ? userId : session.user._id,
       { $set: updates },
       { new: true }
     )

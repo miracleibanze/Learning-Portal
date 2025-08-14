@@ -40,7 +40,7 @@ const Page: FC = () => {
             <Link
               href={`/iLearn/enroll/${course._id}`}
               key={course._id}
-              className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:scale-[1.01] transition hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
+              className="shrink-0 w-64 bg-white dark:bg-zinc-900 shadow-md rounded-lg overflow-hidden border border-gray-200  dark:border-white/60 hover:shadow-lg cursor-pointer dark:hover:border-white flex flex-col"
             >
               <CourseCard course={course} created={true} />
             </Link>

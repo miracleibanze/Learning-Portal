@@ -26,7 +26,11 @@ export async function GET(req: Request) {
 
     try {
       const users = await User.find({
-        $or: [{ name: { $regex: regex } }, { email: { $regex: regex } }],
+        $or: [
+          { name: { $regex: regex } },
+          { email: { $regex: regex } },
+          { about: { $regex: regex } },
+        ],
       })
         .select("name email about role picture username")
         .skip(skip)
@@ -47,7 +51,9 @@ export async function GET(req: Request) {
 
     const users = role
       ? await User.find({ role: role })
-          .select("name email about role picture username")
+          .select(
+            "name email about role picture username fees subscriptionPlan"
+          )
           .skip(skip)
           .limit(limit)
       : await User.find({
